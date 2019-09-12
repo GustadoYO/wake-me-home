@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements AlarmAdapter.Alar
         Context context = this;
         Class destinationClass = DetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, alarmData);
         startActivity(intentToStartDetailActivity);
     }
 
