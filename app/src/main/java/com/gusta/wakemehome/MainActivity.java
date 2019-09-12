@@ -151,9 +151,9 @@ public class MainActivity extends AppCompatActivity implements AlarmAdapter.Alar
 
             // TODO: Replace with real data from database
             String[] alarmsData = new String[3];
-            alarmsData[0] = "Alarm 1";
-            alarmsData[1] = "Alarm 2";
-            alarmsData[2] = "Alarm 3";
+            alarmsData[0] = "7 Gronimann, Tel Aviv";
+            alarmsData[1] = "Even Yehuda";
+            alarmsData[2] = "The Open University";
 
             return alarmsData;
 
