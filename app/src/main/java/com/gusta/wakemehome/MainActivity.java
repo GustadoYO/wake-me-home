@@ -1,6 +1,7 @@
 package com.gusta.wakemehome;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -103,8 +104,9 @@ public class MainActivity extends AppCompatActivity implements AlarmAdapter.Alar
     @Override
     public void onClick(String alarmData) {
         Context context = this;
-        Toast.makeText(context, alarmData, Toast.LENGTH_SHORT)
-                .show();
+        Class destinationClass = DetailActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        startActivity(intentToStartDetailActivity);
     }
 
     /**
