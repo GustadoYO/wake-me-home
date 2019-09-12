@@ -1,5 +1,6 @@
 package com.gusta.wakemehome;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -13,8 +14,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AlarmAdapter.AlarmAdapterOnClickHandler {
 
     private RecyclerView mRecyclerView;
     private AlarmAdapter mAlarmAdapter;
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
          * The AlarmAdapter is responsible for linking our alarms data with the Views that
          * will end up displaying our alarms data.
          */
-        mAlarmAdapter = new AlarmAdapter();
+        mAlarmAdapter = new AlarmAdapter(this);
 
         /* Setting the adapter attaches it to the RecyclerView in our layout. */
         mRecyclerView.setAdapter(mAlarmAdapter);
@@ -90,6 +92,19 @@ public class MainActivity extends AppCompatActivity {
     private void loadWeatherData() {
         showAlarmsDataView();
         new FetchAlarmsTask().execute();
+    }
+
+    /**
+     * This method is overridden by our MainActivity class in order to handle RecyclerView item
+     * clicks.
+     *
+     * @param alarmData The alarm that was clicked
+     */
+    @Override
+    public void onClick(String alarmData) {
+        Context context = this;
+        Toast.makeText(context, alarmData, Toast.LENGTH_SHORT)
+                .show();
     }
 
     /**

@@ -15,24 +15,48 @@ import android.widget.TextView;
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmAdapterViewHolder> {
 
     private String[] mAlarmsData;
+    private final AlarmAdapterOnClickHandler mClickHandler;
 
-    public AlarmAdapter() {
-
+    /**
+     * The interface that receives onClick messages.
+     */
+    public interface AlarmAdapterOnClickHandler {
+        void onClick(String alarmData);
     }
 
     /**
-     * Cache of the children views for an alarm item.
+     * Creates a AlarmAdapter.
+     *
+     * @param clickHandler The on-click handler for this adapter. This single handler is called
+     *                     when an item is clicked.
      */
-    public class AlarmAdapterViewHolder extends RecyclerView.ViewHolder {
+    public AlarmAdapter(AlarmAdapterOnClickHandler clickHandler) {
+        mClickHandler = clickHandler;
+    }
 
-        // Within AlarmAdapterViewHolder ///////////////////////////////////////////////////////
+    /**
+     * Cache of the children views for a forecast list item.
+     */
+    public class AlarmAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final TextView mAlarmTextView;
 
         public AlarmAdapterViewHolder(View view) {
             super(view);
             mAlarmTextView = (TextView) view.findViewById(R.id.tv_alarm_data);
+            view.setOnClickListener(this);
         }
-        // Within AlarmAdapterViewHolder ///////////////////////////////////////////////////////
+
+        /**
+         * This gets called by the child views during a click.
+         *
+         * @param v The View that was clicked
+         */
+        @Override
+        public void onClick(View v) {
+            int adapterPosition = getAdapterPosition();
+            String alarmData = mAlarmsData[adapterPosition];
+            mClickHandler.onClick(alarmData);
+        }
     }
 
     /**
@@ -60,7 +84,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmAdapter
 
     /**
      * OnBindViewHolder is called by the RecyclerView to display the data at the specified
-     * position. In this method, we update the contents of the ViewHolder to display the weather
+     * position. In this method, we update the contents of the ViewHolder to display the alarm
      * details for this particular position, using the "position" argument that is conveniently
      * passed into us.
      *
@@ -87,11 +111,11 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmAdapter
     }
 
     /**
-     * This method is used to set the weather forecast on a ForecastAdapter if we've already
-     * created one. This is handy when we get new data from the web but don't want to create a
-     * new ForecastAdapter to display it.
+     * This method is used to set the alarm on an AlarmAdapter if we've already
+     * created one. This is handy when we get new data but don't want to create a
+     * new AlarmAdapter to display it.
      *
-     * @param alarmsData The new weather data to be displayed.
+     * @param alarmsData The new alarm data to be displayed.
      */
     public void setAlarmsData(String[] alarmsData) {
         this.mAlarmsData = alarmsData;
