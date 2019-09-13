@@ -4,8 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,12 +22,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements AlarmAdapter.AlarmAdapterOnClickHandler {
+import java.net.URL;
+
+public class MainActivity extends AppCompatActivity implements
+        AlarmAdapter.AlarmAdapterOnClickHandler,
+        LoaderManager.LoaderCallbacks<String[]> {
 
     private RecyclerView mRecyclerView;
     private AlarmAdapter mAlarmAdapter;
+
     private TextView mErrorMessageDisplay;
+
     private ProgressBar mLoadingIndicator;
+
+    private static final int ALARMS_LOADER_ID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +86,36 @@ public class MainActivity extends AppCompatActivity implements AlarmAdapter.Alar
          */
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
+        /*
+         * This ID will uniquely identify the Loader. We can use it, for example, to get a handle
+         * on our Loader at a later point in time through the support LoaderManager.
+         */
+        int loaderId = ALARMS_LOADER_ID;
+
+        /*
+         * From MainActivity, we have implemented the LoaderCallbacks interface with the type of
+         * String array. (implements LoaderCallbacks<String[]>) The variable callback is passed
+         * to the call to initLoader below. This means that whenever the loaderManager has
+         * something to notify us of, it will do so through this callback.
+         */
+        LoaderManager.LoaderCallbacks<String[]> callback = MainActivity.this;
+
+        /*
+         * The second parameter of the initLoader method below is a Bundle. Optionally, you can
+         * pass a Bundle to initLoader that you can then access from within the onCreateLoader
+         * callback. In our case, we don't actually use the Bundle, but it's here in case we wanted
+         * to.
+         */
+        Bundle bundleForLoader = null;
+
+        /*
+         * Ensures a loader is initialized and active. If the loader doesn't already exist, one is
+         * created and (if the activity/fragment is currently started) starts the loader. Otherwise
+         * the last created loader is re-used.
+         */
+        getSupportLoaderManager().initLoader(loaderId, bundleForLoader, callback);
+
+        // Initialize the FloatingActionButton
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,18 +124,96 @@ public class MainActivity extends AppCompatActivity implements AlarmAdapter.Alar
                         .setAction("Action", null).show();
             }
         });
-
-        /* Once all of our views are setup, we can load the weather data. */
-        loadWeatherData();
     }
 
     /**
-     * This method will show the alarms view, and then tell some
-     * background method to get the weather data in the background.
+     * Instantiate and return a new Loader for the given ID.
+     *
+     * @param id The ID whose loader is to be created.
+     * @param loaderArgs Any arguments supplied by the caller.
+     *
+     * @return Return a new Loader instance that is ready to start loading.
      */
-    private void loadWeatherData() {
-        showAlarmsDataView();
-        new FetchAlarmsTask().execute();
+    @NonNull
+    @Override
+    public Loader<String[]> onCreateLoader(int id, @Nullable Bundle loaderArgs) {
+        return new AsyncTaskLoader<String[]>(this) {
+
+            /* This String array will hold and help cache our alarms data */
+            String[] mAlarmsData = null;
+
+            /**
+             * Subclasses of AsyncTaskLoader must implement this to take care of loading their data.
+             */
+            @Override
+            protected void onStartLoading() {
+                if (mAlarmsData != null) {
+                    deliverResult(mAlarmsData);
+                } else {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+                    forceLoad();
+                }
+            }
+
+            /**
+             * This is the method of the AsyncTaskLoader that will load and parse the data from DB
+             *
+             * @return Alarms data from DataBase as an array of Strings.
+             */
+            @Override
+            public String[] loadInBackground() {
+
+                // TODO: Replace with real data from database
+                String[] alarmsData = new String[3];
+                alarmsData[0] = "7 Gronimann, Tel Aviv";
+                alarmsData[1] = "Even Yehuda";
+                alarmsData[2] = "The Open University";
+
+                return alarmsData;
+            }
+
+            /**
+             * Sends the result of the load to the registered listener.
+             *
+             * @param data The result of the load
+             */
+            public void deliverResult(String[] data) {
+                mAlarmsData = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    /**
+     * Called when a previously created loader has finished its load.
+     *
+     * @param loader The Loader that has finished.
+     * @param data The data generated by the Loader.
+     */
+    @Override
+    public void onLoadFinished(Loader<String[]> loader, String[] data) {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mAlarmAdapter.setAlarmsData(data);
+        if (null == data) {
+            showErrorMessage();
+        } else {
+            showAlarmsDataView();
+        }
+    }
+
+    /**
+     * Called when a previously created loader is being reset, and thus
+     * making its data unavailable.  The application should at this point
+     * remove any references it has to the Loader's data.
+     *
+     * @param loader The Loader that is being reset.
+     */
+    @Override
+    public void onLoaderReset(Loader<String[]> loader) {
+        /*
+         * We aren't using this method in our example application, but we are required to Override
+         * it to implement the LoaderCallbacks<String> interface
+         */
     }
 
     /**
@@ -136,39 +257,6 @@ public class MainActivity extends AppCompatActivity implements AlarmAdapter.Alar
         mRecyclerView.setVisibility(View.INVISIBLE);
         /* Then, show the error */
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
-    }
-
-    public class FetchAlarmsTask extends AsyncTask<String, Void, String[]> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected String[] doInBackground(String... params) {
-
-            // TODO: Replace with real data from database
-            String[] alarmsData = new String[3];
-            alarmsData[0] = "7 Gronimann, Tel Aviv";
-            alarmsData[1] = "Even Yehuda";
-            alarmsData[2] = "The Open University";
-
-            return alarmsData;
-
-        }
-
-        @Override
-        protected void onPostExecute(String[] alarmsData) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if (alarmsData != null) {
-                showAlarmsDataView();
-                mAlarmAdapter.setAlarmsData(alarmsData);
-            } else {
-                showErrorMessage();
-            }
-        }
     }
 
     @Override
