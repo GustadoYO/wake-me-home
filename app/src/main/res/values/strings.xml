@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <!-- - - - - - - - - - - - - - -->
     <!-- Used throughout WakeMeHome-->
@@ -40,5 +40,20 @@
 
     <!-- Value in SharedPreferences for imperial length unit option [CHAR LIMIT=NONE] -->
     <string name="pref_units_imperial" translatable="false">imperial</string>
+
+
+    <!-- - - - - - - - - - - - - - - -->
+    <!-- Used by WakeMeHomeUnitsUtils-->
+    <!-- - - - - - - - - - - - - - - -->
+
+    <!-- Length format in Kilometres [CHAR LIMIT=5] -->
+    <string name="format_length_kilometres">
+        <xliff:g id="length">%1.0f</xliff:g> km
+    </string>
+
+    <!-- Length format in Miles [CHAR LIMIT=5] -->
+    <string name="format_length_miles">
+        <xliff:g id="length">%1.0f</xliff:g> mi
+    </string>
 
 </resources>
