@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">WakeMeHome</string>
-    <string name="action_settings">Settings</string>
 
+    <string name="action_settings">Settings</string>
     <string name="action_map">Map Location</string>
 
     <string name="error_message">
