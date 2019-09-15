@@ -1,11 +1,44 @@
 <resources>
+
+    <!-- - - - - - - - - - - - - - -->
+    <!-- Used throughout WakeMeHome-->
+    <!-- - - - - - - - - - - - - - -->
+
+    <!--Used in Action Bar, and in AndroidManifest to tell the device the name of this app.-->
+    <!--It's good to keep this short, so your launcher icon isn't displayed with "The greatest Wea"-->
+    <!--or something similar.-->
     <string name="app_name">WakeMeHome</string>
 
+    <!--By convention, "action" denotes that this String will be used as the label for an Action,-->
+    <!--typically from the action bar.  The ActionBar is limited real estate, so shorter is better.-->
     <string name="action_settings">Settings</string>
     <string name="action_map">Map Location</string>
 
     <string name="error_message">
         An error has occurred. Please try again by clicking REFRESH
     </string>
+
+
+    <!-- - - - - - - - - - - -->
+    <!--Used by Preferences  -->
+    <!-- - - - - - - - - - - -->
+
+    <!-- Label for the length units preference [CHAR LIMIT=30] -->
+    <string name="pref_units_label">Length Units</string>
+
+    <!-- Label for metric option in length unit preference [CHAR LIMIT=25] -->
+    <string name="pref_units_label_metric">Metric</string>
+
+    <!-- Label for imperial option in length unit preference [CHAR LIMIT=25] -->
+    <string name="pref_units_label_imperial">Imperial</string>
+
+    <!-- Key name for length unit preference in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_units_key" translatable="false">units</string>
+
+    <!-- Value in SharedPreferences for metric length unit option [CHAR LIMIT=NONE] -->
+    <string name="pref_units_metric" translatable="false">metric</string>
+
+    <!-- Value in SharedPreferences for imperial length unit option [CHAR LIMIT=NONE] -->
+    <string name="pref_units_imperial" translatable="false">imperial</string>
 
 </resources>
