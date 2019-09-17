@@ -20,7 +20,7 @@ public class AlarmsDbHelper extends SQLiteOpenHelper {
      * If you change the database schema, you must increment the database version or the onUpgrade
      * method will not be called.
      */
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public AlarmsDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -49,13 +49,13 @@ public class AlarmsDbHelper extends SQLiteOpenHelper {
                          * named "_ID". We use that here to designate our table's primary key.
                          */
                         AlarmEntry._ID               + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        AlarmEntry.COLUMN_LOCATION   + " TEXT, "                              +
-                        AlarmEntry.COLUMN_COORD_LAT  + " REAL, "                              +
-                        AlarmEntry.COLUMN_COORD_LONG + " REAL, "                              +
-                        AlarmEntry.COLUMN_ENABLED    + " INTEGER, "                           +
-                        AlarmEntry.COLUMN_VIBRATE    + " INTEGER, "                           +
-                        AlarmEntry.COLUMN_MESSAGE    + " TEXT, "                              +
-                        AlarmEntry.COLUMN_ALERT      + " TEXT" + ");";
+                        AlarmEntry.COLUMN_LOCATION   + " TEXT NOT NULL, "                              +
+                        AlarmEntry.COLUMN_COORD_LAT  + " REAL NOT NULL, "                              +
+                        AlarmEntry.COLUMN_COORD_LONG + " REAL NOT NULL, "                              +
+                        AlarmEntry.COLUMN_ENABLED    + " INTEGER NOT NULL, "                           +
+                        AlarmEntry.COLUMN_VIBRATE    + " INTEGER NOT NULL, "                           +
+                        AlarmEntry.COLUMN_MESSAGE    + " TEXT NOT NULL, "                              +
+                        AlarmEntry.COLUMN_ALERT      + " TEXT NOT NULL" + ");";
 
         /*
          * After we've spelled out our SQLite table creation statement above, we actually execute
@@ -77,6 +77,7 @@ public class AlarmsDbHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + AlarmEntry.TABLE_NAME);
+        onCreate(sqLiteDatabase);
     }
 }
