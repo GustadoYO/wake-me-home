@@ -1,5 +1,6 @@
 package com.gusta.wakemehome.database;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
@@ -15,7 +16,9 @@ public class AlarmEntry {
     private double latitude;
     private double longitude;
     private double radius;
+    @ColumnInfo(name = "is_enabled")
     private boolean enabled;
+    @ColumnInfo(name = "should_vibrate")
     private boolean vibrate;
     private String message;
     private String alert;

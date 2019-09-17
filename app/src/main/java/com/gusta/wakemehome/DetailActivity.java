@@ -13,6 +13,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.gusta.wakemehome.database.AlarmEntry;
+import com.gusta.wakemehome.database.AppDatabase;
+
+import java.util.Date;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -37,12 +40,17 @@ public class DetailActivity extends AppCompatActivity {
 
     private int mAlarmId = DEFAULT_ALARM_ID;
 
+    // Member variable for the Database
+    private AppDatabase mDb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
         initViews();
+
+        mDb = AppDatabase.getInstance(getApplicationContext());
 
         if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_ALARM_ID)) {
             mAlarmId = savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID);
@@ -99,7 +107,19 @@ public class DetailActivity extends AppCompatActivity {
      * It retrieves user input and inserts that new alarm data into the underlying database.
      */
     public void onSaveButtonClicked() {
-        // Not yet implemented
+        String location = mLocation.getText().toString();
+        double latitude = Double.parseDouble(mLatitude.getText().toString());
+        double longitude = Double.parseDouble(mLongitude.getText().toString());
+        double radius = Double.parseDouble(mRadius.getText().toString());
+        boolean enabled = Boolean.parseBoolean(mEnabled.getText().toString());
+        boolean vibrate = Boolean.parseBoolean(mVibrate.getText().toString());
+        String message = mMessage.getText().toString();
+        String alert = mAlert.getText().toString();
+
+        AlarmEntry alarmEntry = new AlarmEntry(location, latitude, longitude, radius,
+                enabled, vibrate, message, alert);
+        mDb.alarmDao().insertAlarm(alarmEntry);
+        finish();
     }
 
     /**
