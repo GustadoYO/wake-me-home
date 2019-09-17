@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gusta.wakemehome.database.AlarmEntry;
+import com.gusta.wakemehome.utilities.WakeMeHomeUnitsUtils;
 
 import java.util.List;
 
@@ -79,6 +80,13 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         String vibrate = String.valueOf(taskEntry.isVibrate());
         String message = taskEntry.getMessage();
         String alert = taskEntry.getAlert();
+
+        // TODO: Temporary in order to check preferences view
+        try {
+            double m = Double.parseDouble(message);
+            message = WakeMeHomeUnitsUtils.formatLength(mContext, m);
+        } catch (NumberFormatException | NullPointerException nfe) {
+        }
 
         //Set values
         holder.locationView.setText(location);

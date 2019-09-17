@@ -3,12 +3,10 @@ package com.gusta.wakemehome;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -25,12 +23,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gusta.wakemehome.database.AlarmEntry;
+import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.utilities.WakeMeHomeUnitsUtils;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,14 +35,15 @@ import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
 public class MainActivity extends AppCompatActivity implements
         AlarmAdapter.ItemClickListener,
-        LoaderManager.LoaderCallbacks<List<AlarmEntry>>,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Constant for logging
     private static final String TAG = MainActivity.class.getSimpleName();
     // Member variables for the adapter and RecyclerView
     private RecyclerView mRecyclerView;
-    private AlarmAdapter mAlarmAdapter;
+    private AlarmAdapter mAdapter;
+
+    private AppDatabase mDb;
 
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
@@ -78,8 +76,8 @@ public class MainActivity extends AppCompatActivity implements
         mRecyclerView.setHasFixedSize(true);
 
         // Initialize the adapter and attach it to the RecyclerView
-        mAlarmAdapter = new AlarmAdapter(this, this);
-        mRecyclerView.setAdapter(mAlarmAdapter);
+        mAdapter = new AlarmAdapter(this, this);
+        mRecyclerView.setAdapter(mAdapter);
 
         DividerItemDecoration decoration = new DividerItemDecoration(getApplicationContext(), VERTICAL);
         mRecyclerView.addItemDecoration(decoration);
@@ -118,27 +116,12 @@ public class MainActivity extends AppCompatActivity implements
         int loaderId = ALARMS_LOADER_ID;
 
         /*
-         * From MainActivity, we have implemented the LoaderCallbacks interface with the type of
-         * String array. (implements LoaderCallbacks<String[]>) The variable callback is passed
-         * to the call to initLoader below. This means that whenever the loaderManager has
-         * something to notify us of, it will do so through this callback.
-         */
-        LoaderManager.LoaderCallbacks<List<AlarmEntry>> callback = MainActivity.this;
-
-        /*
          * The second parameter of the initLoader method below is a Bundle. Optionally, you can
          * pass a Bundle to initLoader that you can then access from within the onCreateLoader
          * callback. In our case, we don't actually use the Bundle, but it's here in case we wanted
          * to.
          */
         Bundle bundleForLoader = null;
-
-        /*
-         * Ensures a loader is initialized and active. If the loader doesn't already exist, one is
-         * created and (if the activity/fragment is currently started) starts the loader. Otherwise
-         * the last created loader is re-used.
-         */
-        getSupportLoaderManager().initLoader(loaderId, bundleForLoader, callback);
 
         Log.d(TAG, "onCreate: registering preference changed listener");
 
@@ -160,99 +143,14 @@ public class MainActivity extends AppCompatActivity implements
                 startActivity(addTaskIntent);
             }
         });
+
+        mDb = AppDatabase.getInstance(getApplicationContext());
     }
 
-    /**
-     * Instantiate and return a new Loader for the given ID.
-     *
-     * @param id The ID whose loader is to be created.
-     * @param loaderArgs Any arguments supplied by the caller.
-     *
-     * @return Return a new Loader instance that is ready to start loading.
-     */
-    @NonNull
     @Override
-    public Loader<List<AlarmEntry>> onCreateLoader(int id, @Nullable Bundle loaderArgs) {
-        return new AsyncTaskLoader<List<AlarmEntry>>(this) {
-
-            /* This String array will hold and help cache our alarms data */
-            List<AlarmEntry> mAlarmsData = null;
-
-            /**
-             * Subclasses of AsyncTaskLoader must implement this to take care of loading their data.
-             */
-            @Override
-            protected void onStartLoading() {
-                if (mAlarmsData != null) {
-                    deliverResult(mAlarmsData);
-                } else {
-                    mLoadingIndicator.setVisibility(View.VISIBLE);
-                    forceLoad();
-                }
-            }
-
-            /**
-             * This is the method of the AsyncTaskLoader that will load and parse the data from DB
-             *
-             * @return Alarms data from DataBase as an array of Strings.
-             */
-            @Override
-            public List<AlarmEntry> loadInBackground() {
-
-                // TODO: Replace with real data from database
-                List<AlarmEntry> alarmsData = new ArrayList<>();
-                alarmsData.add(new AlarmEntry("7 Gronimann, Tel Aviv", 1, 1, 1,
-                        true, true, WakeMeHomeUnitsUtils.formatLength(MainActivity.this, 0), ""));
-                alarmsData.add(new AlarmEntry("Even Yehuda", 1, 1, 1,
-                        true, true, WakeMeHomeUnitsUtils.formatLength(MainActivity.this, 100), ""));
-                alarmsData.add(new AlarmEntry("The Open University", 1, 1, 1,
-                        true, true, WakeMeHomeUnitsUtils.formatLength(MainActivity.this, 45.5), ""));
-
-                return alarmsData;
-            }
-
-            /**
-             * Sends the result of the load to the registered listener.
-             *
-             * @param data The result of the load
-             */
-            public void deliverResult(List<AlarmEntry> data) {
-                mAlarmsData = data;
-                super.deliverResult(data);
-            }
-        };
-    }
-
-    /**
-     * Called when a previously created loader has finished its load.
-     *
-     * @param loader The Loader that has finished.
-     * @param data The data generated by the Loader.
-     */
-    @Override
-    public void onLoadFinished(Loader<List<AlarmEntry>> loader, List<AlarmEntry> data) {
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
-        mAlarmAdapter.setAlarms(data);
-        if (null == data) {
-            showErrorMessage();
-        } else {
-            showAlarmsDataView();
-        }
-    }
-
-    /**
-     * Called when a previously created loader is being reset, and thus
-     * making its data unavailable.  The application should at this point
-     * remove any references it has to the Loader's data.
-     *
-     * @param loader The Loader that is being reset.
-     */
-    @Override
-    public void onLoaderReset(Loader<List<AlarmEntry>> loader) {
-        /*
-         * We aren't using this method in our example application, but we are required to Override
-         * it to implement the LoaderCallbacks<String> interface
-         */
+    protected void onResume() {
+        super.onResume();
+        mAdapter.setAlarms(mDb.alarmDao().loadAllAlarms());
     }
 
     /**
@@ -314,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements
          */
         if (PREFERENCES_HAVE_BEEN_UPDATED) {
             Log.d(TAG, "onStart: preferences were updated");
-            getSupportLoaderManager().restartLoader(ALARMS_LOADER_ID, null, this);
+            mAdapter.setAlarms(mDb.alarmDao().loadAllAlarms());
             PREFERENCES_HAVE_BEEN_UPDATED = false;
         }
     }
