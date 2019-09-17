@@ -1,13 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp">
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingStart="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
 
-    <TextView
-        android:id="@+id/tv_display_alarm"
-        android:layout_width="wrap_content"
+    <!-- EditText for alarm human readable location  -->
+    <EditText
+        android:id="@+id/editTextAlarmLocation"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="22sp" />
+        android:gravity="start"
+        android:hint="@string/edit_alarm_location"
+        android:paddingBottom="@dimen/activity_horizontal_margin" />
 
-</FrameLayout>
+    <!-- EditText for alarm latitude -->
+    <EditText
+        android:id="@+id/editTextAlarmLatitude"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/edit_alarm_latitude"
+        android:paddingBottom="@dimen/activity_horizontal_margin" />
+
+    <!-- EditText for alarm longitude -->
+    <EditText
+        android:id="@+id/editTextAlarmLongitude"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/edit_alarm_longitude"
+        android:paddingBottom="@dimen/activity_horizontal_margin" />
+
+    <!-- EditText for alarm radius -->
+    <EditText
+        android:id="@+id/editTextAlarmRadius"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/edit_alarm_radius"
+        android:paddingBottom="@dimen/activity_horizontal_margin" />
+
+    <!-- EditText for "alarm is active?" -->
+    <EditText
+        android:id="@+id/editTextAlarmEnabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/edit_alarm_enabled"
+        android:paddingBottom="@dimen/activity_horizontal_margin" />
+
+    <!-- EditText for "alarm should vibrate?" -->
+    <EditText
+        android:id="@+id/editTextAlarmVibrate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/edit_alarm_vibrate"
+        android:paddingBottom="@dimen/activity_horizontal_margin" />
+
+    <!-- EditText for Message to show when alarm triggers -->
+    <EditText
+        android:id="@+id/editTextAlarmMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/edit_alarm_message"
+        android:paddingBottom="@dimen/activity_horizontal_margin" />
+
+    <!-- EditText for audio alert to play when alarm triggers -->
+    <EditText
+        android:id="@+id/editTextAlarmAlert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/edit_alarm_alert"
+        android:paddingBottom="@dimen/activity_horizontal_margin" />
+
+    <!-- Add button -->
+    <Button
+        android:id="@+id/saveButton"
+        style="@style/TextAppearance.AppCompat.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/colorPrimary"
+        android:text="@string/add_button"
+        android:textColor="@android:color/primary_text_dark" />
+
+</LinearLayout>

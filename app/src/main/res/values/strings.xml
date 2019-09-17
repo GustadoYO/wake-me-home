@@ -18,9 +18,26 @@
         An error has occurred. Please try again by clicking REFRESH
     </string>
 
+    <!-- - - - - - - - - - - - -->
+    <!-- Used by DetailActivity-->
+    <!-- - - - - - - - - - - - -->
+
+    <!-- This has a unicode character for "..." = "&#8230;" -->
+    <string name="edit_alarm_location">Human readable location&#8230;</string>
+    <string name="edit_alarm_latitude">Latitude</string>
+    <string name="edit_alarm_longitude">Longitude</string>
+    <string name="edit_alarm_radius">Radius</string>
+    <string name="edit_alarm_enabled">Enabled?</string>
+    <string name="edit_alarm_vibrate">Vibrate?</string>
+    <string name="edit_alarm_message">Message</string>
+    <string name="edit_alarm_alert">Alert</string>
+
+    <string name="add_button">Add</string>
+    <string name="update_button">Update</string>
+
 
     <!-- - - - - - - - - - - -->
-    <!--Used by Preferences  -->
+    <!-- Used by Preferences -->
     <!-- - - - - - - - - - - -->
 
     <!-- Label for the length units preference [CHAR LIMIT=30] -->

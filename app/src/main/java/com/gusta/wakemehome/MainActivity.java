@@ -14,9 +14,11 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -25,22 +27,27 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.utilities.WakeMeHomeUnitsUtils;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
 public class MainActivity extends AppCompatActivity implements
-        AlarmAdapter.AlarmAdapterOnClickHandler,
-        LoaderManager.LoaderCallbacks<String[]>,
+        AlarmAdapter.ItemClickListener,
+        LoaderManager.LoaderCallbacks<List<AlarmEntry>>,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
+    // Constant for logging
     private static final String TAG = MainActivity.class.getSimpleName();
-
+    // Member variables for the adapter and RecyclerView
     private RecyclerView mRecyclerView;
     private AlarmAdapter mAlarmAdapter;
 
     private TextView mErrorMessageDisplay;
-
     private ProgressBar mLoadingIndicator;
 
     private static final int ALARMS_LOADER_ID = 0;
@@ -54,23 +61,15 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*
-         * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
-         * do things like set the adapter of the RecyclerView and toggle the visibility.
-         */
+        // Set the RecyclerView to its corresponding view
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_alarms);
 
         /* This TextView is used to display errors and will be hidden if there are no errors */
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
 
-        /*
-         * LinearLayoutManager can support HORIZONTAL or VERTICAL orientations. The reverse layout
-         * parameter is useful mostly for HORIZONTAL layouts that should reverse for right to left
-         * languages.
-         */
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
+        // Set the layout for the RecyclerView to be a linear layout, which measures and
+        // positions items within a RecyclerView into a linear list
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         /*
          * Use this setting to improve performance if you know that changes in content do not
@@ -78,14 +77,30 @@ public class MainActivity extends AppCompatActivity implements
          */
         mRecyclerView.setHasFixedSize(true);
 
-        /*
-         * The AlarmAdapter is responsible for linking our alarms data with the Views that
-         * will end up displaying our alarms data.
-         */
-        mAlarmAdapter = new AlarmAdapter(this);
-
-        /* Setting the adapter attaches it to the RecyclerView in our layout. */
+        // Initialize the adapter and attach it to the RecyclerView
+        mAlarmAdapter = new AlarmAdapter(this, this);
         mRecyclerView.setAdapter(mAlarmAdapter);
+
+        DividerItemDecoration decoration = new DividerItemDecoration(getApplicationContext(), VERTICAL);
+        mRecyclerView.addItemDecoration(decoration);
+
+        /*
+         Add a touch helper to the RecyclerView to recognize when a user swipes to delete an item.
+         An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
+         and uses callbacks to signal when a user is performing these actions.
+         */
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            // Called when a user swipes left or right on a ViewHolder
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                // Here is where you'll implement swipe to delete
+            }
+        }).attachToRecyclerView(mRecyclerView);
 
         /*
          * The ProgressBar that will indicate to the user that we are loading data. It will be
@@ -108,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements
          * to the call to initLoader below. This means that whenever the loaderManager has
          * something to notify us of, it will do so through this callback.
          */
-        LoaderManager.LoaderCallbacks<String[]> callback = MainActivity.this;
+        LoaderManager.LoaderCallbacks<List<AlarmEntry>> callback = MainActivity.this;
 
         /*
          * The second parameter of the initLoader method below is a Bundle. Optionally, you can
@@ -140,8 +155,9 @@ public class MainActivity extends AppCompatActivity implements
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                // Create a new intent to start an DetailActivity
+                Intent addTaskIntent = new Intent(MainActivity.this, DetailActivity.class);
+                startActivity(addTaskIntent);
             }
         });
     }
@@ -156,11 +172,11 @@ public class MainActivity extends AppCompatActivity implements
      */
     @NonNull
     @Override
-    public Loader<String[]> onCreateLoader(int id, @Nullable Bundle loaderArgs) {
-        return new AsyncTaskLoader<String[]>(this) {
+    public Loader<List<AlarmEntry>> onCreateLoader(int id, @Nullable Bundle loaderArgs) {
+        return new AsyncTaskLoader<List<AlarmEntry>>(this) {
 
             /* This String array will hold and help cache our alarms data */
-            String[] mAlarmsData = null;
+            List<AlarmEntry> mAlarmsData = null;
 
             /**
              * Subclasses of AsyncTaskLoader must implement this to take care of loading their data.
@@ -181,13 +197,16 @@ public class MainActivity extends AppCompatActivity implements
              * @return Alarms data from DataBase as an array of Strings.
              */
             @Override
-            public String[] loadInBackground() {
+            public List<AlarmEntry> loadInBackground() {
 
                 // TODO: Replace with real data from database
-                String[] alarmsData = new String[3];
-                alarmsData[0] = "7 Gronimann, Tel Aviv, " + WakeMeHomeUnitsUtils.formatLength(MainActivity.this, 0);
-                alarmsData[1] = "Even Yehuda, " + WakeMeHomeUnitsUtils.formatLength(MainActivity.this, 100);
-                alarmsData[2] = "The Open University, " + WakeMeHomeUnitsUtils.formatLength(MainActivity.this, 45.5);
+                List<AlarmEntry> alarmsData = new ArrayList<>();
+                alarmsData.add(new AlarmEntry("7 Gronimann, Tel Aviv", 1, 1, 1,
+                        true, true, WakeMeHomeUnitsUtils.formatLength(MainActivity.this, 0), ""));
+                alarmsData.add(new AlarmEntry("Even Yehuda", 1, 1, 1,
+                        true, true, WakeMeHomeUnitsUtils.formatLength(MainActivity.this, 100), ""));
+                alarmsData.add(new AlarmEntry("The Open University", 1, 1, 1,
+                        true, true, WakeMeHomeUnitsUtils.formatLength(MainActivity.this, 45.5), ""));
 
                 return alarmsData;
             }
@@ -197,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements
              *
              * @param data The result of the load
              */
-            public void deliverResult(String[] data) {
+            public void deliverResult(List<AlarmEntry> data) {
                 mAlarmsData = data;
                 super.deliverResult(data);
             }
@@ -211,9 +230,9 @@ public class MainActivity extends AppCompatActivity implements
      * @param data The data generated by the Loader.
      */
     @Override
-    public void onLoadFinished(Loader<String[]> loader, String[] data) {
+    public void onLoadFinished(Loader<List<AlarmEntry>> loader, List<AlarmEntry> data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        mAlarmAdapter.setAlarmsData(data);
+        mAlarmAdapter.setAlarms(data);
         if (null == data) {
             showErrorMessage();
         } else {
@@ -229,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements
      * @param loader The Loader that is being reset.
      */
     @Override
-    public void onLoaderReset(Loader<String[]> loader) {
+    public void onLoaderReset(Loader<List<AlarmEntry>> loader) {
         /*
          * We aren't using this method in our example application, but we are required to Override
          * it to implement the LoaderCallbacks<String> interface
@@ -240,14 +259,14 @@ public class MainActivity extends AppCompatActivity implements
      * This method is overridden by our MainActivity class in order to handle RecyclerView item
      * clicks.
      *
-     * @param alarmData The alarm that was clicked
+     * @param itemId The alarm that was clicked
      */
     @Override
-    public void onClick(String alarmData) {
+    public void onItemClickListener(int itemId) {
         Context context = this;
         Class destinationClass = DetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, alarmData);
+        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, itemId);
         startActivity(intentToStartDetailActivity);
     }
 
