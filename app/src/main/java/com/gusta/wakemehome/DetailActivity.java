@@ -2,6 +2,8 @@ package com.gusta.wakemehome;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.Nullable;
@@ -67,12 +69,14 @@ public class DetailActivity extends AppCompatActivity {
                 // populate the UI
                 mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
 
-                final LiveData<AlarmEntry> alarm = mDb.alarmDao().loadAlarmById(mAlarmId);
-                alarm.observe(this, new Observer<AlarmEntry>() {
+                DetailViewModelFactory factory = new DetailViewModelFactory(mDb, mAlarmId);
+                final DetailViewModel viewModel =
+                        ViewModelProviders.of(this, factory).get(DetailViewModel.class);
+
+                viewModel.getAlarm().observe(this, new Observer<AlarmEntry>() {
                     @Override
                     public void onChanged(@Nullable AlarmEntry alarmEntry) {
-                        alarm.removeObserver(this);
-                        Log.d(TAG, "Receiving database update from LiveData");
+                        viewModel.getAlarm().removeObserver(this);
                         populateUI(alarmEntry);
                     }
                 });
