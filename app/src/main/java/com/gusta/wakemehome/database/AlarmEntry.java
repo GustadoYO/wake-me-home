@@ -1,9 +1,15 @@
 package com.gusta.wakemehome.database;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+
 import java.util.Date;
 
+@Entity(tableName = "alarm")
 public class AlarmEntry {
 
+    @PrimaryKey(autoGenerate = true)
     private int id;
     private String location;
     private double latitude;
@@ -14,6 +20,7 @@ public class AlarmEntry {
     private String message;
     private String alert;
 
+    @Ignore
     public AlarmEntry(String location, double latitude, double longitude, double radius, boolean enabled, boolean vibrate, String message, String alert) {
         this.location = location;
         this.latitude = latitude;
