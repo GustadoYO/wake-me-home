@@ -1,10 +1,14 @@
 package com.gusta.wakemehome;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -61,21 +65,15 @@ public class DetailActivity extends AppCompatActivity {
             mButton.setText(R.string.update_button);
             if (mAlarmId == DEFAULT_ALARM_ID) {
                 // populate the UI
-                // Use DEFAULT_ALARM_ID as the default
                 mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
-                AppExecutors.getInstance().diskIO().execute(new Runnable() {
+
+                final LiveData<AlarmEntry> alarm = mDb.alarmDao().loadAlarmById(mAlarmId);
+                alarm.observe(this, new Observer<AlarmEntry>() {
                     @Override
-                    public void run() {
-                        // assign its value to a final TaskEntry variable
-                        final AlarmEntry alarm = mDb.alarmDao().loadAlarmById(mAlarmId);
-                        // We will be able to simplify this once we learn more
-                        // about Android Architecture Components
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                populateUI(alarm);
-                            }
-                        });
+                    public void onChanged(@Nullable AlarmEntry alarmEntry) {
+                        alarm.removeObserver(this);
+                        Log.d(TAG, "Receiving database update from LiveData");
+                        populateUI(alarmEntry);
                     }
                 });
             }

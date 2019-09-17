@@ -25,7 +25,6 @@ public interface AlarmDao {
     @Delete
     void deleteAlarm(AlarmEntry alarmEntry);
 
-    // The query for this method should get all the data for that id in the alarm table
     @Query("SELECT * FROM alarm WHERE id = :id")
-    AlarmEntry loadAlarmById(int id);
+    LiveData<AlarmEntry> loadAlarmById(int id);
 }
