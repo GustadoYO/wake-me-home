@@ -6,7 +6,7 @@ import android.support.v7.preference.PreferenceManager;
 
 import com.gusta.wakemehome.R;
 
-public class WakeMeHomePreferences {
+public final class WakeMeHomePreferences {
 
     /**
      * Returns true if the user has selected metric length display.
