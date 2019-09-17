@@ -95,8 +95,17 @@ public class MainActivity extends AppCompatActivity implements
 
             // Called when a user swipes left or right on a ViewHolder
             @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                // Here is where you'll implement swipe to delete
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                // call the diskIO execute method with a new Runnable and implement its run method
+                AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        int position = viewHolder.getAdapterPosition();
+                        List<AlarmEntry> alarms = mAdapter.getAlarms();
+                        mDb.alarmDao().deleteAlarm(alarms.get(position));
+                        retrieveAlarms();
+                    }
+                });
             }
         }).attachToRecyclerView(mRecyclerView);
 
@@ -150,6 +159,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        retrieveAlarms();
+    }
+
+    private void retrieveAlarms() {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -226,21 +239,7 @@ public class MainActivity extends AppCompatActivity implements
          */
         if (PREFERENCES_HAVE_BEEN_UPDATED) {
             Log.d(TAG, "onStart: preferences were updated");
-            AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    // Extract the list of alarms to a final variable
-                    final List<AlarmEntry> alarms = mDb.alarmDao().loadAllAlarms();
-                    // We will be able to simplify this once we learn more
-                    // about Android Architecture Components
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAdapter.setAlarms(alarms);
-                        }
-                    });
-                }
-            });
+            retrieveAlarms();
             PREFERENCES_HAVE_BEEN_UPDATED = false;
         }
     }

@@ -111,6 +111,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         return mAlarmEntries.size();
     }
 
+    public List<AlarmEntry> getAlarms() {
+        return mAlarmEntries;
+    }
+
     /**
      * This method is used to set the alarm on an AlarmAdapter if we've already
      * created one. This is handy when we get new data but don't want to create a
