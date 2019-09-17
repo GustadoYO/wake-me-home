@@ -1,5 +1,7 @@
 package com.gusta.wakemehome;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -103,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements
                         int position = viewHolder.getAdapterPosition();
                         List<AlarmEntry> alarms = mAdapter.getAlarms();
                         mDb.alarmDao().deleteAlarm(alarms.get(position));
-                        retrieveAlarms();
                     }
                 });
             }
@@ -154,28 +155,17 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         mDb = AppDatabase.getInstance(getApplicationContext());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         retrieveAlarms();
     }
 
     private void retrieveAlarms() {
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+        Log.d(TAG, "Actively retrieving the tasks from the DataBase");
+        LiveData<List<AlarmEntry>> alarms = mDb.alarmDao().loadAllAlarms();
+        alarms.observe(this, new Observer<List<AlarmEntry>>() {
             @Override
-            public void run() {
-                // Extract the list of alarms to a final variable
-                final List<AlarmEntry> alarms = mDb.alarmDao().loadAllAlarms();
-                // We will be able to simplify this once we learn more
-                // about Android Architecture Components
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.setAlarms(alarms);
-                    }
-                });
+            public void onChanged(@Nullable List<AlarmEntry> alarmEntries) {
+                Log.d(TAG, "Receiving database update from LiveData");
+                mAdapter.setAlarms(alarmEntries);
             }
         });
     }
