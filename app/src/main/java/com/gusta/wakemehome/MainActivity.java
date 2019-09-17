@@ -188,11 +188,10 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onItemClickListener(int itemId) {
-        Context context = this;
-        Class destinationClass = DetailActivity.class;
-        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, itemId);
-        startActivity(intentToStartDetailActivity);
+        // Launch AddTaskActivity adding the itemId as an extra in the intent
+        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_ALARM_ID, itemId);
+        startActivity(intent);
     }
 
     /**

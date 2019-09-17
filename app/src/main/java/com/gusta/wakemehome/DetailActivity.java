@@ -61,6 +61,23 @@ public class DetailActivity extends AppCompatActivity {
             mButton.setText(R.string.update_button);
             if (mAlarmId == DEFAULT_ALARM_ID) {
                 // populate the UI
+                // Use DEFAULT_ALARM_ID as the default
+                mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
+                AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        // assign its value to a final TaskEntry variable
+                        final AlarmEntry alarm = mDb.alarmDao().loadAlarmById(mAlarmId);
+                        // We will be able to simplify this once we learn more
+                        // about Android Architecture Components
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                populateUI(alarm);
+                            }
+                        });
+                    }
+                });
             }
         }
     }
@@ -99,7 +116,18 @@ public class DetailActivity extends AppCompatActivity {
      * @param alarm the alarmEntry to populate the UI
      */
     private void populateUI(AlarmEntry alarm) {
+        if (alarm == null) {
+            return;
+        }
 
+        mLocation.setText(alarm.getLocation());
+        mLatitude.setText(String.valueOf(alarm.getLatitude()));
+        mLongitude.setText(String.valueOf(alarm.getLongitude()));
+        mRadius.setText(String.valueOf(alarm.getRadius()));
+        mEnabled.setText(String.valueOf(alarm.isEnabled()));
+        mVibrate.setText(String.valueOf(alarm.isVibrate()));
+        mMessage.setText(alarm.getMessage());
+        mAlert.setText(alarm.getAlert());
     }
 
     /**
@@ -116,12 +144,19 @@ public class DetailActivity extends AppCompatActivity {
         String message = mMessage.getText().toString();
         String alert = mAlert.getText().toString();
 
-        final AlarmEntry alarmEntry = new AlarmEntry(location, latitude, longitude, radius,
+        final AlarmEntry alarm = new AlarmEntry(location, latitude, longitude, radius,
                 enabled, vibrate, message, alert);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                mDb.alarmDao().insertAlarm(alarmEntry);
+                if (mAlarmId == DEFAULT_ALARM_ID) {
+                    // insert new alarm
+                    mDb.alarmDao().insertAlarm(alarm);
+                } else {
+                    //update task
+                    alarm.setId(mAlarmId);
+                    mDb.alarmDao().updateAlarm(alarm);
+                }
                 finish();
             }
         });
@@ -140,7 +175,7 @@ public class DetailActivity extends AppCompatActivity {
      * @return The Intent to use to open the map.
      */
     private Intent createOpenAlarmInMapIntent() {
-        Uri geoLocation = Uri.parse("geo:0,0?q=" + mLocation);
+        Uri geoLocation = Uri.parse("geo:0,0?q=" + mLocation.getText());
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geoLocation);
