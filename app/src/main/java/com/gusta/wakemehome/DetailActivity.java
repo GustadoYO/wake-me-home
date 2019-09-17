@@ -116,10 +116,15 @@ public class DetailActivity extends AppCompatActivity {
         String message = mMessage.getText().toString();
         String alert = mAlert.getText().toString();
 
-        AlarmEntry alarmEntry = new AlarmEntry(location, latitude, longitude, radius,
+        final AlarmEntry alarmEntry = new AlarmEntry(location, latitude, longitude, radius,
                 enabled, vibrate, message, alert);
-        mDb.alarmDao().insertAlarm(alarmEntry);
-        finish();
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.alarmDao().insertAlarm(alarmEntry);
+                finish();
+            }
+        });
     }
 
     /**

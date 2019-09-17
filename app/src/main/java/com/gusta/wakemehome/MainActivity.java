@@ -150,7 +150,21 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        mAdapter.setAlarms(mDb.alarmDao().loadAllAlarms());
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                // Extract the list of alarms to a final variable
+                final List<AlarmEntry> alarms = mDb.alarmDao().loadAllAlarms();
+                // We will be able to simplify this once we learn more
+                // about Android Architecture Components
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.setAlarms(alarms);
+                    }
+                });
+            }
+        });
     }
 
     /**
@@ -212,7 +226,21 @@ public class MainActivity extends AppCompatActivity implements
          */
         if (PREFERENCES_HAVE_BEEN_UPDATED) {
             Log.d(TAG, "onStart: preferences were updated");
-            mAdapter.setAlarms(mDb.alarmDao().loadAllAlarms());
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    // Extract the list of alarms to a final variable
+                    final List<AlarmEntry> alarms = mDb.alarmDao().loadAllAlarms();
+                    // We will be able to simplify this once we learn more
+                    // about Android Architecture Components
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.setAlarms(alarms);
+                        }
+                    });
+                }
+            });
             PREFERENCES_HAVE_BEEN_UPDATED = false;
         }
     }
