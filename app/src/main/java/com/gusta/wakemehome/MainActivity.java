@@ -1,17 +1,12 @@
 package com.gusta.wakemehome;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
-import android.content.Context;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.DividerItemDecoration;
@@ -28,9 +23,7 @@ import android.widget.TextView;
 
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
-import com.gusta.wakemehome.utilities.WakeMeHomeUnitsUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
@@ -155,16 +148,15 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         mDb = AppDatabase.getInstance(getApplicationContext());
-        retrieveAlarms();
+        setupViewModel();
     }
 
-    private void retrieveAlarms() {
-        Log.d(TAG, "Actively retrieving the tasks from the DataBase");
-        LiveData<List<AlarmEntry>> alarms = mDb.alarmDao().loadAllAlarms();
-        alarms.observe(this, new Observer<List<AlarmEntry>>() {
+    private void setupViewModel() {
+        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
             @Override
             public void onChanged(@Nullable List<AlarmEntry> alarmEntries) {
-                Log.d(TAG, "Receiving database update from LiveData");
+                Log.d(TAG, "Updating list of tasks from LiveData in ViewModel");
                 mAdapter.setAlarms(alarmEntries);
             }
         });
@@ -228,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements
          */
         if (PREFERENCES_HAVE_BEEN_UPDATED) {
             Log.d(TAG, "onStart: preferences were updated");
-            retrieveAlarms();
+            setupViewModel();
             PREFERENCES_HAVE_BEEN_UPDATED = false;
         }
     }
