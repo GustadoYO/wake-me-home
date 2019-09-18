@@ -75,27 +75,20 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         String location = taskEntry.getLocation();
         String latitude = String.valueOf(taskEntry.getLatitude());
         String longitude = String.valueOf(taskEntry.getLongitude());
-        String radius = String.valueOf(taskEntry.getRadius());
+        String radius = WakeMeHomeUnitsUtils.formatLength(mContext, taskEntry.getRadius());
         String enabled = String.valueOf(taskEntry.isEnabled());
         String vibrate = String.valueOf(taskEntry.isVibrate());
         String message = taskEntry.getMessage();
         String alert = taskEntry.getAlert();
 
-        // TODO: Temporary in order to check preferences view
-        try {
-            double m = Double.parseDouble(message);
-            message = WakeMeHomeUnitsUtils.formatLength(mContext, m);
-        } catch (NumberFormatException | NullPointerException nfe) {
-        }
-
         //Set values
         holder.locationView.setText(location);
 //        holder.latitudeView.setText(latitude);
 //        holder.longitudeView.setText(longitude);
-//        holder.radiusView.setText(radius);
+        holder.radiusView.setText(radius);
         holder.enabledView.setText(enabled);
 //        holder.vibrateView.setText(vibrate);
-        holder.messageView.setText(message);
+//        holder.messageView.setText(message);
 //        holder.alertView.setText(alert);
     }
 
@@ -160,10 +153,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
             locationView = itemView.findViewById(R.id.location);
 //            latitudeView = itemView.findViewById(R.id.latitude);
 //            longitudeView = itemView.findViewById(R.id.longitude);
-//            radiusView = itemView.findViewById(R.id.radius);
+            radiusView = itemView.findViewById(R.id.radius);
             enabledView = itemView.findViewById(R.id.enabled);
 //            vibrateView = itemView.findViewById(R.id.vibrate);
-            messageView = itemView.findViewById(R.id.message);
+//            messageView = itemView.findViewById(R.id.message);
 //            alertView = itemView.findViewById(R.id.alert);
 
             itemView.setOnClickListener(this);
