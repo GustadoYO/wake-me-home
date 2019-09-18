@@ -12,16 +12,16 @@ public class AlarmEntry {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private String location;
-    private double latitude;
-    private double longitude;
-    private double radius;
+    private String location;    // Human readable location string
+    private double latitude;    // The location's latitude
+    private double longitude;   // The location's longitude
+    private double radius;      // Radius from location to start alarm
     @ColumnInfo(name = "is_enabled")
-    private boolean enabled;
+    private boolean enabled;    // True if alarm is active
     @ColumnInfo(name = "should_vibrate")
-    private boolean vibrate;
-    private String message;
-    private String alert;
+    private boolean vibrate;    // True if alarm should vibrate
+    private String message;     // Message to show when alarm triggers
+    private String alert;       // Audio alert to play when alarm triggers
 
     @Ignore
     public AlarmEntry(String location, double latitude, double longitude, double radius, boolean enabled, boolean vibrate, String message, String alert) {
