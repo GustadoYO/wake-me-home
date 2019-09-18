@@ -27,7 +27,7 @@ import com.gusta.wakemehome.database.AppDatabase;
 import java.util.List;
 
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
-
+// test
 public class MainActivity extends AppCompatActivity implements
         AlarmAdapter.ItemClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener {
