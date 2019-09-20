@@ -32,6 +32,10 @@
     <string name="edit_alarm_message">Message</string>
     <string name="edit_alarm_alert">Alert</string>
 
+    <string name="message_label">Alarm name</string>
+    <string name="alert_label">Alarm sound</string>
+    <string name="vibrate_label">Vibration</string>
+
     <string name="add_button">Add</string>
     <string name="update_button">Update</string>
 

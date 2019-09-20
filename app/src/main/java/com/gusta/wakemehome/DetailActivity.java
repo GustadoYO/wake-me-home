@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
+import com.gusta.wakemehome.databinding.ActivityDetailBinding;
 
 import java.util.Date;
 
@@ -33,15 +35,7 @@ public class DetailActivity extends AppCompatActivity {
     private static final int DEFAULT_ALARM_ID = -1;
     // Constant for logging
     private static final String TAG = DetailActivity.class.getSimpleName();
-    // Fields for views
-    EditText mLocation;
-    EditText mLatitude;
-    EditText mLongitude;
-    EditText mRadius;
-    EditText mEnabled;
-    EditText mVibrate;
-    EditText mMessage;
-    EditText mAlert;
+    // Field for the save button
     Button mButton;
 
     private int mAlarmId = DEFAULT_ALARM_ID;
@@ -49,12 +43,29 @@ public class DetailActivity extends AppCompatActivity {
     // Member variable for the Database
     private AppDatabase mDb;
 
+    /*
+     * This field is used for data binding. Normally, we would have to call findViewById many
+     * times to get references to the Views in this Activity. With data binding however, we only
+     * need to call DataBindingUtil.setContentView and pass in a Context and a layout, as we do
+     * in onCreate of this class. Then, we can access all of the Views in our layout
+     * programmatically without cluttering up the code with findViewById.
+     */
+    private ActivityDetailBinding mDetailBinding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
 
-        initViews();
+        mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+
+        // Init the save button
+        mButton = mDetailBinding.saveButton;
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onSaveButtonClicked();
+            }
+        });
 
         mDb = AppDatabase.getInstance(getApplicationContext());
 
@@ -91,28 +102,6 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     /**
-     * initViews is called from onCreate to init the member variable views
-     */
-    private void initViews() {
-        mLocation = findViewById(R.id.editTextAlarmLocation);
-        mLatitude = findViewById(R.id.editTextAlarmLatitude);
-        mLongitude = findViewById(R.id.editTextAlarmLongitude);
-        mRadius = findViewById(R.id.editTextAlarmRadius);
-        mEnabled = findViewById(R.id.editTextAlarmEnabled);
-        mVibrate = findViewById(R.id.editTextAlarmVibrate);
-        mMessage = findViewById(R.id.editTextAlarmMessage);
-        mAlert = findViewById(R.id.editTextAlarmAlert);
-
-        mButton = findViewById(R.id.saveButton);
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onSaveButtonClicked();
-            }
-        });
-    }
-
-    /**
      * populateUI would be called to populate the UI when in update mode
      *
      * @param alarm the alarmEntry to populate the UI
@@ -122,14 +111,13 @@ public class DetailActivity extends AppCompatActivity {
             return;
         }
 
-        mLocation.setText(alarm.getLocation());
-        mLatitude.setText(String.valueOf(alarm.getLatitude()));
-        mLongitude.setText(String.valueOf(alarm.getLongitude()));
-        mRadius.setText(String.valueOf(alarm.getRadius()));
-        mEnabled.setText(String.valueOf(alarm.isEnabled()));
-        mVibrate.setText(String.valueOf(alarm.isVibrate()));
-        mMessage.setText(alarm.getMessage());
-        mAlert.setText(alarm.getAlert());
+        mDetailBinding.locationDetails.location.setText(alarm.getLocation());
+        mDetailBinding.locationDetails.latitude.setText(String.valueOf(alarm.getLatitude()));
+        mDetailBinding.locationDetails.longitude.setText(String.valueOf(alarm.getLongitude()));
+        mDetailBinding.locationDetails.radius.setText(String.valueOf(alarm.getRadius()));
+        mDetailBinding.clockDetails.vibrate.setChecked(alarm.isVibrate());
+        mDetailBinding.clockDetails.message.setText(alarm.getMessage());
+        mDetailBinding.clockDetails.alert.setText(alarm.getAlert());
     }
 
     /**
@@ -137,17 +125,18 @@ public class DetailActivity extends AppCompatActivity {
      * It retrieves user input and inserts that new alarm data into the underlying database.
      */
     public void onSaveButtonClicked() {
-        String location = mLocation.getText().toString();
-        double latitude = Double.parseDouble(mLatitude.getText().toString());
-        double longitude = Double.parseDouble(mLongitude.getText().toString());
-        double radius = Double.parseDouble(mRadius.getText().toString());
-        boolean enabled = Boolean.parseBoolean(mEnabled.getText().toString());
-        boolean vibrate = Boolean.parseBoolean(mVibrate.getText().toString());
-        String message = mMessage.getText().toString();
-        String alert = mAlert.getText().toString();
+        String location = mDetailBinding.locationDetails.location.getText().toString();
+        double latitude = Double.parseDouble(mDetailBinding.locationDetails.latitude.getText().toString());
+        double longitude = Double.parseDouble(mDetailBinding.locationDetails.longitude.getText().toString());
+        double radius = Double.parseDouble(mDetailBinding.locationDetails.radius.getText().toString());
+//        boolean enabled = Boolean.parseBoolean(mEnabled.getText().toString());
+        boolean vibrate = Boolean.parseBoolean(mDetailBinding.clockDetails.vibrate.getText().toString());
+        String message = mDetailBinding.clockDetails.message.getText().toString();
+        String alert = mDetailBinding.clockDetails.alert.getText().toString();
 
+        // TODO: replace "true" constant with the current "enabled" value
         final AlarmEntry alarm = new AlarmEntry(location, latitude, longitude, radius,
-                enabled, vibrate, message, alert);
+                true, vibrate, message, alert);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -177,7 +166,8 @@ public class DetailActivity extends AppCompatActivity {
      * @return The Intent to use to open the map.
      */
     private Intent createOpenAlarmInMapIntent() {
-        Uri geoLocation = Uri.parse("geo:0,0?q=" + mLocation.getText());
+        Uri geoLocation =
+                Uri.parse("geo:0,0?q=" + mDetailBinding.locationDetails.location.getText());
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geoLocation);
