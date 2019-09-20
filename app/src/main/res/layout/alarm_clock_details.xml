@@ -7,12 +7,13 @@
         android:id="@+id/clock_details"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="16dp"
-        android:paddingEnd="32dp"
-        android:paddingLeft="32dp"
-        android:paddingRight="32dp"
-        android:paddingStart="32dp"
-        android:paddingTop="16dp">
+        android:background="@color/detail_accent_pane_background"
+        android:paddingBottom="@dimen/detail_vertical_padding"
+        android:paddingEnd="@dimen/detail_horizontal_padding"
+        android:paddingLeft="@dimen/detail_horizontal_padding"
+        android:paddingRight="@dimen/detail_horizontal_padding"
+        android:paddingStart="@dimen/detail_horizontal_padding"
+        android:paddingTop="@dimen/detail_vertical_padding">
 
         <!-- This guideline divides the layout into a left and right half and is used for alignment -->
         <android.support.constraint.Guideline
@@ -27,7 +28,9 @@
             android:id="@+id/message_label"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:fontFamily="sans-serif"
             android:text="@string/message_label"
+            android:textColor="@color/detail_accent_label"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/message"
             app:layout_constraintBottom_toBottomOf="@+id/message"/>
@@ -37,9 +40,10 @@
             android:id="@+id/message"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:gravity="start"
             android:hint="@string/edit_alarm_message"
-            android:paddingBottom="@dimen/activity_horizontal_margin"
+            android:textColor="@android:color/white"
+            android:gravity="start"
+            android:paddingBottom="@dimen/detail_vertical_padding"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="@+id/horizontal_middle"
             tools:text="Get off at Brodetsky/Salvador"/>
@@ -49,7 +53,9 @@
             android:id="@+id/alert_label"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:fontFamily="sans-serif"
             android:text="@string/alert_label"
+            android:textColor="@color/detail_accent_label"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/alert"
             app:layout_constraintBottom_toBottomOf="@+id/alert"/>
@@ -59,9 +65,10 @@
             android:id="@+id/alert"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:gravity="start"
             android:hint="@string/edit_alarm_alert"
-            android:paddingBottom="@dimen/activity_horizontal_margin"
+            android:textColor="@android:color/white"
+            android:gravity="start"
+            android:paddingBottom="@dimen/detail_vertical_padding"
             app:layout_constraintTop_toBottomOf="@+id/message"
             app:layout_constraintLeft_toLeftOf="@+id/horizontal_middle"
             tools:text="Morning Flower"/>
@@ -71,7 +78,9 @@
             android:id="@+id/vibrate_label"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:fontFamily="sans-serif"
             android:text="@string/vibrate_label"
+            android:textColor="@color/detail_accent_label"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/vibrate"
             app:layout_constraintBottom_toBottomOf="@+id/vibrate"/>
@@ -81,6 +90,7 @@
             android:id="@+id/vibrate"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:textColor="@android:color/white"
             app:layout_constraintTop_toBottomOf="@+id/alert"
             app:layout_constraintLeft_toLeftOf="@+id/horizontal_middle"/>
 

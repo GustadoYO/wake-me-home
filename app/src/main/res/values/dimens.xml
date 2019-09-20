@@ -1,8 +1,20 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="activity_horizontal_padding">12dp</dimen>
-    <dimen name="activity_vertical_padding">12dp</dimen>
+    <dimen name="detail_horizontal_padding">32dp</dimen>
+    <dimen name="detail_vertical_padding">16dp</dimen>
+
+    <!-- We will eventually use this to allow us to add additional padding for different screen
+         sizes-->
+    <dimen name="list_item_padding_horizontal">16dp</dimen>
+    <dimen name="list_item_padding_vertical">12dp</dimen>
+    <dimen name="list_item_location_left_margin">16dp</dimen>
+    <dimen name="list_item_location_start_margin">@dimen/list_item_location_left_margin</dimen>
+    <dimen name="list_item_enabled_margin">12dp</dimen>
+    <dimen name="list_item_enabled_text_size">12sp</dimen>
+
+    <!-- Loading indicator dimens -->
+    <dimen name="loading_indicator_size">42dp</dimen>
+
+    <!-- Floating action button dimens -->
     <dimen name="fab_margin">16dp</dimen>
 </resources>
