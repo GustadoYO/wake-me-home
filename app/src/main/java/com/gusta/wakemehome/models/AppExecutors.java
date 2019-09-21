@@ -1,4 +1,4 @@
-package com.gusta.wakemehome;
+package com.gusta.wakemehome.models;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
  * Grouping tasks like this avoids the effects of task starvation (e.g. disk reads don't wait behind
  * webservice requests).
  */
-class AppExecutors {
+public class AppExecutors {
 
     // For Singleton instantiation
     private static final Object LOCK = new Object();
@@ -20,7 +20,7 @@ class AppExecutors {
         this.diskIO = diskIO;
     }
 
-    static AppExecutors getInstance() {
+    public static AppExecutors getInstance() {
         if (sInstance == null) {
             synchronized (LOCK) {
                 sInstance = new AppExecutors(Executors.newSingleThreadExecutor());
@@ -29,7 +29,7 @@ class AppExecutors {
         return sInstance;
     }
 
-    Executor diskIO() {
+    public Executor diskIO() {
         return diskIO;
     }
 

@@ -1,4 +1,4 @@
-package com.gusta.wakemehome;
+package com.gusta.wakemehome.models;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -25,7 +25,7 @@ public class MainViewModel extends AndroidViewModel {
         alarms = database.alarmDao().loadAllAlarms();
     }
 
-    LiveData<List<AlarmEntry>> getAlarms() {
+    public LiveData<List<AlarmEntry>> getAlarms() {
         return alarms;
     }
 }

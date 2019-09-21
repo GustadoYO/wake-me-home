@@ -1,4 +1,4 @@
-package com.gusta.wakemehome;
+package com.gusta.wakemehome.models;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
@@ -6,7 +6,7 @@ import android.arch.lifecycle.ViewModel;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 
-class DetailViewModel extends ViewModel {
+public class DetailViewModel extends ViewModel {
 
     private LiveData<AlarmEntry> alarm;
 

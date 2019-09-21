@@ -1,4 +1,4 @@
-package com.gusta.wakemehome;
+package com.gusta.wakemehome.models;
 
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
@@ -11,7 +11,7 @@ public class DetailViewModelFactory extends ViewModelProvider.NewInstanceFactory
     private final AppDatabase mDb;
     private final int mAlarmId;
 
-    DetailViewModelFactory(AppDatabase database, int alarmId) {
+    public DetailViewModelFactory(AppDatabase database, int alarmId) {
         mDb = database;
         mAlarmId = alarmId;
     }

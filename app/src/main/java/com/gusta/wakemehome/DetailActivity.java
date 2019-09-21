@@ -16,6 +16,9 @@ import android.widget.Button;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
+import com.gusta.wakemehome.models.AppExecutors;
+import com.gusta.wakemehome.models.DetailViewModel;
+import com.gusta.wakemehome.models.DetailViewModelFactory;
 
 public class DetailActivity extends AppCompatActivity {
 

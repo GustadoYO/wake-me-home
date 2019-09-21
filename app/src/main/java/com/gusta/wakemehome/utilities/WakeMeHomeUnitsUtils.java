@@ -3,7 +3,6 @@ package com.gusta.wakemehome.utilities;
 import android.content.Context;
 
 import com.gusta.wakemehome.R;
-import com.gusta.wakemehome.data.WakeMeHomePreferences;
 
 /**
  * Contains useful utilities , such as conversion between Kilometres and Miles.
@@ -20,8 +19,7 @@ public final class WakeMeHomeUnitsUtils {
      * @return Length in Miles (mi)
      */
     private static double kilometresToMiles(double lengthInKilometres) {
-        double lengthInMiles = lengthInKilometres * 0.621371;
-        return lengthInMiles;
+        return lengthInKilometres * 0.621371;
     }
 
     /**
