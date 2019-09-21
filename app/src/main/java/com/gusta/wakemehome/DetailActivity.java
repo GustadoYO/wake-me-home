@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,7 +40,7 @@ public class DetailActivity extends AppCompatActivity {
     // VARIABLES //
     //===========//
 
-    Button mButton;                                 // The save button
+    Button mButton;                                 // The open map button
     private int mAlarmId = DEFAULT_ALARM_ID;        // The current alarm ID
     private AppDatabase mDb;                        // The database member
     private ActivityDetailBinding mDetailBinding;   // The data binding object
@@ -56,11 +57,11 @@ public class DetailActivity extends AppCompatActivity {
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
         // Init the save button
-        mButton = mDetailBinding.saveButton;
+        mButton = mDetailBinding.locationDetails.OpenMapButton;
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onSaveButtonClicked();
+                onOpenMapButtonClicked();
             }
         });
 
@@ -75,7 +76,6 @@ public class DetailActivity extends AppCompatActivity {
         // If ALARM_ID was sent, it is update mode (list item clicked)
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
-            mButton.setText(R.string.update_button);
 
             // If member alarm ID is still DEFAULT_ID, the alarm fields should be loaded from model
             if (mAlarmId == DEFAULT_ALARM_ID) {
@@ -167,10 +167,6 @@ public class DetailActivity extends AppCompatActivity {
         });
     }
 
-    //=====================//
-    // OPTION MENU METHODS //
-    //=====================//
-
     /**
      * This method uses the URI scheme for showing the alarm on a
      * map. This super-handy intent is detailed in the "Common Intents"
@@ -180,23 +176,28 @@ public class DetailActivity extends AppCompatActivity {
      *
      * Hint: Hold Command on Mac or Control on Windows and click that link
      * to automagically open the Common Intents page
-     *
-     * @return The Intent to use to open the map.
      */
-    private Intent createOpenAlarmInMapIntent() {
+    private void onOpenMapButtonClicked() {
         Uri geoLocation =
                 Uri.parse("geo:0,0?q=" + mDetailBinding.locationDetails.location.getText());
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geoLocation);
-        return intent;
+
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Log.d(TAG, "Couldn't call " + geoLocation.toString() + ", no receiving apps installed!");
+        }
     }
+
+    //=====================//
+    // OPTION MENU METHODS //
+    //=====================//
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_detail, menu);
-        MenuItem menuItem = menu.findItem(R.id.action_map);
-        menuItem.setIntent(createOpenAlarmInMapIntent());
         return true;
     }
 
@@ -204,9 +205,8 @@ public class DetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
-            startActivity(startSettingsActivity);
+        if (id == R.id.action_save) {
+            onSaveButtonClicked();
             return true;
         }
 

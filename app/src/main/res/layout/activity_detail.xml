@@ -39,17 +39,6 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
-        <!-- Add button -->
-        <Button
-            android:id="@+id/saveButton"
-            style="@style/TextAppearance.AppCompat.Large"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@color/colorPrimary"
-            android:text="@string/add_button"
-            android:textColor="@android:color/primary_text_dark" />
-
     </LinearLayout>
 
 </layout>
