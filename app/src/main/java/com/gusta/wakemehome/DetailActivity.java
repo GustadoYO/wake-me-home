@@ -77,7 +77,7 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
 
-            // If member alarm ID is still DEFAULT_ID, the alarm fields should be loaded from model
+            // If member alarm ID is still DEFAULT_ID, the alarm model should be loaded from db
             if (mAlarmId == DEFAULT_ALARM_ID) {
 
                 // Set member alarm ID to wanted alarm (from intent)
@@ -139,14 +139,10 @@ public class DetailActivity extends AppCompatActivity {
                 Double.parseDouble(mDetailBinding.locationDetails.longitude.getText().toString());
         double radius =
                 Double.parseDouble(mDetailBinding.locationDetails.radius.getText().toString());
-//        boolean enabled =
-//                  Boolean.parseBoolean(mEnabled.getText().toString());
-        boolean vibrate =
-                Boolean.parseBoolean(mDetailBinding.clockDetails.vibrate.getText().toString());
-        String message =
-                mDetailBinding.clockDetails.message.getText().toString();
-        String alert =
-                mDetailBinding.clockDetails.alert.getText().toString();
+//        boolean enabled = Boolean.parseBoolean(mEnabled.getText().toString());
+        boolean vibrate = mDetailBinding.clockDetails.vibrate.isChecked();
+        String message = mDetailBinding.clockDetails.message.getText().toString();
+        String alert = mDetailBinding.clockDetails.alert.getText().toString();
 
         // TODO: replace "true" constant with the current "enabled" value
         final AlarmEntry alarm = new AlarmEntry(location, latitude, longitude, radius,
@@ -175,7 +171,7 @@ public class DetailActivity extends AppCompatActivity {
      * see <a"http://developer.android.com/guide/components/intents-common.html#Maps">
      *
      * Hint: Hold Command on Mac or Control on Windows and click that link
-     * to automagically open the Common Intents page
+     * to automatically open the Common Intents page
      */
     private void onOpenMapButtonClicked() {
         Uri geoLocation =
@@ -187,7 +183,8 @@ public class DetailActivity extends AppCompatActivity {
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         } else {
-            Log.d(TAG, "Couldn't call " + geoLocation.toString() + ", no receiving apps installed!");
+            Log.d(TAG, "Couldn't call " + geoLocation.toString() +
+                    ", no receiving apps installed!");
         }
     }
 
