@@ -40,6 +40,7 @@ public class DetailActivity extends AppCompatActivity {
     // VARIABLES //
     //===========//
 
+    // TODO: Change architecture according to https://developer.android.com/jetpack/docs/guide
     Button mButton;                                 // The open map button
     private int mAlarmId = DEFAULT_ALARM_ID;        // The current alarm ID
     private AppDatabase mDb;                        // The database member
