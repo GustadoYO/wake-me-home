@@ -6,9 +6,7 @@
   - In order to use Android's data binding capabilities, (to avoid having to type findViewById   -
   - over and over again) we wrap this layout in a <layout></layout> tag.                         -
   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +26,9 @@
             android:layout_height="wrap_content"
             android:gravity="start"
             android:hint="@string/edit_alarm_location"
-            android:paddingBottom="@dimen/detail_vertical_padding" />
+            android:paddingBottom="@dimen/detail_vertical_padding"
+            android:importantForAutofill="no"
+            android:inputType="text" />
 
         <!-- EditText for alarm latitude -->
         <EditText
@@ -37,7 +37,9 @@
             android:layout_height="wrap_content"
             android:gravity="start"
             android:hint="@string/edit_alarm_latitude"
-            android:paddingBottom="@dimen/detail_vertical_padding" />
+            android:paddingBottom="@dimen/detail_vertical_padding"
+            android:importantForAutofill="no"
+            android:inputType="numberDecimal" />
 
         <!-- EditText for alarm longitude -->
         <EditText
@@ -46,7 +48,9 @@
             android:layout_height="wrap_content"
             android:gravity="start"
             android:hint="@string/edit_alarm_longitude"
-            android:paddingBottom="@dimen/detail_vertical_padding" />
+            android:paddingBottom="@dimen/detail_vertical_padding"
+            android:importantForAutofill="no"
+            android:inputType="numberDecimal" />
 
         <!-- EditText for alarm radius -->
         <EditText
@@ -55,7 +59,9 @@
             android:layout_height="wrap_content"
             android:gravity="start"
             android:hint="@string/edit_alarm_radius"
-            android:paddingBottom="@dimen/detail_vertical_padding" />
+            android:paddingBottom="@dimen/detail_vertical_padding"
+            android:importantForAutofill="no"
+            android:inputType="numberDecimal" />
 
     </LinearLayout>
 

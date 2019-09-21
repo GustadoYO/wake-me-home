@@ -25,7 +25,7 @@ public class MainViewModel extends AndroidViewModel {
         alarms = database.alarmDao().loadAllAlarms();
     }
 
-    public LiveData<List<AlarmEntry>> getAlarms() {
+    LiveData<List<AlarmEntry>> getAlarms() {
         return alarms;
     }
 }

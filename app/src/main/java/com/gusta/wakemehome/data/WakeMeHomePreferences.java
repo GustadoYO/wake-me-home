@@ -23,11 +23,7 @@ public final class WakeMeHomePreferences {
         String preferredUnits = prefs.getString(keyForUnits, defaultUnits);
         String metric = context.getString(R.string.pref_units_metric);
         boolean userPrefersMetric;
-        if (metric.equals(preferredUnits)) {
-            userPrefersMetric = true;
-        } else {
-            userPrefersMetric = false;
-        }
+        userPrefersMetric = metric.equals(preferredUnits);
         return userPrefersMetric;
     }
 

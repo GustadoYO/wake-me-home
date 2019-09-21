@@ -39,7 +39,9 @@
             android:hint="@string/edit_alarm_message"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="@+id/horizontal_middle"
-            tools:text="Get off at Brodetsky/Salvador"/>
+            tools:text="Get off at Brodetsky/Salvador"
+            android:importantForAutofill="no"
+            android:inputType="text" />
 
         <!-- Alert label -->
         <TextView
@@ -58,7 +60,9 @@
             android:paddingBottom="@dimen/detail_vertical_padding"
             app:layout_constraintTop_toBottomOf="@+id/message"
             app:layout_constraintLeft_toLeftOf="@+id/horizontal_middle"
-            tools:text="Morning Flower"/>
+            tools:text="Morning Flower"
+            android:importantForAutofill="no"
+            android:inputType="text" />
 
         <!-- Vibrate label -->
         <TextView

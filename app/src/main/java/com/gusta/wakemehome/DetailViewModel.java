@@ -10,7 +10,7 @@ class DetailViewModel extends ViewModel {
 
     private LiveData<AlarmEntry> alarm;
 
-    public DetailViewModel(AppDatabase database, int alarmId) {
+    DetailViewModel(AppDatabase database, int alarmId) {
         alarm = database.alarmDao().loadAlarmById(alarmId);
     }
 

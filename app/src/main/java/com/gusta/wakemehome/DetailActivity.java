@@ -1,29 +1,21 @@
 package com.gusta.wakemehome;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ShareCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
-
-import java.util.Date;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -158,7 +150,7 @@ public class DetailActivity extends AppCompatActivity {
      * map. This super-handy intent is detailed in the "Common Intents"
      * page of Android's developer site:
      *
-     * @see <a"http://developer.android.com/guide/components/intents-common.html#Maps">
+     * see <a"http://developer.android.com/guide/components/intents-common.html#Maps">
      *
      * Hint: Hold Command on Mac or Control on Windows and click that link
      * to automagically open the Common Intents page

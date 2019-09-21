@@ -1,7 +1,6 @@
 package com.gusta.wakemehome;
 
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -33,7 +32,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
      * @param context  the current Context
      * @param listener the ItemClickListener
      */
-    public AlarmAdapter(Context context, ItemClickListener listener) {
+    AlarmAdapter(Context context, ItemClickListener listener) {
         mContext = context;
         mItemClickListener = listener;
     }
@@ -98,7 +97,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         return mAlarmEntries.size();
     }
 
-    public List<AlarmEntry> getAlarms() {
+    List<AlarmEntry> getAlarms() {
         return mAlarmEntries;
     }
 
@@ -109,7 +108,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
      *
      * @param alarmEntries The new alarm data to be displayed.
      */
-    public void setAlarms(List<AlarmEntry> alarmEntries) {
+    void setAlarms(List<AlarmEntry> alarmEntries) {
         mAlarmEntries = alarmEntries;
         notifyDataSetChanged();
     }
@@ -136,7 +135,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
          *
          * @param itemView The view inflated in onCreateViewHolder
          */
-        public AlarmViewHolder(View itemView) {
+        AlarmViewHolder(View itemView) {
             super(itemView);
 
             locationView = itemView.findViewById(R.id.location);
