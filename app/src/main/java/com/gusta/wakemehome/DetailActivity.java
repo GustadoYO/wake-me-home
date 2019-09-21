@@ -19,35 +19,37 @@ import com.gusta.wakemehome.databinding.ActivityDetailBinding;
 
 public class DetailActivity extends AppCompatActivity {
 
+    //===========//
+    // CONSTANTS //
+    //===========//
+
+    // Constant for logging
+    private static final String TAG = DetailActivity.class.getSimpleName();
     // Extra for the alarm ID to be received in the intent
     public static final String EXTRA_ALARM_ID = "extraAlarmId";
     // Extra for the alarm ID to be received after rotation
     public static final String INSTANCE_ALARM_ID = "instanceAlarmId";
     // Constant for default alarm id to be used when not in update mode
     private static final int DEFAULT_ALARM_ID = -1;
-    // Constant for logging
-    private static final String TAG = DetailActivity.class.getSimpleName();
-    // Field for the save button
-    Button mButton;
 
-    private int mAlarmId = DEFAULT_ALARM_ID;
+    //===========//
+    // VARIABLES //
+    //===========//
 
-    // Member variable for the Database
-    private AppDatabase mDb;
+    Button mButton;                                 // The save button
+    private int mAlarmId = DEFAULT_ALARM_ID;        // The current alarm ID
+    private AppDatabase mDb;                        // The database member
+    private ActivityDetailBinding mDetailBinding;   // The data binding object
 
-    /*
-     * This field is used for data binding. Normally, we would have to call findViewById many
-     * times to get references to the Views in this Activity. With data binding however, we only
-     * need to call DataBindingUtil.setContentView and pass in a Context and a layout, as we do
-     * in onCreate of this class. Then, we can access all of the Views in our layout
-     * programmatically without cluttering up the code with findViewById.
-     */
-    private ActivityDetailBinding mDetailBinding;
+    //=========//
+    // METHODS //
+    //=========//
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Init the data binding object
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
         // Init the save button
@@ -59,26 +61,35 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+        // Init the database member
         mDb = AppDatabase.getInstance(getApplicationContext());
 
+        // Check for saved state (like after phone orientation change) - and load it
         if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_ALARM_ID)) {
             mAlarmId = savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID);
         }
 
+        // If ALARM_ID was sent, it is update mode (list item clicked)
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
             mButton.setText(R.string.update_button);
+
+            // If member alarm ID is still DEFAULT_ID, the alarm fields should be loaded from model
             if (mAlarmId == DEFAULT_ALARM_ID) {
-                // populate the UI
+
+                // Set member alarm ID to wanted alarm (from intent)
                 mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
 
+                // Load alarm model
                 DetailViewModelFactory factory = new DetailViewModelFactory(mDb, mAlarmId);
                 final DetailViewModel viewModel =
                         ViewModelProviders.of(this, factory).get(DetailViewModel.class);
 
+                // Observe changes in model in order to update UI
                 viewModel.getAlarm().observe(this, new Observer<AlarmEntry>() {
                     @Override
                     public void onChanged(@Nullable AlarmEntry alarmEntry) {
+                        // populate the UI
                         viewModel.getAlarm().removeObserver(this);
                         populateUI(alarmEntry);
                     }
@@ -89,6 +100,7 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        // Save alarm ID to state (to keep it in case of phone orientation change for example)
         outState.putInt(INSTANCE_ALARM_ID, mAlarmId);
         super.onSaveInstanceState(outState);
     }
@@ -118,13 +130,20 @@ public class DetailActivity extends AppCompatActivity {
      */
     public void onSaveButtonClicked() {
         String location = mDetailBinding.locationDetails.location.getText().toString();
-        double latitude = Double.parseDouble(mDetailBinding.locationDetails.latitude.getText().toString());
-        double longitude = Double.parseDouble(mDetailBinding.locationDetails.longitude.getText().toString());
-        double radius = Double.parseDouble(mDetailBinding.locationDetails.radius.getText().toString());
-//        boolean enabled = Boolean.parseBoolean(mEnabled.getText().toString());
-        boolean vibrate = Boolean.parseBoolean(mDetailBinding.clockDetails.vibrate.getText().toString());
-        String message = mDetailBinding.clockDetails.message.getText().toString();
-        String alert = mDetailBinding.clockDetails.alert.getText().toString();
+        double latitude =
+                Double.parseDouble(mDetailBinding.locationDetails.latitude.getText().toString());
+        double longitude =
+                Double.parseDouble(mDetailBinding.locationDetails.longitude.getText().toString());
+        double radius =
+                Double.parseDouble(mDetailBinding.locationDetails.radius.getText().toString());
+//        boolean enabled =
+//                  Boolean.parseBoolean(mEnabled.getText().toString());
+        boolean vibrate =
+                Boolean.parseBoolean(mDetailBinding.clockDetails.vibrate.getText().toString());
+        String message =
+                mDetailBinding.clockDetails.message.getText().toString();
+        String alert =
+                mDetailBinding.clockDetails.alert.getText().toString();
 
         // TODO: replace "true" constant with the current "enabled" value
         final AlarmEntry alarm = new AlarmEntry(location, latitude, longitude, radius,
@@ -144,6 +163,10 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
     }
+
+    //=====================//
+    // OPTION MENU METHODS //
+    //=====================//
 
     /**
      * This method uses the URI scheme for showing the alarm on a

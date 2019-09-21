@@ -31,13 +31,26 @@ public class MainActivity extends AppCompatActivity implements
         AlarmAdapter.ItemClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
+    //===========//
+    // CONSTANTS //
+    //===========//
+
     // Constant for logging
     private static final String TAG = MainActivity.class.getSimpleName();
-    private AlarmAdapter mAdapter;
 
-    private AppDatabase mDb;
+    //===========//
+    // VARIABLES //
+    //===========//
 
+    private AlarmAdapter mAdapter;  // The RecyclerView adapter
+    private AppDatabase mDb;        // The database member
+
+    // TODO: Change preferences update handling
     private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
+
+    //=========//
+    // METHODS //
+    //=========//
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +77,9 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter = new AlarmAdapter(this, this);
         mRecyclerView.setAdapter(mAdapter);
 
-        DividerItemDecoration decoration = new DividerItemDecoration(getApplicationContext(), VERTICAL);
+        // Add divider between list items
+        DividerItemDecoration decoration =
+                new DividerItemDecoration(getApplicationContext(), VERTICAL);
         mRecyclerView.addItemDecoration(decoration);
 
         /*
@@ -72,9 +87,12 @@ public class MainActivity extends AppCompatActivity implements
          An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
          and uses callbacks to signal when a user is performing these actions.
          */
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
 
@@ -109,15 +127,20 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 // Create a new intent to start an DetailActivity
-                Intent addTaskIntent = new Intent(MainActivity.this, DetailActivity.class);
+                Intent addTaskIntent =
+                        new Intent(MainActivity.this, DetailActivity.class);
                 startActivity(addTaskIntent);
             }
         });
 
+        // Init the database member and the model
         mDb = AppDatabase.getInstance(getApplicationContext());
         setupViewModel();
     }
 
+    /**
+     * Start observing the "alarms list" model in order to  update UI of any change
+     * */
     private void setupViewModel() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         viewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
@@ -127,20 +150,6 @@ public class MainActivity extends AppCompatActivity implements
                 mAdapter.setAlarms(alarmEntries);
             }
         });
-    }
-
-    /**
-     * This method is overridden by our MainActivity class in order to handle RecyclerView item
-     * clicks.
-     *
-     * @param itemId The alarm that was clicked
-     */
-    @Override
-    public void onItemClickListener(int itemId) {
-        // Launch AddTaskActivity adding the itemId as an extra in the intent
-        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-        intent.putExtra(DetailActivity.EXTRA_ALARM_ID, itemId);
-        startActivity(intent);
     }
 
     @Override
@@ -173,6 +182,10 @@ public class MainActivity extends AppCompatActivity implements
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
 
+    //=====================//
+    // OPTION MENU METHODS //
+    //=====================//
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -196,6 +209,28 @@ public class MainActivity extends AppCompatActivity implements
 
         return super.onOptionsItemSelected(item);
     }
+
+    //===========================//
+    // ItemClickListener METHODS //
+    //===========================//
+
+    /**
+     * This method is overridden by our MainActivity class in order to handle RecyclerView item
+     * clicks.
+     *
+     * @param itemId The alarm that was clicked
+     */
+    @Override
+    public void onItemClickListener(int itemId) {
+        // Launch AddTaskActivity adding the itemId as an extra in the intent
+        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_ALARM_ID, itemId);
+        startActivity(intent);
+    }
+
+    //==========================================//
+    // OnSharedPreferenceChangeListener METHODS //
+    //==========================================//
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {

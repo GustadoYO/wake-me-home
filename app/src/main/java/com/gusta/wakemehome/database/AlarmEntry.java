@@ -22,7 +22,8 @@ public class AlarmEntry {
     private String alert;       // Audio alert to play when alarm triggers
 
     @Ignore
-    public AlarmEntry(String location, double latitude, double longitude, double radius, boolean enabled, boolean vibrate, String message, String alert) {
+    public AlarmEntry(String location, double latitude, double longitude, double radius,
+                      boolean enabled, boolean vibrate, String message, String alert) {
         this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -33,7 +34,8 @@ public class AlarmEntry {
         this.alert = alert;
     }
 
-    public AlarmEntry(int id, String location, double latitude, double longitude, double radius, boolean enabled, boolean vibrate, String message, String alert) {
+    public AlarmEntry(int id, String location, double latitude, double longitude, double radius,
+                      boolean enabled, boolean vibrate, String message, String alert) {
         this.id = id;
         this.location = location;
         this.latitude = latitude;
