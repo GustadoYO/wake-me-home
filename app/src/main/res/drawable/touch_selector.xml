@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- This selector works everywhere, but does not support ripple -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@color/activated"
+    <item android:drawable="@color/colorPrimaryLight"
         android:state_activated="true"
         android:state_focused="false"/>
 

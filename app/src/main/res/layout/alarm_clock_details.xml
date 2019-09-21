@@ -7,7 +7,7 @@
         android:id="@+id/clock_details"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/detail_accent_pane_background"
+        android:background="@color/divider"
         android:paddingBottom="@dimen/detail_vertical_padding"
         android:paddingEnd="@dimen/detail_horizontal_padding"
         android:paddingLeft="@dimen/detail_horizontal_padding"
