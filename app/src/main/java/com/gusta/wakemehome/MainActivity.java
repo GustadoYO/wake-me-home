@@ -47,9 +47,6 @@ public class MainActivity extends AppCompatActivity implements
     private AlarmAdapter mAdapter;  // The RecyclerView adapter
     private AppDatabase mDb;        // The database member
 
-    // TODO: Change preferences update handling
-    private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
-
     //=========//
     // METHODS //
     //=========//
@@ -155,27 +152,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        /*
-         * If the preferences for location or units have changed since the user was last in
-         * MainActivity, perform another query and set the flag to false.
-         *
-         * This isn't the ideal solution because there really isn't a need to perform another
-         * GET request just to change the units, but this is the simplest solution that gets the
-         * job done for now. Later in this course, we are going to show you more elegant ways to
-         * handle converting the units from celsius to fahrenheit and back without hitting the
-         * network again by keeping a copy of the data in a manageable format.
-         */
-        if (PREFERENCES_HAVE_BEEN_UPDATED) {
-            Log.d(TAG, "onStart: preferences were updated");
-            setupViewModel();
-            PREFERENCES_HAVE_BEEN_UPDATED = false;
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -236,16 +212,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        /*
-         * Set this flag to true so that when control returns to MainActivity, it can refresh the
-         * data.
-         *
-         * This isn't the ideal solution because there really isn't a need to perform another
-         * GET request just to change the units, but this is the simplest solution that gets the
-         * job done for now. Later in this course, we are going to show you more elegant ways to
-         * handle converting the units from celsius to fahrenheit and back without hitting the
-         * network again by keeping a copy of the data in a manageable format.
-         */
-        PREFERENCES_HAVE_BEEN_UPDATED = true;
+        mAdapter.notifyDataSetChanged();
     }
 }
