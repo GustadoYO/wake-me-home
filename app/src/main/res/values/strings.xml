@@ -33,7 +33,7 @@
     <string name="edit_alarm_radius">Radius</string>
     <string name="edit_alarm_enabled">Enabled?</string>
     <string name="edit_alarm_vibrate">Vibrate?</string>
-    <string name="edit_alarm_message">Message</string>
+    <string name="edit_alarm_message">None</string>
     <string name="edit_alarm_alert">Alert</string>
 
     <string name="message_label">Alarm name</string>
@@ -71,13 +71,13 @@
     <!-- - - - - - - - - - - - - - - -->
 
     <!-- Length format in Kilometres [CHAR LIMIT=5] -->
-    <string name="format_length_kilometres">
-        <xliff:g id="length">%1.0f</xliff:g> km
+    <string name="format_length_metres">
+        <xliff:g id="length">%1.0f</xliff:g> m
     </string>
 
     <!-- Length format in Miles [CHAR LIMIT=5] -->
-    <string name="format_length_miles">
-        <xliff:g id="length">%1.0f</xliff:g> mi
+    <string name="format_length_feet">
+        <xliff:g id="length">%1.0f</xliff:g> ft
     </string>
 
 </resources>
