@@ -22,6 +22,9 @@
     <!-- - - - - - - - - - - - -->
 
     <string name="action_save">Save</string>
+    <string name="mandatory_fields">
+        Please select location and radius in order to save the alarm
+    </string>
 
     <!-- This has a unicode character for "..." = "&#8230;" -->
     <string name="edit_alarm_location">Human readable location&#8230;</string>

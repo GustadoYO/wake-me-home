@@ -1,4 +1,4 @@
-package com.gusta.wakemehome.models;
+package com.gusta.wakemehome.viewmodel;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;

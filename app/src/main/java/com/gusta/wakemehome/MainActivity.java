@@ -22,8 +22,8 @@ import android.view.View;
 
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
-import com.gusta.wakemehome.models.AppExecutors;
-import com.gusta.wakemehome.models.MainViewModel;
+import com.gusta.wakemehome.viewmodel.AppExecutors;
+import com.gusta.wakemehome.viewmodel.MainViewModel;
 
 import java.util.List;
 

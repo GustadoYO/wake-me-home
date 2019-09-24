@@ -1,4 +1,4 @@
-package com.gusta.wakemehome.models;
+package com.gusta.wakemehome.viewmodel;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
