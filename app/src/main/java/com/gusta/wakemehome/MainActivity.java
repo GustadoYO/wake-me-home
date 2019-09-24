@@ -1,25 +1,28 @@
 package com.gusta.wakemehome;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
@@ -27,7 +30,7 @@ import com.gusta.wakemehome.viewmodel.MainViewModel;
 
 import java.util.List;
 
-import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
+import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
 
 public class MainActivity extends AppCompatActivity implements
         AlarmAdapter.ItemClickListener,
@@ -44,8 +47,9 @@ public class MainActivity extends AppCompatActivity implements
     // VARIABLES //
     //===========//
 
-    private AlarmAdapter mAdapter;  // The RecyclerView adapter
-    private AppDatabase mDb;        // The database member
+    private AlarmAdapter mAdapter;              // The RecyclerView adapter
+    private AppDatabase mDb;                    // The database member
+    private GeofencingClient geofencingClient;  // The geofencing client
 
     //=========//
     // METHODS //
@@ -135,6 +139,9 @@ public class MainActivity extends AppCompatActivity implements
         // Init the database member and the model
         mDb = AppDatabase.getInstance(getApplicationContext());
         setupViewModel();
+
+        // Init geofancing client
+        geofencingClient = LocationServices.getGeofencingClient(this);
     }
 
     /**

@@ -1,13 +1,14 @@
 package com.gusta.wakemehome;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.utilities.WakeMeHomeUnitsUtils;
@@ -15,14 +16,14 @@ import com.gusta.wakemehome.utilities.WakeMeHomeUnitsUtils;
 import java.util.List;
 
 /**
- * {@link AlarmAdapter} exposes a list of weather forecasts to a
- * {@link android.support.v7.widget.RecyclerView}
+ * {@link AlarmAdapter} exposes a list of alarms to a
+ * {@link RecyclerView}
  */
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder> {
 
     // Member variable to handle item clicks
     final private ItemClickListener mItemClickListener;
-    // Class variables for the List that holds task data and the Context
+    // Class variables for the List that holds alarm data and the Context
     private List<AlarmEntry> mAlarmEntries;
     private Context mContext;
 
@@ -44,7 +45,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
      * @param parent   The ViewGroup that these ViewHolders are contained within.
      * @param viewType If your RecyclerView has more than one type of item (which ours doesn't) you
      *                 can use this viewType integer to provide a different layout. See
-     *                 {@link android.support.v7.widget.RecyclerView.Adapter#getItemViewType(int)}
+     *                 {@link RecyclerView.Adapter#getItemViewType(int)}
      *                 for more details.
      * @return A new AlarmAdapterViewHolder that holds the View for each list item
      */
