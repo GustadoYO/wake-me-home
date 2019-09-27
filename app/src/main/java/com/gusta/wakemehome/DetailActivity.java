@@ -150,10 +150,9 @@ public class DetailActivity extends AppCompatActivity {
         String alert = mDetailBinding.clockDetails.alert.getText().toString();
 
         // Show error and abort save if one of the mandatory fields is empty
-        //TODO: Check valid latitude and longitude!
         if (latitudeString.isEmpty() || longitudeString.isEmpty() || radiusString.isEmpty()) {
             Toast.makeText(getApplicationContext(),
-                    R.string.mandatory_fields,Toast.LENGTH_SHORT).show();
+                    R.string.error_mandatory,Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -161,6 +160,18 @@ public class DetailActivity extends AppCompatActivity {
         double latitude = Double.parseDouble(latitudeString);
         double longitude = Double.parseDouble(longitudeString);
         float radius = Float.parseFloat(radiusString);
+
+        // Check if coordinates are valid: -90 < latitude < 90 && -180 < longitude < 180
+        if (latitude < -90 || latitude > 90) {
+            Toast.makeText(getApplicationContext(),
+                    R.string.error_latitude,Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (longitude < -180 || longitude > 180) {
+            Toast.makeText(getApplicationContext(),
+                    R.string.error_longitude,Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // "enabled" field is not shown on this screen - keep current value (if exists)
         boolean enabled = (mViewModel == null) ||

@@ -22,11 +22,16 @@
     <!-- - - - - - - - - - - - -->
 
     <string name="action_save">Save</string>
-    <string name="mandatory_fields">
+
+
+    <string name="error_mandatory">
         Please select location and radius in order to save the alarm
     </string>
+    <!-- "&#176;" = unicode character for degree symbol -->
+    <string name="error_latitude">Latitude must be between -90&#176; and +90&#176;</string>
+    <string name="error_longitude">Longitude must be between -180&#176; and +180&#176;</string>
 
-    <!-- This has a unicode character for "..." = "&#8230;" -->
+    <!-- "&#8230;" = unicode character for "..." -->
     <string name="edit_alarm_location">Human readable location&#8230;</string>
     <string name="edit_alarm_latitude">Latitude</string>
     <string name="edit_alarm_longitude">Longitude</string>
