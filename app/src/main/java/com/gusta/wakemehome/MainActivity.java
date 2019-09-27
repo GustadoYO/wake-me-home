@@ -43,9 +43,9 @@ public class MainActivity extends AppCompatActivity implements
     // Constant for logging
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    //===========//
-    // VARIABLES //
-    //===========//
+    //=========//
+    // MEMBERS //
+    //=========//
 
     private AlarmAdapter mAdapter;              // The RecyclerView adapter
     private AppDatabase mDb;                    // The database member

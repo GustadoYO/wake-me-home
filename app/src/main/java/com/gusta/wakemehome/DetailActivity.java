@@ -42,9 +42,9 @@ public class DetailActivity extends AppCompatActivity {
     // Constant for default alarm id to be used when not in update mode
     private static final int DEFAULT_ALARM_ID = -1;
 
-    //===========//
-    // VARIABLES //
-    //===========//
+    //=========//
+    // MEMBERS //
+    //=========//
 
     private int mAlarmId = DEFAULT_ALARM_ID;        // The current alarm ID
     private DetailViewModel mViewModel;             // The current alarm view model
