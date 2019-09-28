@@ -1,5 +1,6 @@
 package com.gusta.wakemehome;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,14 +21,19 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.MainViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
@@ -47,9 +53,13 @@ public class MainActivity extends AppCompatActivity implements
     // MEMBERS //
     //=========//
 
+    private MainViewModel mViewModel;           // The activities view model
     private AlarmAdapter mAdapter;              // The RecyclerView adapter
     private AppDatabase mDb;                    // The database member
-    private GeofencingClient geofencingClient;  // The geofencing client
+
+    // Geofencing
+    private GeofencingClient geofencingClient;
+    private PendingIntent geofencePendingIntent;
 
     //=========//
     // METHODS //
@@ -136,24 +146,25 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
+        // Init geofancing client
+        geofencingClient = LocationServices.getGeofencingClient(this);
+
         // Init the database member and the model
         mDb = AppDatabase.getInstance(getApplicationContext());
         setupViewModel();
-
-        // Init geofancing client
-        geofencingClient = LocationServices.getGeofencingClient(this);
     }
 
     /**
-     * Start observing the "alarms list" model in order to  update UI of any change
+     * Start observing the "alarms list" model in order to update UI and geofences of any change
      * */
     private void setupViewModel() {
-        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        viewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
+        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mViewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
             @Override
             public void onChanged(@Nullable List<AlarmEntry> alarmEntries) {
-                Log.d(TAG, "Updating list of tasks from LiveData in ViewModel");
+                Log.d(TAG, "Updating list of alarms from LiveData in ViewModel");
                 mAdapter.setAlarms(alarmEntries);
+                addGeofences();
             }
         });
     }
@@ -221,4 +232,75 @@ public class MainActivity extends AppCompatActivity implements
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         mAdapter.notifyDataSetChanged();
     }
+
+    //====================//
+    // geofencing METHODS //
+    //====================//
+
+    // TODO: Try to move geofencing logic to MainViewModel or a utility class
+
+    private GeofencingRequest getGeofencingRequest() {
+        Log.d(TAG, "Creating and destroying geofences according to alarms list");
+        List<AlarmEntry> alarmEntries = mViewModel.getAlarms().getValue();
+        List<Geofence> geofenceList = new ArrayList<>();
+
+        // Create geofence objects
+        if (alarmEntries != null) {
+            for(AlarmEntry entry : alarmEntries)
+            {
+                if (entry.isEnabled()) {
+                    geofenceList.add(new Geofence.Builder()
+                            // Set the request ID of the geofence.
+                            // This is a string to identify this geofence.
+                            .setRequestId(String.valueOf(entry.getId()))
+
+                            .setCircularRegion(
+                                    entry.getLatitude(),
+                                    entry.getLongitude(),
+                                    entry.getRadius()
+                            )
+                            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                            .build());
+                }
+            }
+        }
+
+        // Specify geofences and initial triggers
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofences(geofenceList);
+        return builder.build();
+    }
+
+    private PendingIntent getGeofencePendingIntent() {
+        // Reuse the PendingIntent if we already have it.
+        if (geofencePendingIntent != null) {
+            return geofencePendingIntent;
+        }
+        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
+        // calling addGeofences() and removeGeofences().
+        geofencePendingIntent = PendingIntent.getBroadcast(this, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        return geofencePendingIntent;
+    }
+
+    private void addGeofences() {
+        // TODO: Ask for permissions (android.permission.ACCESS_FINE_LOCATION)
+        geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
+                .addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "Geofences added");
+                            }
+                        })
+                .addOnFailureListener(MainActivity.this, new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d(TAG, "Failed to add geofences");
+                            }
+                        });
+    }
+
 }
