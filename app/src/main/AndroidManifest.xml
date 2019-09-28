@@ -41,7 +41,8 @@
         <!--The manifest entry for our SettingsActivity. Each Activity requires a manifest entry-->
         <activity android:name=".SettingsActivity" />
 
-        <receiver android:name=".GeofenceBroadcastReceiver"/>
+        <receiver android:name=".geofencing.GeofenceBroadcastReceiver"/>
+        <service android:name=".geofencing.GeofenceTransitionsJobIntentService"/>
 
     </application>
 
