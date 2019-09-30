@@ -148,13 +148,16 @@ public class GeofenceManager implements OnCompleteListener<Void> {
                 .addOnFailureListener(mActivity, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
+                        // Typically this is because the user turned off location access in
+                        // settings > location access."
                         Log.d(TAG, "Failed to add geofences");
                     }
                 });
     }
 
     /**
-     * Removes geofences, which stops further notifications when the device enters or exits
+     * Removes geofences, which stops further notifications when the device enters
      * previously registered geofences.
      */
     public void removeGeofences() {
@@ -218,18 +221,6 @@ public class GeofenceManager implements OnCompleteListener<Void> {
         mGeofencePendingIntent = PendingIntent.getBroadcast(mActivity, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         return mGeofencePendingIntent;
-    }
-
-    /**
-     * Shows a {@link Snackbar} using {@code text}.
-     *
-     * @param text The Snackbar text.
-     */
-    private void showSnackbar(final String text) {
-        View container = mActivity.findViewById(android.R.id.content);
-        if (container != null) {
-            Snackbar.make(container, text, Snackbar.LENGTH_LONG).show();
-        }
     }
 
     /**

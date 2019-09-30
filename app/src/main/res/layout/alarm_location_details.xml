@@ -39,7 +39,7 @@
             android:hint="@string/edit_alarm_latitude"
             android:paddingBottom="@dimen/detail_vertical_padding"
             android:importantForAutofill="no"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal|numberSigned" />
 
         <!-- EditText for alarm longitude -->
         <EditText
@@ -50,7 +50,7 @@
             android:hint="@string/edit_alarm_longitude"
             android:paddingBottom="@dimen/detail_vertical_padding"
             android:importantForAutofill="no"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal|numberSigned" />
 
         <!-- EditText for alarm radius -->
         <EditText
