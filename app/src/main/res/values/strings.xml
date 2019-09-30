@@ -90,6 +90,9 @@
     <!-- Used by geofencing package-->
     <!-- - - - - - - - - - - - - - -->
 
+    <string name="geofences_added">Geofences added</string>
+    <string name="geofences_removed">Geofences removed</string>
+
     <!-- Error strings -->
     <string name="geofence_not_available">Geofence service is not available now</string>
     <string name="geofence_too_many_geofences">Your app has registered too many geofences</string>
@@ -112,5 +115,12 @@
         Click notification to return to app
     </string>
 
+    <string name="permission_rationale">
+        Location permission is needed for core functionality
+    </string>
+    <string name="permission_denied_explanation">
+        Permission was denied, but is needed for core functionality.
+    </string>
+    <string name="settings">Settings</string>
 
 </resources>
