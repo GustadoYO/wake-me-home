@@ -3,7 +3,6 @@ package com.gusta.wakemehome.utilities;
 import android.content.Context;
 
 import com.gusta.wakemehome.R;
-import com.gusta.wakemehome.data.WakeMeHomePreferences;
 
 /**
  * Contains useful utilities , such as conversion between Kilometres and Miles.
@@ -15,13 +14,12 @@ public final class WakeMeHomeUnitsUtils {
     /**
      * This method will convert a length from Kilometres to Miles.
      *
-     * @param lengthInKilometres Length in Kilometres (km)
+     * @param lengthInMetres Length in metres (m)
      *
-     * @return Length in Miles (mi)
+     * @return Length in feet (ft)
      */
-    private static double kilometresToMiles(double lengthInKilometres) {
-        double lengthInMiles = lengthInKilometres * 0.621371;
-        return lengthInMiles;
+    private static double metresToFeet(double lengthInMetres) {
+        return lengthInMetres * 3.28084;
     }
 
     /**
@@ -37,11 +35,11 @@ public final class WakeMeHomeUnitsUtils {
      * "21 km"
      */
     public static String formatLength(Context context, double length) {
-        int temperatureFormatResourceId = R.string.format_length_kilometres;
+        int temperatureFormatResourceId = R.string.format_length_metres;
 
         if (!WakeMeHomePreferences.isMetric(context)) {
-            length = kilometresToMiles(length);
-            temperatureFormatResourceId = R.string.format_length_miles;
+            length = metresToFeet(length);
+            temperatureFormatResourceId = R.string.format_length_feet;
         }
 
         /* For presentation, assume the user doesn't care about tenths of a degree. */

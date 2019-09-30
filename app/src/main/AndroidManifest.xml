@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.gusta.wakemehome">
 
     <application
@@ -8,8 +9,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".SettingsActivity"></activity>
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+
+        <!--The manifest entry for our MainActivity. Each Activity requires a manifest entry-->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -21,6 +24,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--The manifest entry for our DetailActivity. Each Activity requires a manifest entry-->
         <activity
             android:name=".DetailActivity"
             android:parentActivityName=".MainActivity">
@@ -28,6 +33,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <!--The manifest entry for our SettingsActivity. Each Activity requires a manifest entry-->
+        <activity android:name=".SettingsActivity" />
+
     </application>
 
 </manifest>

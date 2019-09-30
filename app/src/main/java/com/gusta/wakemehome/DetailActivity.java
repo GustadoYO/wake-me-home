@@ -1,82 +1,105 @@
 package com.gusta.wakemehome;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ShareCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
+import com.gusta.wakemehome.databinding.ActivityDetailBinding;
+import com.gusta.wakemehome.viewmodel.AppExecutors;
+import com.gusta.wakemehome.viewmodel.DetailViewModel;
+import com.gusta.wakemehome.viewmodel.DetailViewModelFactory;
 
-import java.util.Date;
+import java.util.Objects;
 
 public class DetailActivity extends AppCompatActivity {
 
+    //===========//
+    // CONSTANTS //
+    //===========//
+
+    // Constant for logging
+    private static final String TAG = DetailActivity.class.getSimpleName();
     // Extra for the alarm ID to be received in the intent
     public static final String EXTRA_ALARM_ID = "extraAlarmId";
     // Extra for the alarm ID to be received after rotation
     public static final String INSTANCE_ALARM_ID = "instanceAlarmId";
     // Constant for default alarm id to be used when not in update mode
     private static final int DEFAULT_ALARM_ID = -1;
-    // Constant for logging
-    private static final String TAG = DetailActivity.class.getSimpleName();
-    // Fields for views
-    EditText mLocation;
-    EditText mLatitude;
-    EditText mLongitude;
-    EditText mRadius;
-    EditText mEnabled;
-    EditText mVibrate;
-    EditText mMessage;
-    EditText mAlert;
-    Button mButton;
 
-    private int mAlarmId = DEFAULT_ALARM_ID;
+    //===========//
+    // VARIABLES //
+    //===========//
 
-    // Member variable for the Database
-    private AppDatabase mDb;
+    private int mAlarmId = DEFAULT_ALARM_ID;        // The current alarm ID
+    private DetailViewModel mViewModel;             // The current alarm view model
+    private AppDatabase mDb;                        // The database member
+    private ActivityDetailBinding mDetailBinding;   // The data binding object
+    Button mButton;                                 // The open map button
+
+    //=========//
+    // METHODS //
+    //=========//
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
 
-        initViews();
+        // Init the data binding object
+        mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
+        // Init the save button
+        mButton = mDetailBinding.locationDetails.OpenMapButton;
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onOpenMapButtonClicked();
+            }
+        });
+
+        // Init the database member
         mDb = AppDatabase.getInstance(getApplicationContext());
 
+        // Check for saved state (like after phone orientation change) - and load it
         if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_ALARM_ID)) {
             mAlarmId = savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID);
         }
 
+        // If ALARM_ID was sent, it is update mode (list item clicked)
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
-            mButton.setText(R.string.update_button);
+
+            // If member alarm ID is still DEFAULT_ID, the alarm model should be loaded from db
             if (mAlarmId == DEFAULT_ALARM_ID) {
-                // populate the UI
+
+                // Set member alarm ID to wanted alarm (from intent)
                 mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
 
+                // Load alarm model
                 DetailViewModelFactory factory = new DetailViewModelFactory(mDb, mAlarmId);
-                final DetailViewModel viewModel =
+                mViewModel =
                         ViewModelProviders.of(this, factory).get(DetailViewModel.class);
 
-                viewModel.getAlarm().observe(this, new Observer<AlarmEntry>() {
+                // Observe changes in model in order to update UI
+                mViewModel.getAlarm().observe(this, new Observer<AlarmEntry>() {
                     @Override
                     public void onChanged(@Nullable AlarmEntry alarmEntry) {
-                        viewModel.getAlarm().removeObserver(this);
+                        // populate the UI
+                        mViewModel.getAlarm().removeObserver(this);
                         populateUI(alarmEntry);
                     }
                 });
@@ -86,30 +109,9 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        // Save alarm ID to state (to keep it in case of phone orientation change for example)
         outState.putInt(INSTANCE_ALARM_ID, mAlarmId);
         super.onSaveInstanceState(outState);
-    }
-
-    /**
-     * initViews is called from onCreate to init the member variable views
-     */
-    private void initViews() {
-        mLocation = findViewById(R.id.editTextAlarmLocation);
-        mLatitude = findViewById(R.id.editTextAlarmLatitude);
-        mLongitude = findViewById(R.id.editTextAlarmLongitude);
-        mRadius = findViewById(R.id.editTextAlarmRadius);
-        mEnabled = findViewById(R.id.editTextAlarmEnabled);
-        mVibrate = findViewById(R.id.editTextAlarmVibrate);
-        mMessage = findViewById(R.id.editTextAlarmMessage);
-        mAlert = findViewById(R.id.editTextAlarmAlert);
-
-        mButton = findViewById(R.id.saveButton);
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onSaveButtonClicked();
-            }
-        });
     }
 
     /**
@@ -122,30 +124,47 @@ public class DetailActivity extends AppCompatActivity {
             return;
         }
 
-        mLocation.setText(alarm.getLocation());
-        mLatitude.setText(String.valueOf(alarm.getLatitude()));
-        mLongitude.setText(String.valueOf(alarm.getLongitude()));
-        mRadius.setText(String.valueOf(alarm.getRadius()));
-        mEnabled.setText(String.valueOf(alarm.isEnabled()));
-        mVibrate.setText(String.valueOf(alarm.isVibrate()));
-        mMessage.setText(alarm.getMessage());
-        mAlert.setText(alarm.getAlert());
+        mDetailBinding.locationDetails.location.setText(alarm.getLocation());
+        mDetailBinding.locationDetails.latitude.setText(String.valueOf(alarm.getLatitude()));
+        mDetailBinding.locationDetails.longitude.setText(String.valueOf(alarm.getLongitude()));
+        mDetailBinding.locationDetails.radius.setText(String.valueOf(alarm.getRadius()));
+        mDetailBinding.clockDetails.vibrate.setChecked(alarm.isVibrate());
+        mDetailBinding.clockDetails.message.setText(alarm.getMessage());
+        mDetailBinding.clockDetails.alert.setText(alarm.getAlert());
     }
 
     /**
      * onSaveButtonClicked is called when the "save" button is clicked.
      * It retrieves user input and inserts that new alarm data into the underlying database.
      */
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void onSaveButtonClicked() {
-        String location = mLocation.getText().toString();
-        double latitude = Double.parseDouble(mLatitude.getText().toString());
-        double longitude = Double.parseDouble(mLongitude.getText().toString());
-        double radius = Double.parseDouble(mRadius.getText().toString());
-        boolean enabled = Boolean.parseBoolean(mEnabled.getText().toString());
-        boolean vibrate = Boolean.parseBoolean(mVibrate.getText().toString());
-        String message = mMessage.getText().toString();
-        String alert = mAlert.getText().toString();
+        // Get user inputs
+        String location = mDetailBinding.locationDetails.location.getText().toString();
+        String latitudeString = mDetailBinding.locationDetails.latitude.getText().toString();
+        String longitudeString = mDetailBinding.locationDetails.longitude.getText().toString();
+        String radiusString = mDetailBinding.locationDetails.radius.getText().toString();
+        boolean vibrate = mDetailBinding.clockDetails.vibrate.isChecked();
+        String message = mDetailBinding.clockDetails.message.getText().toString();
+        String alert = mDetailBinding.clockDetails.alert.getText().toString();
 
+        // Show error and abort save if one of the mandatory fields is empty
+        if (latitudeString.isEmpty() || longitudeString.isEmpty() || radiusString.isEmpty()) {
+            Toast.makeText(getApplicationContext(),R.string.mandatory_fields,Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
+        // Parse numeric fields to their appropriate types
+        double latitude = Double.parseDouble(latitudeString);
+        double longitude = Double.parseDouble(longitudeString);
+        double radius = Double.parseDouble(radiusString);
+
+        // "enabled" field is not shown on this screen - keep current value (if exists)
+        boolean enabled = (mViewModel == null) ||
+                Objects.requireNonNull(mViewModel.getAlarm().getValue()).isEnabled();
+
+        // Save the added/updated alarm entity
         final AlarmEntry alarm = new AlarmEntry(location, latitude, longitude, radius,
                 enabled, vibrate, message, alert);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
@@ -169,36 +188,43 @@ public class DetailActivity extends AppCompatActivity {
      * map. This super-handy intent is detailed in the "Common Intents"
      * page of Android's developer site:
      *
-     * @see <a"http://developer.android.com/guide/components/intents-common.html#Maps">
+     * see <a"http://developer.android.com/guide/components/intents-common.html#Maps">
      *
      * Hint: Hold Command on Mac or Control on Windows and click that link
-     * to automagically open the Common Intents page
-     *
-     * @return The Intent to use to open the map.
+     * to automatically open the Common Intents page
      */
-    private Intent createOpenAlarmInMapIntent() {
-        Uri geoLocation = Uri.parse("geo:0,0?q=" + mLocation.getText());
+    private void onOpenMapButtonClicked() {
+        Uri geoLocation =
+                Uri.parse("geo:0,0?q=" + mDetailBinding.locationDetails.location.getText());
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geoLocation);
-        return intent;
+
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Log.d(TAG, "Couldn't call " + geoLocation.toString() +
+                    ", no receiving apps installed!");
+        }
     }
+
+    //=====================//
+    // OPTION MENU METHODS //
+    //=====================//
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_detail, menu);
-        MenuItem menuItem = menu.findItem(R.id.action_map);
-        menuItem.setIntent(createOpenAlarmInMapIntent());
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
-            startActivity(startSettingsActivity);
+        if (id == R.id.action_save) {
+            onSaveButtonClicked();
             return true;
         }
 

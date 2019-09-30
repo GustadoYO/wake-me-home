@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -15,14 +16,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.view.View;
 
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
+import com.gusta.wakemehome.viewmodel.AppExecutors;
+import com.gusta.wakemehome.viewmodel.MainViewModel;
 
 import java.util.List;
 
@@ -32,20 +33,23 @@ public class MainActivity extends AppCompatActivity implements
         AlarmAdapter.ItemClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
+    //===========//
+    // CONSTANTS //
+    //===========//
+
     // Constant for logging
     private static final String TAG = MainActivity.class.getSimpleName();
-    // Member variables for the adapter and RecyclerView
-    private RecyclerView mRecyclerView;
-    private AlarmAdapter mAdapter;
 
-    private AppDatabase mDb;
+    //===========//
+    // VARIABLES //
+    //===========//
 
-    private TextView mErrorMessageDisplay;
-    private ProgressBar mLoadingIndicator;
+    private AlarmAdapter mAdapter;  // The RecyclerView adapter
+    private AppDatabase mDb;        // The database member
 
-    private static final int ALARMS_LOADER_ID = 0;
-
-    private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
+    //=========//
+    // METHODS //
+    //=========//
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +59,8 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         // Set the RecyclerView to its corresponding view
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_alarms);
-
-        /* This TextView is used to display errors and will be hidden if there are no errors */
-        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
+        // Member variables for the adapter and RecyclerView
+        RecyclerView mRecyclerView = findViewById(R.id.rv_alarms);
 
         // Set the layout for the RecyclerView to be a linear layout, which measures and
         // positions items within a RecyclerView into a linear list
@@ -74,7 +76,9 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter = new AlarmAdapter(this, this);
         mRecyclerView.setAdapter(mAdapter);
 
-        DividerItemDecoration decoration = new DividerItemDecoration(getApplicationContext(), VERTICAL);
+        // Add divider between list items
+        DividerItemDecoration decoration =
+                new DividerItemDecoration(getApplicationContext(), VERTICAL);
         mRecyclerView.addItemDecoration(decoration);
 
         /*
@@ -82,15 +86,18 @@ public class MainActivity extends AppCompatActivity implements
          An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
          and uses callbacks to signal when a user is performing these actions.
          */
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
 
             // Called when a user swipes left or right on a ViewHolder
             @Override
-            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
+            public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 // call the diskIO execute method with a new Runnable and implement its run method
                 AppExecutors.getInstance().diskIO().execute(new Runnable() {
                     @Override
@@ -102,29 +109,6 @@ public class MainActivity extends AppCompatActivity implements
                 });
             }
         }).attachToRecyclerView(mRecyclerView);
-
-        /*
-         * The ProgressBar that will indicate to the user that we are loading data. It will be
-         * hidden when no data is loading.
-         *
-         * Please note: This so called "ProgressBar" isn't a bar by default. It is more of a
-         * circle. We didn't make the rules (or the names of Views), we just follow them.
-         */
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-
-        /*
-         * This ID will uniquely identify the Loader. We can use it, for example, to get a handle
-         * on our Loader at a later point in time through the support LoaderManager.
-         */
-        int loaderId = ALARMS_LOADER_ID;
-
-        /*
-         * The second parameter of the initLoader method below is a Bundle. Optionally, you can
-         * pass a Bundle to initLoader that you can then access from within the onCreateLoader
-         * callback. In our case, we don't actually use the Bundle, but it's here in case we wanted
-         * to.
-         */
-        Bundle bundleForLoader = null;
 
         Log.d(TAG, "onCreate: registering preference changed listener");
 
@@ -142,15 +126,20 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 // Create a new intent to start an DetailActivity
-                Intent addTaskIntent = new Intent(MainActivity.this, DetailActivity.class);
+                Intent addTaskIntent =
+                        new Intent(MainActivity.this, DetailActivity.class);
                 startActivity(addTaskIntent);
             }
         });
 
+        // Init the database member and the model
         mDb = AppDatabase.getInstance(getApplicationContext());
         setupViewModel();
     }
 
+    /**
+     * Start observing the "alarms list" model in order to  update UI of any change
+     * */
     private void setupViewModel() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         viewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
@@ -162,69 +151,6 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    /**
-     * This method is overridden by our MainActivity class in order to handle RecyclerView item
-     * clicks.
-     *
-     * @param itemId The alarm that was clicked
-     */
-    @Override
-    public void onItemClickListener(int itemId) {
-        // Launch AddTaskActivity adding the itemId as an extra in the intent
-        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-        intent.putExtra(DetailActivity.EXTRA_ALARM_ID, itemId);
-        startActivity(intent);
-    }
-
-    /**
-     * This method will make the View for the alarms data visible and
-     * hide the error message.
-     * <p>
-     * Since it is okay to redundantly set the visibility of a View, we don't
-     * need to check whether each view is currently visible or invisible.
-     */
-    private void showAlarmsDataView() {
-        /* First, make sure the error is invisible */
-        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
-        /* Then, make sure the alarms data is visible */
-        mRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * This method will make the error message visible and hide the alarms
-     * View.
-     * <p>
-     * Since it is okay to redundantly set the visibility of a View, we don't
-     * need to check whether each view is currently visible or invisible.
-     */
-    private void showErrorMessage() {
-        /* First, hide the currently visible data */
-        mRecyclerView.setVisibility(View.INVISIBLE);
-        /* Then, show the error */
-        mErrorMessageDisplay.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        /*
-         * If the preferences for location or units have changed since the user was last in
-         * MainActivity, perform another query and set the flag to false.
-         *
-         * This isn't the ideal solution because there really isn't a need to perform another
-         * GET request just to change the units, but this is the simplest solution that gets the
-         * job done for now. Later in this course, we are going to show you more elegant ways to
-         * handle converting the units from celsius to fahrenheit and back without hitting the
-         * network again by keeping a copy of the data in a manageable format.
-         */
-        if (PREFERENCES_HAVE_BEEN_UPDATED) {
-            Log.d(TAG, "onStart: preferences were updated");
-            setupViewModel();
-            PREFERENCES_HAVE_BEEN_UPDATED = false;
-        }
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -233,6 +159,10 @@ public class MainActivity extends AppCompatActivity implements
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
+
+    //=====================//
+    // OPTION MENU METHODS //
+    //=====================//
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -258,18 +188,30 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    //===========================//
+    // ItemClickListener METHODS //
+    //===========================//
+
+    /**
+     * This method is overridden by our MainActivity class in order to handle RecyclerView item
+     * clicks.
+     *
+     * @param itemId The alarm that was clicked
+     */
+    @Override
+    public void onItemClickListener(int itemId) {
+        // Launch AddTaskActivity adding the itemId as an extra in the intent
+        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_ALARM_ID, itemId);
+        startActivity(intent);
+    }
+
+    //==========================================//
+    // OnSharedPreferenceChangeListener METHODS //
+    //==========================================//
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        /*
-         * Set this flag to true so that when control returns to MainActivity, it can refresh the
-         * data.
-         *
-         * This isn't the ideal solution because there really isn't a need to perform another
-         * GET request just to change the units, but this is the simplest solution that gets the
-         * job done for now. Later in this course, we are going to show you more elegant ways to
-         * handle converting the units from celsius to fahrenheit and back without hitting the
-         * network again by keeping a copy of the data in a manageable format.
-         */
-        PREFERENCES_HAVE_BEEN_UPDATED = true;
+        mAdapter.notifyDataSetChanged();
     }
 }

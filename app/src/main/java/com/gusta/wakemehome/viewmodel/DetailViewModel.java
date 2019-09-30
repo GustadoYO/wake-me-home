@@ -1,4 +1,4 @@
-package com.gusta.wakemehome;
+package com.gusta.wakemehome.viewmodel;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
@@ -6,11 +6,11 @@ import android.arch.lifecycle.ViewModel;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 
-class DetailViewModel extends ViewModel {
+public class DetailViewModel extends ViewModel {
 
     private LiveData<AlarmEntry> alarm;
 
-    public DetailViewModel(AppDatabase database, int alarmId) {
+    DetailViewModel(AppDatabase database, int alarmId) {
         alarm = database.alarmDao().loadAlarmById(alarmId);
     }
 

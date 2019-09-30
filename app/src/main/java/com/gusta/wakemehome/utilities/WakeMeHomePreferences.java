@@ -1,4 +1,4 @@
-package com.gusta.wakemehome.data;
+package com.gusta.wakemehome.utilities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,7 +6,7 @@ import android.support.v7.preference.PreferenceManager;
 
 import com.gusta.wakemehome.R;
 
-public final class WakeMeHomePreferences {
+final class WakeMeHomePreferences {
 
     /**
      * Returns true if the user has selected metric length display.
@@ -15,7 +15,7 @@ public final class WakeMeHomePreferences {
      *
      * @return true If metric display should be used
      */
-    public static boolean isMetric(Context context) {
+    static boolean isMetric(Context context) {
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(context);
         String keyForUnits = context.getString(R.string.pref_units_key);
@@ -23,11 +23,7 @@ public final class WakeMeHomePreferences {
         String preferredUnits = prefs.getString(keyForUnits, defaultUnits);
         String metric = context.getString(R.string.pref_units_metric);
         boolean userPrefersMetric;
-        if (metric.equals(preferredUnits)) {
-            userPrefersMetric = true;
-        } else {
-            userPrefersMetric = false;
-        }
+        userPrefersMetric = metric.equals(preferredUnits);
         return userPrefersMetric;
     }
 

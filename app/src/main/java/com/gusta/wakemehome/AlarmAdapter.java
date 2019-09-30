@@ -1,12 +1,12 @@
 package com.gusta.wakemehome;
 
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.gusta.wakemehome.database.AlarmEntry;
@@ -32,7 +32,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
      * @param context  the current Context
      * @param listener the ItemClickListener
      */
-    public AlarmAdapter(Context context, ItemClickListener listener) {
+    AlarmAdapter(Context context, ItemClickListener listener) {
         mContext = context;
         mItemClickListener = listener;
     }
@@ -73,23 +73,16 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         // Determine the values of the wanted data
         AlarmEntry taskEntry = mAlarmEntries.get(position);
         String location = taskEntry.getLocation();
-        String latitude = String.valueOf(taskEntry.getLatitude());
-        String longitude = String.valueOf(taskEntry.getLongitude());
-        String radius = WakeMeHomeUnitsUtils.formatLength(mContext, taskEntry.getRadius());
-        String enabled = String.valueOf(taskEntry.isEnabled());
-        String vibrate = String.valueOf(taskEntry.isVibrate());
+        String radius =
+                WakeMeHomeUnitsUtils.formatLength(mContext, taskEntry.getRadius()) + " radius";
+        boolean enabled = taskEntry.isEnabled();
         String message = taskEntry.getMessage();
-        String alert = taskEntry.getAlert();
 
         //Set values
         holder.locationView.setText(location);
-//        holder.latitudeView.setText(latitude);
-//        holder.longitudeView.setText(longitude);
-        holder.radiusView.setText(radius);
-        holder.enabledView.setText(enabled);
-//        holder.vibrateView.setText(vibrate);
-//        holder.messageView.setText(message);
-//        holder.alertView.setText(alert);
+        holder.enabledView.setText(radius);
+        holder.enabledView.setChecked(enabled);
+        holder.messageView.setText(message);
     }
 
     /**
@@ -104,7 +97,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         return mAlarmEntries.size();
     }
 
-    public List<AlarmEntry> getAlarms() {
+    List<AlarmEntry> getAlarms() {
         return mAlarmEntries;
     }
 
@@ -115,7 +108,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
      *
      * @param alarmEntries The new alarm data to be displayed.
      */
-    public void setAlarms(List<AlarmEntry> alarmEntries) {
+    void setAlarms(List<AlarmEntry> alarmEntries) {
         mAlarmEntries = alarmEntries;
         notifyDataSetChanged();
     }
@@ -134,30 +127,20 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
         // Class variables
         TextView locationView;
-        TextView latitudeView;
-        TextView longitudeView;
-        TextView radiusView;
-        TextView enabledView;
-        TextView vibrateView;
+        Switch enabledView;
         TextView messageView;
-        TextView alertView;
 
         /**
          * Constructor for the AlarmViewHolder.
          *
          * @param itemView The view inflated in onCreateViewHolder
          */
-        public AlarmViewHolder(View itemView) {
+        AlarmViewHolder(View itemView) {
             super(itemView);
 
             locationView = itemView.findViewById(R.id.location);
-//            latitudeView = itemView.findViewById(R.id.latitude);
-//            longitudeView = itemView.findViewById(R.id.longitude);
-            radiusView = itemView.findViewById(R.id.radius);
             enabledView = itemView.findViewById(R.id.enabled);
-//            vibrateView = itemView.findViewById(R.id.vibrate);
-//            messageView = itemView.findViewById(R.id.message);
-//            alertView = itemView.findViewById(R.id.alert);
+            messageView = itemView.findViewById(R.id.message);
 
             itemView.setOnClickListener(this);
         }
