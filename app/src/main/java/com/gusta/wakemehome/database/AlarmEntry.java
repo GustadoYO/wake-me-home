@@ -5,8 +5,10 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.gusta.wakemehome.geofencing.GeofenceEntry;
+
 @Entity(tableName = "alarm")
-public class AlarmEntry {
+public class AlarmEntry implements GeofenceEntry {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
