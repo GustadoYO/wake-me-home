@@ -30,6 +30,7 @@ import com.gusta.wakemehome.viewmodel.MainViewModel;
 import java.util.List;
 
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
+import static com.gusta.wakemehome.utilities.Constants.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE;
 
 public class MainActivity extends AppCompatActivity implements
         AlarmAdapter.ItemClickListener,
@@ -48,11 +49,11 @@ public class MainActivity extends AppCompatActivity implements
 
     private AlarmAdapter mAdapter;              // The RecyclerView adapter
     private AppDatabase mDb;                    // The database member
-    private GeofenceManager geofenceManager;    // The geofence manager
+    private GeofenceManager mGeofenceManager;    // The geofence manager
 
-    //=========//
-    // METHODS //
-    //=========//
+    //===================//
+    // LIFECYCLE METHODS //
+    //===================//
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements
      * */
     private void setupViewModel() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        geofenceManager = new GeofenceManager(this, viewModel.getAlarms());
+        mGeofenceManager = new GeofenceManager(this, viewModel.getAlarms());
 
         viewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
             @Override
@@ -155,8 +156,8 @@ public class MainActivity extends AppCompatActivity implements
                 mAdapter.setAlarms(alarmEntries);
 
                 // Remove all current geofences and add back only for the enabled alarms
-                geofenceManager.removeGeofences();
-                geofenceManager.addGeofences();
+                mGeofenceManager.removeGeofences();
+                mGeofenceManager.addGeofences();
             }
         });
     }
@@ -196,6 +197,22 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    //====================//
+    // PERMISSION METHODS //
+    //====================//
+
+    /**
+     * Callback received when a permissions request has been completed.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        Log.i(TAG, "onRequestPermissionResult");
+        if (requestCode == ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE) {
+            mGeofenceManager.onRequestPermissionsResult(grantResults);
+        }
     }
 
     //===========================//
