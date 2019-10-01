@@ -223,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void run() {
                 mDb.alarmDao().updateAlarm(alarm);
-                finish();
             }
         });
     }
