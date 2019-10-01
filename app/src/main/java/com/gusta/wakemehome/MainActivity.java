@@ -31,7 +31,8 @@ import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
 public class MainActivity extends AppCompatActivity implements
         AlarmAdapter.ItemClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener,
+        AlarmAdapter.AlarmEnabledChange {
 
     //===========//
     // CONSTANTS //
@@ -212,6 +213,18 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onAlarmEnabledChangeListener(final AlarmEntry alarm) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.alarmDao().updateAlarm(alarm);
+                finish();
+            }
+        });
     }
 }

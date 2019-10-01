@@ -47,6 +47,19 @@ public class AlarmEntry {
         this.alert = alert;
     }
 
+    public AlarmEntry(AlarmEntry alarm) {
+
+        this.id = alarm.id;
+        this.location = alarm.location;
+        this.latitude = alarm.latitude;
+        this.longitude = alarm.longitude;
+        this.radius = alarm.radius;
+        this.enabled = alarm.enabled;
+        this.vibrate = alarm.vibrate;
+        this.message = alarm.message;
+        this.alert = alarm.alert;
+    }
+
     public int getId() {
         return id;
     }
