@@ -30,9 +30,8 @@ import java.util.List;
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
 public class MainActivity extends AppCompatActivity implements
-        AlarmAdapter.ItemClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener,
-        AlarmAdapter.AlarmEnabledChange {
+        AlarmAdapter.AlarmAdapterListeners,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     //===========//
     // CONSTANTS //
@@ -207,6 +206,22 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
+    /**
+     * This method is overridden by our MainActivity class in order to handle RecyclerView item
+     * enable.
+     *
+     * @param alarm The alarm that was enabled
+     */
+    @Override
+    public void onAlarmEnabledChangeListener(final AlarmEntry alarm) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.alarmDao().updateAlarm(alarm);
+            }
+        });
+    }
+
     //==========================================//
     // OnSharedPreferenceChangeListener METHODS //
     //==========================================//
@@ -217,13 +232,4 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onAlarmEnabledChangeListener(final AlarmEntry alarm) {
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                mDb.alarmDao().updateAlarm(alarm);
-            }
-        });
-    }
 }
