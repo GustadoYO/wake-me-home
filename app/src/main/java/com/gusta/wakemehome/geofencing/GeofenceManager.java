@@ -52,7 +52,7 @@ public class GeofenceManager implements OnCompleteListener<Void> {
      * Tracks whether the user requested to add or remove geofences, or to do neither.
      */
     private enum PendingGeofenceTask {
-        ADD, REMOVE, NONE
+        REFRESH, NONE
     }
 
     //=========//
@@ -63,12 +63,10 @@ public class GeofenceManager implements OnCompleteListener<Void> {
      * The activity so show messages (like errors) on.
      */
     private Activity mActivity;
-
     /**
      * The list of entries tracked - each entry will need a geofence.
      */
     private LiveData<? extends List<? extends GeofenceEntry>> mLiveData;
-
     /**
      * Provides access to the Geofencing API.
      */
@@ -88,6 +86,20 @@ public class GeofenceManager implements OnCompleteListener<Void> {
         mActivity = activity;
         mLiveData = liveData;
         mGeofencingClient = LocationServices.getGeofencingClient(activity);
+    }
+
+    public void refresh() {
+        // Ask for location permissions if not yet granted
+        if (!checkPermissions()) {
+            mPendingGeofenceTask = PendingGeofenceTask.REFRESH;
+            requestPermissions();
+            return;
+        }
+
+        // TODO: remove only irrelevant geofences and add only the new ones
+        // Remove all geofences and back all the relevant ones
+        removeGeofences();
+        addGeofences();
     }
 
     /**
@@ -129,13 +141,12 @@ public class GeofenceManager implements OnCompleteListener<Void> {
     }
 
     /**
-     * Adds geofences, which sets alerts to be notified when the device enters or exits one of the
-     * specified geofences. Handles the success or failure results returned by addGeofences().
+     * Adds geofences. This method should be called after the user has granted the location
+     * permission.
      */
-    public void addGeofences() {
+    private void addGeofences() {
         if (!checkPermissions()) {
-            mPendingGeofenceTask = PendingGeofenceTask.ADD;
-            requestPermissions();
+            showSnackbar(mActivity.getString(R.string.insufficient_permissions));
             return;
         }
         mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
@@ -157,13 +168,12 @@ public class GeofenceManager implements OnCompleteListener<Void> {
     }
 
     /**
-     * Removes geofences, which stops further notifications when the device enters
-     * previously registered geofences.
+     * Removes geofences. This method should be called after the user has granted the location
+     * permission.
      */
-    public void removeGeofences() {
+    private void removeGeofences() {
         if (!checkPermissions()) {
-            mPendingGeofenceTask = PendingGeofenceTask.REMOVE;
-            requestPermissions();
+            showSnackbar(mActivity.getString(R.string.insufficient_permissions));
             return;
         }
         mGeofencingClient.removeGeofences(getGeofencePendingIntent())
@@ -224,6 +234,18 @@ public class GeofenceManager implements OnCompleteListener<Void> {
     }
 
     /**
+     * Shows a {@link Snackbar} using {@code text}.
+     *
+     * @param text The Snackbar text.
+     */
+    private void showSnackbar(final String text) {
+        View container = mActivity.findViewById(android.R.id.content);
+        if (container != null) {
+            Snackbar.make(container, text, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    /**
      * Shows a {@link Snackbar}.
      *
      * @param mainTextStringId The id for the string resource for the Snackbar text.
@@ -262,10 +284,8 @@ public class GeofenceManager implements OnCompleteListener<Void> {
      * Performs the geofencing task that was pending until location permission was granted.
      */
     private void performPendingGeofenceTask() {
-        if (mPendingGeofenceTask == PendingGeofenceTask.ADD) {
-            addGeofences();
-        } else if (mPendingGeofenceTask == PendingGeofenceTask.REMOVE) {
-            removeGeofences();
+        if (mPendingGeofenceTask == PendingGeofenceTask.REFRESH) {
+            refresh();
         }
     }
 

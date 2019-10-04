@@ -156,8 +156,7 @@ public class MainActivity extends AppCompatActivity implements
                 mAdapter.setAlarms(alarmEntries);
 
                 // Remove all current geofences and add back only for the enabled alarms
-                mGeofenceManager.removeGeofences();
-                mGeofenceManager.addGeofences();
+                mGeofenceManager.refresh();
             }
         });
     }
