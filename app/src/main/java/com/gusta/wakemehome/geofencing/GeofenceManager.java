@@ -162,22 +162,45 @@ public class GeofenceManager implements OnCompleteListener<Void> {
             return;
         }
 
-        mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Geofences added");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
-                        // Typically this is because the user turned off location access in
-                        // settings > location access."
-                        Log.d(TAG, "Failed to add geofences");
-                    }
-                });
+        // If the context wrapper is an activity - errors can be shown on it
+        if (mContextWrapper instanceof Activity) {
+            Activity activity = (Activity) mContextWrapper;
+            mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
+                    .addOnSuccessListener(activity, new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "Geofences added");
+                        }
+                    })
+                    .addOnFailureListener(activity, new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
+                            // Typically this is because the user turned off location access in
+                            // settings > location access."
+                            Log.d(TAG, "Failed to add geofences");
+                        }
+                    });
+
+            // If the context wrapper is not an activity, a notification is needed to show errors
+        } else {
+            mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "Geofences added");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
+                            // Typically this is because the user turned off location access in
+                            // settings > location access."
+                            Log.d(TAG, "Failed to add geofences");
+                        }
+                    });
+        }
     }
 
     /**
