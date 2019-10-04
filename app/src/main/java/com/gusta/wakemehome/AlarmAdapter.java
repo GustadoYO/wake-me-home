@@ -26,7 +26,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     private static final String TAG = AlarmAdapter.class.getSimpleName();
 
     // Member variable to handle item clicks
-    final private IAlarmAdapterListeners mAlarmListeners;
+    final private AlarmAdapterListeners mAlarmListeners;
     // Class variables for the List that holds task data and the Context
     private List<AlarmEntry> mAlarmEntries;
     private Context mContext;
@@ -37,7 +37,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
      * @param context  the current Context
      * @param listener the ItemClickListener
      */
-    AlarmAdapter(Context context, IAlarmAdapterListeners listener) {
+    AlarmAdapter(Context context, AlarmAdapterListeners listener) {
         mContext = context;
         mAlarmListeners = listener;
     }
@@ -127,6 +127,14 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     void setAlarms(List<AlarmEntry> alarmEntries) {
         mAlarmEntries = alarmEntries;
         notifyDataSetChanged();
+    }
+
+    /**
+     * The interface that receives onClick messages.
+     */
+    public interface AlarmAdapterListeners {
+        void onItemClickListener(int itemId);
+        void onAlarmEnabledChangeListener(AlarmEntry alarm);
     }
 
     /**
