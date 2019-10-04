@@ -33,8 +33,8 @@ import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
 import static com.gusta.wakemehome.utilities.Constants.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE;
 
 public class MainActivity extends AppCompatActivity implements
-        AlarmAdapter.ItemClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        AlarmAdapter.AlarmAdapterListeners,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     //===========//
     // CONSTANTS //
@@ -232,12 +232,30 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
+    /**
+     * This method is overridden by our MainActivity class in order to handle RecyclerView item
+     * enable.
+     *
+     * @param alarm The alarm that was enabled
+     */
+    @Override
+    public void onAlarmEnabledChangeListener(final AlarmEntry alarm) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.alarmDao().updateAlarm(alarm);
+            }
+        });
+    }
+
     //==========================================//
     // OnSharedPreferenceChangeListener METHODS //
     //==========================================//
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+
         mAdapter.notifyDataSetChanged();
     }
+
 }

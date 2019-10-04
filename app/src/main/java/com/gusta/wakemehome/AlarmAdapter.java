@@ -1,9 +1,11 @@
 package com.gusta.wakemehome;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -21,9 +23,12 @@ import java.util.List;
  */
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder> {
 
+    // Constant for logging
+    private static final String TAG = AlarmAdapter.class.getSimpleName();
+
     // Member variable to handle item clicks
-    final private ItemClickListener mItemClickListener;
-    // Class variables for the List that holds alarm data and the Context
+    final private AlarmAdapterListeners mAlarmListeners;
+    // Class variables for the List that holds task data and the Context
     private List<AlarmEntry> mAlarmEntries;
     private Context mContext;
 
@@ -33,9 +38,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
      * @param context  the current Context
      * @param listener the ItemClickListener
      */
-    AlarmAdapter(Context context, ItemClickListener listener) {
+    AlarmAdapter(Context context, AlarmAdapterListeners listener) {
         mContext = context;
-        mItemClickListener = listener;
+        mAlarmListeners = listener;
     }
 
     /**
@@ -72,18 +77,29 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     @Override
     public void onBindViewHolder(@NonNull AlarmViewHolder holder, int position) {
         // Determine the values of the wanted data
-        AlarmEntry taskEntry = mAlarmEntries.get(position);
-        String location = taskEntry.getLocation();
+        final AlarmEntry alarmEntry = mAlarmEntries.get(position);
+        String location = alarmEntry.getLocation();
         String radius =
-                WakeMeHomeUnitsUtils.formatLength(mContext, taskEntry.getRadius()) + " radius";
-        boolean enabled = taskEntry.isEnabled();
-        String message = taskEntry.getMessage();
+                WakeMeHomeUnitsUtils.formatLength(mContext, alarmEntry.getRadius()) + " radius";
+        boolean enabled = alarmEntry.isEnabled();
+        String message = alarmEntry.getMessage();
 
         //Set values
-        holder.locationView.setText(location);
-        holder.enabledView.setText(radius);
-        holder.enabledView.setChecked(enabled);
-        holder.messageView.setText(message);
+        holder.locationElement.setText(location);
+        holder.messageElement.setText(message);
+        holder.enabledElement.setText(radius);
+        holder.enabledElement.setChecked(enabled);
+        holder.enabledElement.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // do something, the isChecked will be
+                // true if the switch is in the On position
+                Log.d(TAG, "switch change from " + !isChecked + " -> " + isChecked);
+                // Save the added/updated alarm entity
+
+                alarmEntry.setEnabled(isChecked);
+                mAlarmListeners.onAlarmEnabledChangeListener(alarmEntry);
+            }
+        });
     }
 
     /**
@@ -117,8 +133,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     /**
      * The interface that receives onClick messages.
      */
-    public interface ItemClickListener {
+    public interface AlarmAdapterListeners {
         void onItemClickListener(int itemId);
+        void onAlarmEnabledChangeListener(AlarmEntry alarm);
     }
 
     /**
@@ -127,9 +144,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     public class AlarmViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // Class variables
-        TextView locationView;
-        Switch enabledView;
-        TextView messageView;
+        TextView locationElement;
+        Switch enabledElement;
+        TextView messageElement;
 
         /**
          * Constructor for the AlarmViewHolder.
@@ -139,9 +156,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         AlarmViewHolder(View itemView) {
             super(itemView);
 
-            locationView = itemView.findViewById(R.id.location);
-            enabledView = itemView.findViewById(R.id.enabled);
-            messageView = itemView.findViewById(R.id.message);
+            locationElement = itemView.findViewById(R.id.location);
+            enabledElement = itemView.findViewById(R.id.enabled);
+            messageElement = itemView.findViewById(R.id.message);
 
             itemView.setOnClickListener(this);
         }
@@ -154,7 +171,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         @Override
         public void onClick(View view) {
             int elementId = mAlarmEntries.get(getAdapterPosition()).getId();
-            mItemClickListener.onItemClickListener(elementId);
+            mAlarmListeners.onItemClickListener(elementId);
         }
     }
 }
