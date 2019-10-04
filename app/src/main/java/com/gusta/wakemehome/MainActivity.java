@@ -30,7 +30,7 @@ import java.util.List;
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
 public class MainActivity extends AppCompatActivity implements
-        AlarmAdapter.AlarmAdapterListeners,
+        IAlarmAdapterListeners,
         SharedPreferences.OnSharedPreferenceChangeListener{
 
     //===========//
