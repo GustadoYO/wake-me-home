@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private AlarmAdapter mAdapter;              // The RecyclerView adapter
     private AppDatabase mDb;                    // The database member
-    private GeofenceManager mGeofenceManager;    // The geofence manager
+    private GeofenceManager mGeofenceManager;   // The geofence manager
 
     //===================//
     // LIFECYCLE METHODS //
@@ -146,7 +146,8 @@ public class MainActivity extends AppCompatActivity implements
      * */
     private void setupViewModel() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        mGeofenceManager = new GeofenceManager(this, viewModel.getAlarms());
+        if (mGeofenceManager == null)
+            mGeofenceManager = new GeofenceManager(this, viewModel.getAlarms());
 
         viewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
             @Override
