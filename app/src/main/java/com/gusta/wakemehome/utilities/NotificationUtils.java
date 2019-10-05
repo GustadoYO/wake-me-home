@@ -21,10 +21,11 @@ public final class NotificationUtils {
      * Constructs and displays a notification.
      *
      * @param context Context used to use various Utility methods
-     * @param Title   Notification's title
-     * @param Text    Notification's text
+     * @param title   Notification's title
+     * @param text    Notification's text
+     * @param intent  Intent to be called when notification is pressed
      */
-    public static void sendNotification(Context context, String Title, String Text) {
+    public static void sendNotification(Context context, String title, String text, Intent intent) {
         // Get an instance of the Notification manager
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -41,9 +42,6 @@ public final class NotificationUtils {
             mNotificationManager.createNotificationChannel(mChannel);
         }
 
-        // Create an explicit content Intent that starts the main Activity.
-        Intent notificationIntent = new Intent(context.getApplicationContext(), MainActivity.class);
-
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
 
@@ -51,7 +49,7 @@ public final class NotificationUtils {
         stackBuilder.addParentStack(MainActivity.class);
 
         // Push the content Intent onto the stack.
-        stackBuilder.addNextIntent(notificationIntent);
+        stackBuilder.addNextIntent(intent);
 
         // Get a PendingIntent containing the entire back stack.
         PendingIntent notificationPendingIntent =
@@ -68,8 +66,8 @@ public final class NotificationUtils {
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),
                         R.mipmap.ic_launcher))
                 .setColor(Color.RED)
-                .setContentTitle(Title)
-                .setContentText(Text)
+                .setContentTitle(title)
+                .setContentText(text)
                 .setContentIntent(notificationPendingIntent);
 
         // Set the Channel ID for Android O.

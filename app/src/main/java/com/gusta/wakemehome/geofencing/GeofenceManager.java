@@ -330,6 +330,27 @@ public class GeofenceManager implements OnCompleteListener<Void> {
     }
 
     /**
+     * Shows a {@link Snackbar}.
+     *
+     * @param mainTextStringId The id for the string resource for the Snackbar text.
+     * @param actionStringId   The text of the action item.
+     * @param listener         The listener associated with the Snackbar action.
+     */
+    private void showSnackbar(final int mainTextStringId, final int actionStringId,
+                              View.OnClickListener listener) {
+        // Abort if the context wrapper is not an activity (can't show messages to the user)
+        if (!(mContextWrapper instanceof Activity)) return;
+        Activity activity = (Activity) mContextWrapper;
+
+        // Show the message to the user
+        Snackbar.make(
+                activity.findViewById(android.R.id.content),
+                mContextWrapper.getString(mainTextStringId),
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(mContextWrapper.getString(actionStringId), listener).show();
+    }
+
+    /**
      * Ask the user for permission.
      */
     private void requestPermissions() {
@@ -365,27 +386,6 @@ public class GeofenceManager implements OnCompleteListener<Void> {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     Constants.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE);
         }
-    }
-
-    /**
-     * Shows a {@link Snackbar}.
-     *
-     * @param mainTextStringId The id for the string resource for the Snackbar text.
-     * @param actionStringId   The text of the action item.
-     * @param listener         The listener associated with the Snackbar action.
-     */
-    private void showSnackbar(final int mainTextStringId, final int actionStringId,
-                              View.OnClickListener listener) {
-        // Abort if the context wrapper is not an activity (can't show messages to the user)
-        if (!(mContextWrapper instanceof Activity)) return;
-        Activity activity = (Activity) mContextWrapper;
-
-        // Show the message to the user
-        Snackbar.make(
-                activity.findViewById(android.R.id.content),
-                mContextWrapper.getString(mainTextStringId),
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(mContextWrapper.getString(actionStringId), listener).show();
     }
 
     /**

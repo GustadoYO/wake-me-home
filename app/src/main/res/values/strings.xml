@@ -111,8 +111,15 @@
     <string name="geofence_transition_exited">Exited</string>
     <string name="unknown_geofence_transition">Unknown Transition</string>
 
+    <!-- Notification texts -->
     <string name="geofence_transition_notification_text">
         Click notification to return to app
+    </string>
+    <string name="geofence_not_available_title">
+        Location services are unavailable - alarms will not trigger!
+    </string>
+    <string name="geofence_not_available_text">
+        Was location access turned off? Click notification to go to settings
     </string>
 
     <string name="insufficient_permissions">Insufficient permissions.</string>

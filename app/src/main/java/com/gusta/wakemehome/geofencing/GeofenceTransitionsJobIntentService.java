@@ -10,7 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
+import com.gusta.wakemehome.MainActivity;
 import com.gusta.wakemehome.R;
 import com.gusta.wakemehome.utilities.NotificationUtils;
 
@@ -47,9 +49,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
     protected void onHandleWork(@NonNull Intent intent) {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         if (geofencingEvent.hasError()) {
-            String errorMessage = GeofenceErrorMessages.getErrorString(this,
-                    geofencingEvent.getErrorCode());
-            Log.e(TAG, errorMessage);
+            handleError(geofencingEvent);
             return;
         }
 
@@ -67,12 +67,33 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
             String geofenceTransitionDetails = getGeofenceTransitionDetails(geofenceTransition,
                     triggeringGeofences);
 
+            // Create an explicit content Intent that starts the main Activity.
+            Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+
             // Send notification and log the transition details.
-            sendNotification(geofenceTransitionDetails);
+            NotificationUtils.sendNotification(this, geofenceTransitionDetails,
+                    getString(R.string.geofence_transition_notification_text), notificationIntent);
             Log.i(TAG, geofenceTransitionDetails);
         } else {
             // Log the error.
             Log.e(TAG, getString(R.string.geofence_transition_invalid_type, geofenceTransition));
+        }
+    }
+
+    private void handleError(GeofencingEvent geofencingEvent) {
+        int errorCode = geofencingEvent.getErrorCode();
+        String errorMessage = GeofenceErrorMessages.getErrorString(this, errorCode);
+        Log.e(TAG, errorMessage);
+
+        if (errorCode == GeofenceStatusCodes.GEOFENCE_NOT_AVAILABLE) {
+            // TODO: Use JobScheduler to re-register geofences once location access is turned on
+
+            // Geofence service is not available now. Typically this is because the user turned off
+            // location access in settings > location access. Send error notification.
+            NotificationUtils.sendNotification(this,
+                    getString(R.string.geofence_not_available_title),
+                    getString(R.string.geofence_not_available_text),
+                    new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         }
     }
 
@@ -98,15 +119,6 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
                 TextUtils.join(", ",  triggeringGeofencesIdsList);
 
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
-    }
-
-    /**
-     * Posts a notification in the notification bar when a transition is detected.
-     * If the user clicks the notification, control goes to the MainActivity.
-     */
-    private void sendNotification(String notificationDetails) {
-        NotificationUtils.sendNotification(this, notificationDetails,
-                getString(R.string.geofence_transition_notification_text));
     }
 
     /**
