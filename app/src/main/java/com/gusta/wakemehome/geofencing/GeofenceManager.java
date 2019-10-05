@@ -48,16 +48,10 @@ public class GeofenceManager implements OnCompleteListener<Void> {
     //=======//
 
     /**
-     * Adds geofences, which sets alerts to be notified when the device enters or exits one of the
-     * specified geofences. Handles the success or failure results returned by addGeofences().
+     * Tracks whether the user requested to add or remove geofences, or to do neither.
      */
-    public void addGeofences() {
-        if (missingPermissions()) {
-            mPendingGeofenceTask = PendingGeofenceTask.ADD;
-            requestPermissions();
-            return;
-        }
-        addGeofencesTask();
+    private enum PendingGeofenceTask {
+        ADD, REMOVE, NONE
     }
 
     //=========//
@@ -94,9 +88,34 @@ public class GeofenceManager implements OnCompleteListener<Void> {
     }
 
     /**
+     * Adds geofences, which sets alerts to be notified when the device enters or exits one of the
+     * specified geofences. Handles the success or failure results returned by addGeofences().
+     */
+    public void addGeofences() {
+        if (missingPermissions()) {
+            mPendingGeofenceTask = PendingGeofenceTask.ADD;
+            requestPermissions();
+            return;
+        }
+        addGeofencesTask();
+    }
+
+    /**
+     * Removes geofences, which stops further notifications when the device enters or exits
+     * previously registered geofences.
+     */
+    public void removeGeofences() {
+        if (missingPermissions()) {
+            mPendingGeofenceTask = PendingGeofenceTask.REMOVE;
+            requestPermissions();
+            return;
+        }
+        removeGeofencesTask();
+    }
+
+    /**
      * Runs when the result of calling {@link #addGeofences()} and/or {@link #removeGeofences()}
      * is available.
-     *
      * @param task the resulting Task, containing either a result or error.
      */
     @Override
@@ -114,77 +133,6 @@ public class GeofenceManager implements OnCompleteListener<Void> {
             String errorMessage = GeofenceErrorMessages.getErrorString(mContextWrapper,
                     task.getException());
             Log.w(TAG, errorMessage);
-        }
-    }
-
-    /**
-     * Removes geofences, which stops further notifications when the device enters or exits
-     * previously registered geofences.
-     */
-    public void removeGeofences() {
-        if (missingPermissions()) {
-            mPendingGeofenceTask = PendingGeofenceTask.REMOVE;
-            requestPermissions();
-            return;
-        }
-        removeGeofencesTask();
-    }
-
-    /**
-     * Adds geofences. This method should be called after the user has granted the location
-     * permission.
-     */
-    private void addGeofencesTask() {
-        if (missingPermissions()) {
-            showSnackbar(mContextWrapper.getString(R.string.insufficient_permissions));
-            return;
-        }
-
-        // Get the geofencing request. If it's null, there are no enabled geofences in the list
-        GeofencingRequest geofencingRequest = getGeofencingRequest();
-        if (geofencingRequest == null) {
-            Log.d(TAG, "No geofences to add");
-            return;
-        }
-
-        // If the context wrapper is an activity - errors can be shown on it
-        if (mContextWrapper instanceof Activity) {
-            Activity activity = (Activity) mContextWrapper;
-            mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
-                    .addOnSuccessListener(activity, new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "Geofences added");
-                        }
-                    })
-                    .addOnFailureListener(activity, new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
-                            // Typically this is because the user turned off location access in
-                            // settings > location access."
-                            Log.d(TAG, "Failed to add geofences");
-                        }
-                    });
-
-            // If the context wrapper is not an activity, a notification is needed to show errors
-        } else {
-            mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "Geofences added");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
-                            // Typically this is because the user turned off location access in
-                            // settings > location access."
-                            Log.d(TAG, "Failed to add geofences");
-                        }
-                    });
         }
     }
 
@@ -257,10 +205,61 @@ public class GeofenceManager implements OnCompleteListener<Void> {
     }
 
     /**
-     * Tracks whether the user requested to add or remove geofences, or to do neither.
+     * Adds geofences. This method should be called after the user has granted the location
+     * permission.
      */
-    private enum PendingGeofenceTask {
-        ADD, REMOVE, NONE
+    private void addGeofencesTask() {
+        if (missingPermissions()) {
+            showSnackbar(mContextWrapper.getString(R.string.insufficient_permissions));
+            return;
+        }
+
+        // Get the geofencing request. If it's null, there are no enabled geofences in the list
+        GeofencingRequest geofencingRequest = getGeofencingRequest();
+        if (geofencingRequest == null) {
+            Log.d(TAG, "No geofences to add");
+            return;
+        }
+
+        // If the context wrapper is an activity - errors can be shown on it
+        if (mContextWrapper instanceof Activity) {
+            Activity activity = (Activity) mContextWrapper;
+            mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
+                    .addOnSuccessListener(activity, new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "Geofences added");
+                        }
+                    })
+                    .addOnFailureListener(activity, new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
+                            // Typically this is because the user turned off location access in
+                            // settings > location access."
+                            Log.d(TAG, "Failed to add geofences");
+                        }
+                    });
+
+            // If the context wrapper is not an activity, a notification is needed to show errors
+        } else {
+            mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "Geofences added");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
+                            // Typically this is because the user turned off location access in
+                            // settings > location access."
+                            Log.d(TAG, "Failed to add geofences");
+                        }
+                    });
+        }
     }
 
     /**
