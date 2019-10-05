@@ -80,6 +80,11 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
         }
     }
 
+    /**
+     * Handle geofencing intents that have errors.
+     *
+     * @param geofencingEvent The geofencing intent.
+     */
     private void handleError(GeofencingEvent geofencingEvent) {
         int errorCode = geofencingEvent.getErrorCode();
         String errorMessage = GeofenceErrorMessages.getErrorString(this, errorCode);

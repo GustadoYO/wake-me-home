@@ -25,6 +25,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.gusta.wakemehome.BuildConfig;
 import com.gusta.wakemehome.R;
 import com.gusta.wakemehome.utilities.Constants;
+import com.gusta.wakemehome.utilities.NotificationUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -203,45 +204,23 @@ public class GeofenceManager {
             return;
         }
 
-        // If the context wrapper is an activity - errors can be shown on it
-        if (mContextWrapper instanceof Activity) {
-            Activity activity = (Activity) mContextWrapper;
-            mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
-                    .addOnSuccessListener(activity, new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "Geofences added");
-                        }
-                    })
-                    .addOnFailureListener(activity, new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
-                            // Typically this is because the user turned off location access in
-                            // settings > location access."
-                            Log.d(TAG, "Failed to add geofences");
-                        }
-                    });
-
-            // If the context wrapper is not an activity, a notification is needed to show errors
-        } else {
-            mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "Geofences added");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
-                            // Typically this is because the user turned off location access in
-                            // settings > location access."
-                            Log.d(TAG, "Failed to add geofences");
-                        }
-                    });
-        }
+        mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Geofences added");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        //TODO: Handle StatusCode = 1000: "Geofence service is not available now.
+                        // Typically this is because the user turned off location access in
+                        // settings > location access."
+                        Log.d(TAG, "Failed to add geofences");
+                        handleError(e);
+                    }
+                });
     }
 
     /**
@@ -265,6 +244,7 @@ public class GeofenceManager {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d(TAG, "Failed to remove geofences");
+                        handleError(e);
                     }
                 });
     }
@@ -282,6 +262,34 @@ public class GeofenceManager {
         // TODO: Add & remove only deltas from current geofences
         removeGeofencesTask();
         addGeofencesTask();
+    }
+
+    /**
+     * Handle geofences tasks failures.
+     *
+     * @param e The exception received.
+     */
+    private void handleError(Exception e) {
+        // TODO: Use JobScheduler to re-register geofences once location access is turned on
+
+        // Build intent that displays the App settings screen.
+        final Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+
+        // If the context wrapper is an activity, the error can be shown on screen
+        if (mContextWrapper instanceof Activity) {
+            showSnackbar(R.string.geofence_not_available_title, R.string.settings,
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mContextWrapper.startActivity(intent);
+                        }
+                    });
+        } else {    // The context wrapper is not an activity - a notification needs to be used
+            NotificationUtils.sendNotification(mContextWrapper,
+                    mContextWrapper.getString(R.string.geofence_not_available_title),
+                    mContextWrapper.getString(R.string.geofence_not_available_text), intent);
+        }
     }
 
     /**
