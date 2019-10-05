@@ -62,11 +62,11 @@ public final class NotificationUtils {
                 new NotificationCompat.Builder(context, Constants.CHANNEL_ID);
 
         // Define the notification settings.
-        builder.setSmallIcon(R.drawable.ic_launcher_foreground)
+        builder.setSmallIcon(R.mipmap.ic_launcher)
                 // In a real app, you may want to use a library like Volley
                 // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),
-                        R.drawable.ic_launcher_foreground))
+                        R.mipmap.ic_launcher))
                 .setColor(Color.RED)
                 .setContentTitle(Title)
                 .setContentText(Text)
