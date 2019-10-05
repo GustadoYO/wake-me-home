@@ -337,6 +337,7 @@ public class GeofenceManager implements OnCompleteListener<Void> {
         }
     }
 
+    // TODO: Export permissions logic to a utility class
     /**
      * Return the current state of the permissions needed.
      */
