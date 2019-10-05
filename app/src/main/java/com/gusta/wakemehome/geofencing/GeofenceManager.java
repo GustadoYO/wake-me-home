@@ -51,7 +51,7 @@ public class GeofenceManager implements OnCompleteListener<Void> {
      * Tracks whether the user requested to add or remove geofences, or to do neither.
      */
     private enum PendingGeofenceTask {
-        ADD, REMOVE, NONE
+        ADD, REMOVE, NONE, UPDATE
     }
 
     //=========//
@@ -114,6 +114,18 @@ public class GeofenceManager implements OnCompleteListener<Void> {
     }
 
     /**
+     * Update geofences client according to current list.
+     */
+    public void updateGeofences() {
+        if (missingPermissions()) {
+            mPendingGeofenceTask = PendingGeofenceTask.UPDATE;
+            requestPermissions();
+            return;
+        }
+        updateGeofencesTask();
+    }
+
+    /**
      * Runs when the result of calling {@link #addGeofences()} and/or {@link #removeGeofences()}
      * is available.
      * @param task the resulting Task, containing either a result or error.
@@ -135,8 +147,6 @@ public class GeofenceManager implements OnCompleteListener<Void> {
             Log.w(TAG, errorMessage);
         }
     }
-
-    // TODO: Add public function to "update"/"refresh" geofences - adds & removes only deltas
 
     //=================//
     // PRIVATE METHODS //
@@ -288,6 +298,21 @@ public class GeofenceManager implements OnCompleteListener<Void> {
     }
 
     /**
+     * Updates geofences. This method should be called after the user has granted the location
+     * permission.
+     */
+    private void updateGeofencesTask() {
+        if (missingPermissions()) {
+            showSnackbar(mContextWrapper.getString(R.string.insufficient_permissions));
+            return;
+        }
+
+        // TODO: Add & remove only deltas from current geofences
+        removeGeofencesTask();
+        addGeofencesTask();
+    }
+
+    /**
      * Shows a {@link Snackbar} using {@code text}.
      *
      * @param text The Snackbar text.
@@ -367,10 +392,16 @@ public class GeofenceManager implements OnCompleteListener<Void> {
      * Performs the geofencing task that was pending until location permission was granted.
      */
     private void performPendingGeofenceTask() {
-        if (mPendingGeofenceTask == PendingGeofenceTask.ADD) {
-            addGeofencesTask();
-        } else if (mPendingGeofenceTask == PendingGeofenceTask.REMOVE) {
-            removeGeofencesTask();
+        switch (mPendingGeofenceTask) {
+            case ADD:
+                addGeofencesTask();
+                break;
+            case REMOVE:
+                removeGeofencesTask();
+                break;
+            case UPDATE:
+                updateGeofencesTask();
+                break;
         }
     }
 

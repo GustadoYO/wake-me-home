@@ -156,10 +156,8 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(TAG, "Updating list of alarms from LiveData in ViewModel");
                 mAdapter.setAlarms(alarmEntries);
 
-                // TODO: remove only irrelevant geofences and add only the new ones
-                // Remove all current geofences and add back only for the enabled alarms
-                mGeofenceManager.removeGeofences();
-                mGeofenceManager.addGeofences();
+                // Update geofence manger to current alarms list
+                mGeofenceManager.updateGeofences();
             }
         });
     }
