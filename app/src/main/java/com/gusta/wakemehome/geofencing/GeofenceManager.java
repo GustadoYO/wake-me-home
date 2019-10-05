@@ -5,14 +5,11 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -22,10 +19,8 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.gusta.wakemehome.BuildConfig;
 import com.gusta.wakemehome.R;
@@ -34,7 +29,7 @@ import com.gusta.wakemehome.utilities.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GeofenceManager implements OnCompleteListener<Void> {
+public class GeofenceManager {
 
     //===========//
     // CONSTANTS //
@@ -123,29 +118,6 @@ public class GeofenceManager implements OnCompleteListener<Void> {
             return;
         }
         updateGeofencesTask();
-    }
-
-    /**
-     * Runs when the result of calling {@link #addGeofences()} and/or {@link #removeGeofences()}
-     * is available.
-     * @param task the resulting Task, containing either a result or error.
-     */
-    @Override
-    public void onComplete(@NonNull Task<Void> task) {
-        mPendingGeofenceTask = PendingGeofenceTask.NONE;
-        if (task.isSuccessful()) {
-            updateGeofencesAdded(!getGeofencesAdded());
-
-            int messageId = getGeofencesAdded() ? R.string.geofences_added :
-                    R.string.geofences_removed;
-            Toast.makeText(mContextWrapper, mContextWrapper.getString(messageId),
-                    Toast.LENGTH_SHORT).show();
-        } else {
-            // Get the status code for the error and log it using a user-friendly message.
-            String errorMessage = GeofenceErrorMessages.getErrorString(mContextWrapper,
-                    task.getException());
-            Log.w(TAG, errorMessage);
-        }
     }
 
     //=================//
@@ -403,26 +375,6 @@ public class GeofenceManager implements OnCompleteListener<Void> {
                 updateGeofencesTask();
                 break;
         }
-    }
-
-    /**
-     * Returns true if geofences were added, otherwise false.
-     */
-    private boolean getGeofencesAdded() {
-        return PreferenceManager.getDefaultSharedPreferences(mContextWrapper).getBoolean(
-                Constants.GEOFENCES_ADDED_KEY, false);
-    }
-
-    /**
-     * Stores whether geofences were added ore removed in {@link SharedPreferences};
-     *
-     * @param added Whether geofences were added or removed.
-     */
-    private void updateGeofencesAdded(boolean added) {
-        PreferenceManager.getDefaultSharedPreferences(mContextWrapper)
-                .edit()
-                .putBoolean(Constants.GEOFENCES_ADDED_KEY, added)
-                .apply();
     }
 
     // TODO: Export permissions logic to a utility class
