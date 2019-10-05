@@ -63,6 +63,6 @@ public class ReRegisterGeofencesJobIntentService extends JobIntentService {
             mGeofenceManager = new GeofenceManager(this, alarms);
         }
 
-        mGeofenceManager.refresh();
+        mGeofenceManager.addGeofences();
     }
 }

@@ -7,8 +7,7 @@ import android.location.LocationManager;
 import android.util.Log;
 
 import com.gusta.wakemehome.ReRegisterGeofencesJobIntentService;
-
-import static com.gusta.wakemehome.utilities.Constants.ACTION_GEOFENCE_TRANSITION_OCCURRED;
+import com.gusta.wakemehome.utilities.Constants;
 
 /**
  * Receiver for geofence transition changes.
@@ -37,7 +36,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
         // Enqueues a JobIntentService passing the context and intent as parameters
         assert action != null;
-        if (action.equals(ACTION_GEOFENCE_TRANSITION_OCCURRED)) {
+        if (action.equals(Constants.ACTION_GEOFENCE_TRANSITION_OCCURRED)) {
             GeofenceTransitionsJobIntentService.enqueueWork(context, intent);
         }
         if (action.equals(Intent.ACTION_BOOT_COMPLETED) ||

@@ -110,7 +110,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
     }
 
-    // TODO: Export permissions logic to a utility class
+    // TODO: Export notifications logic to a utility class
     /**
      * Posts a notification in the notification bar when a transition is detected.
      * If the user clicks the notification, control goes to the MainActivity.
