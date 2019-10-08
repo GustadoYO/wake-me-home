@@ -1,16 +1,15 @@
 package com.gusta.wakemehome;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
-import android.net.Uri;
+import androidx.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +35,8 @@ public class DetailActivity extends AppCompatActivity {
     private static final String TAG = DetailActivity.class.getSimpleName();
     // Extra for the alarm ID to be received in the intent
     public static final String EXTRA_ALARM_ID = "extraAlarmId";
+    // Extra for the alarm ID to be received in the intent
+    public static final String ALARM_COORDINATES = "alarmCoordinates";
     // Extra for the alarm ID to be received after rotation
     public static final String INSTANCE_ALARM_ID = "instanceAlarmId";
     // Constant for default alarm id to be used when not in update mode
@@ -81,6 +82,12 @@ public class DetailActivity extends AppCompatActivity {
 
         // If ALARM_ID was sent, it is update mode (list item clicked)
         Intent intent = getIntent();
+        if (intent != null && intent.hasExtra(ALARM_COORDINATES)) {
+            // get coordinates (from intent)
+            double[] coordinates = intent.getDoubleArrayExtra(ALARM_COORDINATES);
+            mDetailBinding.locationDetails.latitude.setText(Double.toString(coordinates[0]));
+            mDetailBinding.locationDetails.longitude.setText(Double.toString(coordinates[1]));
+        }
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
 
             // If member alarm ID is still DEFAULT_ID, the alarm model should be loaded from db
@@ -194,18 +201,11 @@ public class DetailActivity extends AppCompatActivity {
      * to automatically open the Common Intents page
      */
     private void onOpenMapButtonClicked() {
-        Uri geoLocation =
-                Uri.parse("geo:0,0?q=" + mDetailBinding.locationDetails.location.getText());
 
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(geoLocation);
-
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        } else {
-            Log.d(TAG, "Couldn't call " + geoLocation.toString() +
-                    ", no receiving apps installed!");
-        }
+        // Create a new intent to start an DetailActivity
+        Intent addTaskIntent =
+                new Intent(DetailActivity.this, mapsAdapter.class);
+        startActivity(addTaskIntent);
     }
 
     //=====================//
