@@ -1,6 +1,7 @@
 package com.gusta.wakemehome;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -39,10 +41,12 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.gusta.wakemehome.databinding.ActivityMapsBinding;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
+import java.util.Map;
 
 
 public class mapsAdapter extends AppCompatActivity  implements OnMapReadyCallback {
@@ -50,8 +54,7 @@ public class mapsAdapter extends AppCompatActivity  implements OnMapReadyCallbac
     private Button mUpdateLocationButton;
     private ActivityMapsBinding mMapsBinding;   // The data binding object
     private static final String TAG = mapsAdapter.class.getSimpleName();
-    private double mLatitude;
-    private double mLongitude;
+    private MapAddress mMapAddress;
     private GoogleMap mMap;
 
 
@@ -71,6 +74,7 @@ public class mapsAdapter extends AppCompatActivity  implements OnMapReadyCallbac
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    public static final String INSTANCE_MAPS_SELECTION = "instanceMapsSelection";
     private boolean mLocationPermissionGranted;
 
     // The geographical location where the device is currently located. That is, the last-known
@@ -94,6 +98,11 @@ public class mapsAdapter extends AppCompatActivity  implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         // Init the data binding object
         setContentView(R.layout.activity_maps);
+
+        // Check for saved state (like after phone orientation change) - and load it
+        if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_MAPS_SELECTION)) {
+            mMapAddress = savedInstanceState.getParcelable(INSTANCE_MAPS_SELECTION);
+        }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -126,16 +135,15 @@ public class mapsAdapter extends AppCompatActivity  implements OnMapReadyCallbac
             @Override
             public void onPlaceSelected(Place place) {
 
-//                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-//                List<Address> addresses;
-//                addresses = geocoder.getFromLocationName(place, 1);
-//                if(addresses.size() > 0) {
-//                    double latitude= addresses.get(0).getLatitude();
-//                    double longitude= addresses.get(0).getLongitude();
-//                }
-//                LatLng land = place.getLatLng();
-//                Log.d(TAG, land.latitude + "latitude" + land.longitude + "longitude");
-                Log.i(TAG, "Place: 11111111111" + place.getName() + ", " + place.getId());
+                LatLng cord = getCoordinatesAddress(place.getName());
+                setMarker(cord);
+                try {
+                    Log.d(TAG, "1111111111111111111111 " + place.getLatLng().toString());
+                }catch(Exception e){
+                    Log.d(TAG, "1111111111111111111111 " + e.getMessage());
+                }
+
+                Log.d(TAG, "Place: 1111111111111111111111" + place.getName() + ", " + place.getId());
             }
 
             @Override
@@ -146,28 +154,23 @@ public class mapsAdapter extends AppCompatActivity  implements OnMapReadyCallbac
         });
 
 
-//        googleMap.addMarker(new MarkerOptions()
-//                .position(new LatLng(
-//                        Double.parseDouble(getArguments().getString("lat")),
-//                        Double.parseDouble(getArguments().getString("lng"))
-//                ))
-//                .title(getArguments().getString("name")));
-//        marker.showInfoWindow();
+        // Set the RecyclerView to its corresponding view
+        // Member variables for the adapter and RecyclerView
+        mUpdateLocationButton = findViewById(R.id.updateLocation);
+        mUpdateLocationButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(mapsAdapter.this, DetailActivity.class);
+                intent.putExtra(DetailActivity.ALARM_COORDINATES, mMapAddress);
+                startActivity(intent);
+                finish();
+            }
+        });
+    }
 
-
-//        // Set the RecyclerView to its corresponding view
-//        // Member variables for the adapter and RecyclerView
-//        mUpdateLocationButton = findViewById(R.id.updateLocation);
-//        mUpdateLocationButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                Intent intent = new Intent(mapsAdapter.this, DetailActivity.class);
-//                double[] coordinates = new double[2];
-//                coordinates[0] = mLatitude;
-//                coordinates[1] = mLongitude;
-//                intent.putExtra(DetailActivity.ALARM_COORDINATES, coordinates);
-//                startActivity(intent);
-//            }
-//        });
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(INSTANCE_MAPS_SELECTION, mMapAddress);
+        super.onSaveInstanceState(outState);
     }
 
 
@@ -188,38 +191,48 @@ public class mapsAdapter extends AppCompatActivity  implements OnMapReadyCallbac
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             @Override
-            public void onMapClick(LatLng latLng) {
+            public void onMapClick(LatLng coordinates) {
 
-                // Creating a marker
-                MarkerOptions markerOptions = new MarkerOptions();
+                setMarker(coordinates);
 
-                // Setting the position for the marker
-                markerOptions.position(latLng);
-
-                // Setting the title for the marker.
-                // This will be displayed on taping the marker
-                markerOptions.title(getAddress(latLng.latitude, latLng.longitude));
-
-                // Clears the previously touched position
-                mMap.clear();
-
-                // Animating to the touched position
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-
-                // Placing a marker on the touched position
-                mMap.addMarker(markerOptions).showInfoWindow();
             }
         });
 
-        // Prompt the user for permission.
-        getLocationPermission();
+        if(mMapAddress == null) {
+            // Prompt the user for permission.
+            getLocationPermission();
 
-        // Turn on the My Location layer and the related control on the map.
-        updateLocationUI();
+            // Turn on the My Location layer and the related control on the map.
+            updateLocationUI();
 
-        // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
+            // Get the current location of the device and set the position of the map.
+            getDeviceLocation();
+        }else{
+            setMarker(mMapAddress.getCoordinates());
+        }
 
+    }
+
+    private void setMarker(LatLng coordinate){
+        // Creating a marker
+        MarkerOptions markerOptions = new MarkerOptions();
+
+        // Setting the position for the marker
+        markerOptions.position(coordinate);
+
+        mMapAddress = new MapAddress(coordinate,getAddress(coordinate.latitude, coordinate.longitude));
+        // Setting the title for the marker.
+        // This will be displayed on taping the marker
+        markerOptions.title(mMapAddress.getAddressName());
+
+        // Clears the previously touched position
+        mMap.clear();
+
+        // Animating to the touched position
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(coordinate));
+
+        // Placing a marker on the touched position
+        mMap.addMarker(markerOptions).showInfoWindow();
     }
 
     /**
@@ -236,19 +249,23 @@ public class mapsAdapter extends AppCompatActivity  implements OnMapReadyCallbac
                 locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
+                        LatLng coordinates;
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
+                            coordinates = new LatLng(mLastKnownLocation.getLatitude(),
+                                    mLastKnownLocation.getLongitude());
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                    coordinates , DEFAULT_ZOOM));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
+                            coordinates = mDefaultLocation;
                             mMap.moveCamera(CameraUpdateFactory
                                     .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
                             mMap.getUiSettings().setMyLocationButtonEnabled(false);
                         }
+                        setMarker(coordinates);
                     }
                 });
             }
@@ -441,13 +458,13 @@ public class mapsAdapter extends AppCompatActivity  implements OnMapReadyCallbac
             Address obj = addresses.get(0);
 
             String add = obj.getAddressLine(0);
-            add = add + "\n" + obj.getCountryName();
-            add = add + "\n" + obj.getCountryCode();
-            add = add + "\n" + obj.getAdminArea();
-            add = add + "\n" + obj.getPostalCode();
-            add = add + "\n" + obj.getSubAdminArea();
-            add = add + "\n" + obj.getLocality();
-            add = add + "\n" + obj.getSubThoroughfare();
+//            add = add + "\n" + obj.getCountryName();
+//            add = add + "\n" + obj.getCountryCode();
+//            add = add + "\n" + obj.getAdminArea();
+//            add = add + "\n" + obj.getPostalCode();
+//            add = add + "\n" + obj.getSubAdminArea();
+//            add = add + "\n" + obj.getLocality();
+//            add = add + "\n" + obj.getSubThoroughfare();
 
             return add;
         } catch (IOException e) {
@@ -456,4 +473,20 @@ public class mapsAdapter extends AppCompatActivity  implements OnMapReadyCallbac
             return null;
         }
     }
+
+    public LatLng getCoordinatesAddress(String address) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(address, 1);
+            Address obj = addresses.get(0);
+
+            LatLng coordinates = new LatLng(obj.getLatitude(),obj.getLongitude());
+            return coordinates;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+
 }

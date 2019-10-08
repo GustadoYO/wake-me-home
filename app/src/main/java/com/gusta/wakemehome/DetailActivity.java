@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
@@ -23,6 +24,7 @@ import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.DetailViewModel;
 import com.gusta.wakemehome.viewmodel.DetailViewModelFactory;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class DetailActivity extends AppCompatActivity {
@@ -84,9 +86,10 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(ALARM_COORDINATES)) {
             // get coordinates (from intent)
-            double[] coordinates = intent.getDoubleArrayExtra(ALARM_COORDINATES);
-            mDetailBinding.locationDetails.latitude.setText(Double.toString(coordinates[0]));
-            mDetailBinding.locationDetails.longitude.setText(Double.toString(coordinates[1]));
+            MapAddress mapAddress = intent.getParcelableExtra(ALARM_COORDINATES);
+            mDetailBinding.locationDetails.latitude.setText(Double.toString(mapAddress.getlatitude()));
+            mDetailBinding.locationDetails.longitude.setText(Double.toString(mapAddress.getlongitude()));
+            mDetailBinding.locationDetails.location.setText(mapAddress.getAddressName());
         }
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
 
