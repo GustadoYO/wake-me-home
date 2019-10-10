@@ -1,21 +1,22 @@
 package com.gusta.wakemehome;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
@@ -41,9 +42,9 @@ public class DetailActivity extends AppCompatActivity {
     // Constant for default alarm id to be used when not in update mode
     private static final int DEFAULT_ALARM_ID = -1;
 
-    //===========//
-    // VARIABLES //
-    //===========//
+    //=========//
+    // MEMBERS //
+    //=========//
 
     private int mAlarmId = DEFAULT_ALARM_ID;        // The current alarm ID
     private DetailViewModel mViewModel;             // The current alarm view model
@@ -150,15 +151,27 @@ public class DetailActivity extends AppCompatActivity {
 
         // Show error and abort save if one of the mandatory fields is empty
         if (latitudeString.isEmpty() || longitudeString.isEmpty() || radiusString.isEmpty()) {
-            Toast.makeText(getApplicationContext(),R.string.mandatory_fields,Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(getApplicationContext(),
+                    R.string.error_mandatory,Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Parse numeric fields to their appropriate types
         double latitude = Double.parseDouble(latitudeString);
         double longitude = Double.parseDouble(longitudeString);
-        double radius = Double.parseDouble(radiusString);
+        float radius = Float.parseFloat(radiusString);
+
+        // Check if coordinates are valid: -90 < latitude < 90 && -180 < longitude < 180
+        if (latitude < -90 || latitude > 90) {
+            Toast.makeText(getApplicationContext(),
+                    R.string.error_latitude,Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (longitude < -180 || longitude > 180) {
+            Toast.makeText(getApplicationContext(),
+                    R.string.error_longitude,Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // "enabled" field is not shown on this screen - keep current value (if exists)
         boolean enabled = (mViewModel == null) ||

@@ -22,11 +22,16 @@
     <!-- - - - - - - - - - - - -->
 
     <string name="action_save">Save</string>
-    <string name="mandatory_fields">
+
+
+    <string name="error_mandatory">
         Please select location and radius in order to save the alarm
     </string>
+    <!-- "&#176;" = unicode character for degree symbol -->
+    <string name="error_latitude">Latitude must be between -90&#176; and +90&#176;</string>
+    <string name="error_longitude">Longitude must be between -180&#176; and +180&#176;</string>
 
-    <!-- This has a unicode character for "..." = "&#8230;" -->
+    <!-- "&#8230;" = unicode character for "..." -->
     <string name="edit_alarm_location">Human readable location&#8230;</string>
     <string name="edit_alarm_latitude">Latitude</string>
     <string name="edit_alarm_longitude">Longitude</string>
@@ -79,5 +84,44 @@
     <string name="format_length_feet">
         <xliff:g id="length">%1.0f</xliff:g> ft
     </string>
+
+
+    <!-- - - - - - - - - - - - - - -->
+    <!-- Used by geofencing package-->
+    <!-- - - - - - - - - - - - - - -->
+
+    <string name="geofences_added">Geofences added</string>
+    <string name="geofences_removed">Geofences removed</string>
+
+    <!-- Error strings -->
+    <string name="geofence_not_available">Geofence service is not available now</string>
+    <string name="geofence_too_many_geofences">Your app has registered too many geofences</string>
+    <string name="geofence_too_many_pending_intents">
+        You have provided too many PendingIntents to the addGeofences() call
+    </string>
+    <string name="unknown_geofence_error">
+        Unknown error: the Geofence service is not available now
+    </string>
+    <string name="geofence_transition_invalid_type">
+        Geofence transition error: invalid transition type %1$d
+    </string>
+
+    <!-- Transition type strings -->
+    <string name="geofence_transition_entered">Entered</string>
+    <string name="geofence_transition_exited">Exited</string>
+    <string name="unknown_geofence_transition">Unknown Transition</string>
+
+    <string name="geofence_transition_notification_text">
+        Click notification to return to app
+    </string>
+
+    <string name="insufficient_permissions">Insufficient permissions.</string>
+    <string name="permission_rationale">
+        Location permission is needed for core functionality
+    </string>
+    <string name="permission_denied_explanation">
+        Permission was denied, but is needed for core functionality.
+    </string>
+    <string name="settings">Settings</string>
 
 </resources>

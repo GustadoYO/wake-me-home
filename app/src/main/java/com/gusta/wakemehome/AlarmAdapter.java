@@ -1,8 +1,6 @@
 package com.gusta.wakemehome;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +9,17 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.utilities.WakeMeHomeUnitsUtils;
 
 import java.util.List;
 
 /**
- * {@link AlarmAdapter} exposes a list of weather forecasts to a
- * {@link android.support.v7.widget.RecyclerView}
+ * {@link AlarmAdapter} exposes a list of alarms to a
+ * {@link RecyclerView}
  */
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder> {
 
@@ -49,7 +50,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
      * @param parent   The ViewGroup that these ViewHolders are contained within.
      * @param viewType If your RecyclerView has more than one type of item (which ours doesn't) you
      *                 can use this viewType integer to provide a different layout. See
-     *                 {@link android.support.v7.widget.RecyclerView.Adapter#getItemViewType(int)}
+     *                 {@link RecyclerView.Adapter#getItemViewType(int)}
      *                 for more details.
      * @return A new AlarmAdapterViewHolder that holds the View for each list item
      */
@@ -76,12 +77,12 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     @Override
     public void onBindViewHolder(@NonNull AlarmViewHolder holder, int position) {
         // Determine the values of the wanted data
-        final AlarmEntry alarmData = mAlarmEntries.get(position);
-        String location = alarmData.getLocation();
+        final AlarmEntry alarmEntry = mAlarmEntries.get(position);
+        String location = alarmEntry.getLocation();
         String radius =
-                WakeMeHomeUnitsUtils.formatLength(mContext, alarmData.getRadius()) + " radius";
-        boolean enabled = alarmData.isEnabled();
-        String message = alarmData.getMessage();
+                WakeMeHomeUnitsUtils.formatLength(mContext, alarmEntry.getRadius()) + " radius";
+        boolean enabled = alarmEntry.isEnabled();
+        String message = alarmEntry.getMessage();
 
         //Set values
         holder.locationElement.setText(location);
@@ -95,8 +96,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
                 Log.d(TAG, "switch change from " + !isChecked + " -> " + isChecked);
                 // Save the added/updated alarm entity
 
-                alarmData.setEnabled(isChecked);
-                mAlarmListeners.onAlarmEnabledChangeListener(alarmData);
+                alarmEntry.setEnabled(isChecked);
+                mAlarmListeners.onAlarmEnabledChangeListener(alarmEntry);
             }
         });
     }
