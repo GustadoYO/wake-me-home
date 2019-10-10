@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
@@ -24,7 +23,6 @@ import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.DetailViewModel;
 import com.gusta.wakemehome.viewmodel.DetailViewModelFactory;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class DetailActivity extends AppCompatActivity {
@@ -42,7 +40,7 @@ public class DetailActivity extends AppCompatActivity {
     // Extra for the alarm ID to be received after rotation
     public static final String INSTANCE_ALARM_ID = "instanceAlarmId";
     // Constant for default alarm id to be used when not in update mode
-    private static final int DEFAULT_ALARM_ID = -1;
+    public static final int DEFAULT_ALARM_ID = -1;
 
     //===========//
     // VARIABLES //
@@ -87,33 +85,10 @@ public class DetailActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra(ALARM_COORDINATES)) {
             // get coordinates (from intent)
             MapAddress mapAddress = intent.getParcelableExtra(ALARM_COORDINATES);
-            mDetailBinding.locationDetails.latitude.setText(Double.toString(mapAddress.getlatitude()));
-            mDetailBinding.locationDetails.longitude.setText(Double.toString(mapAddress.getlongitude()));
-            mDetailBinding.locationDetails.location.setText(mapAddress.getAddressName());
+            getAlarmData(intent,mapAddress);
         }
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
-
-            // If member alarm ID is still DEFAULT_ID, the alarm model should be loaded from db
-            if (mAlarmId == DEFAULT_ALARM_ID) {
-
-                // Set member alarm ID to wanted alarm (from intent)
-                mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
-
-                // Load alarm model
-                DetailViewModelFactory factory = new DetailViewModelFactory(mDb, mAlarmId);
-                mViewModel =
-                        ViewModelProviders.of(this, factory).get(DetailViewModel.class);
-
-                // Observe changes in model in order to update UI
-                mViewModel.getAlarm().observe(this, new Observer<AlarmEntry>() {
-                    @Override
-                    public void onChanged(@Nullable AlarmEntry alarmEntry) {
-                        // populate the UI
-                        mViewModel.getAlarm().removeObserver(this);
-                        populateUI(alarmEntry);
-                    }
-                });
-            }
+            getAlarmData(intent,null);
         }
     }
 
@@ -122,6 +97,35 @@ public class DetailActivity extends AppCompatActivity {
         // Save alarm ID to state (to keep it in case of phone orientation change for example)
         outState.putInt(INSTANCE_ALARM_ID, mAlarmId);
         super.onSaveInstanceState(outState);
+    }
+
+    private void getAlarmData(Intent intent, final MapAddress mapAddress){
+        // If member alarm ID is still DEFAULT_ID, the alarm model should be loaded from db
+        if (mAlarmId == DEFAULT_ALARM_ID) {
+
+            // Set member alarm ID to wanted alarm (from intent)
+            mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
+
+            // Load alarm model
+            DetailViewModelFactory factory = new DetailViewModelFactory(mDb, mAlarmId);
+            mViewModel =
+                    ViewModelProviders.of(this, factory).get(DetailViewModel.class);
+
+            // Observe changes in model in order to update UI
+            mViewModel.getAlarm().observe(this, new Observer<AlarmEntry>() {
+                @Override
+                public void onChanged(@Nullable AlarmEntry alarmEntry) {
+                    // populate the UI
+                    mViewModel.getAlarm().removeObserver(this);
+                    if(mapAddress != null) {
+                        alarmEntry.setLatitude(mapAddress.getlatitude());
+                        alarmEntry.setLongitude(mapAddress.getlongitude());
+                        alarmEntry.setLocation(mapAddress.getAddressName());
+                    }
+                    populateUI(alarmEntry);
+                }
+            });
+        }
     }
 
     /**
@@ -207,8 +211,10 @@ public class DetailActivity extends AppCompatActivity {
 
         // Create a new intent to start an DetailActivity
         Intent addTaskIntent =
-                new Intent(DetailActivity.this, mapsAdapter.class);
+                new Intent(DetailActivity.this, MapsActivity.class);
+        addTaskIntent.putExtra(EXTRA_ALARM_ID, mAlarmId);
         startActivity(addTaskIntent);
+        finish();
     }
 
     //=====================//
