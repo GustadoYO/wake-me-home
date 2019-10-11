@@ -119,9 +119,9 @@ public class DetailActivity extends AppCompatActivity {
                     mViewModel.getAlarm().removeObserver(this);
                     populateUI(alarmEntry);
                     if(mapAddress != null) {
-                        mDetailBinding.locationDetails.location.setText(mapAddress.getAddressName());
-                        mDetailBinding.locationDetails.latitude.setText(String.valueOf(mapAddress.getlatitude()));
-                        mDetailBinding.locationDetails.longitude.setText(String.valueOf(mapAddress.getlongitude()));
+                        mDetailBinding.locationDetails.location.setText(mapAddress.getLocation());
+                        mDetailBinding.locationDetails.latitude.setText(String.valueOf(mapAddress.getLatitude()));
+                        mDetailBinding.locationDetails.longitude.setText(String.valueOf(mapAddress.getLongitude()));
                     }
                 }
             });

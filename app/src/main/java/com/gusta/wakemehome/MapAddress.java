@@ -12,29 +12,29 @@ import java.util.List;
 
 public class MapAddress implements Parcelable {
     private LatLng coordinates;
-    private String addressName;
+    private String location;
 
     public MapAddress(LatLng coordinates, Geocoder geocoder) {
         this.coordinates = coordinates;
-        this.addressName = getAddress(geocoder,coordinates.latitude,coordinates.longitude);
+        this.location = getAddress(geocoder,coordinates.latitude,coordinates.longitude);
     }
-    public MapAddress(String addressName, Geocoder geocoder) {
-        this.coordinates = getCoordinatesAddress(geocoder,addressName);
-        this.addressName = addressName;
+    public MapAddress(String location, Geocoder geocoder) {
+        this.coordinates = getCoordinatesAddress(geocoder,location);
+        this.location = location;
     }
-    public MapAddress(LatLng coordinates, String addressName) {
+    public MapAddress(LatLng coordinates, String location) {
         this.coordinates = coordinates;
-        this.addressName = addressName;
+        this.location = location;
     }
     private MapAddress(Parcel in) {
         double latitude = in.readDouble();
         double longitude = in.readDouble();
         coordinates = new LatLng(latitude,longitude);
-        addressName = in.readString();
+        location = in.readString();
     }
 
-    public void setAddressName(String addressName) {
-        this.addressName = addressName;
+    public void setLocation(String location) {
+        this.location = location;
     }
     public void setCoordinates(LatLng coordinates) {
         this.coordinates = coordinates;
@@ -42,14 +42,14 @@ public class MapAddress implements Parcelable {
     public LatLng getCoordinates() {
         return coordinates;
     }
-    public double getlatitude() {
+    public double getLatitude() {
         return coordinates.latitude;
     }
-    public double getlongitude() {
+    public double getLongitude() {
         return coordinates.longitude;
     }
-    public String getAddressName() {
-        return addressName;
+    public String getLocation() {
+        return location;
     }
 
     public int describeContents() {
@@ -58,7 +58,7 @@ public class MapAddress implements Parcelable {
 
     @Override
     public String toString() {
-        return addressName + " " + coordinates.toString();
+        return location + " " + coordinates.toString();
     }
 
     public static String getAddress(Geocoder geocoder, double lat,double lng) {
@@ -66,9 +66,9 @@ public class MapAddress implements Parcelable {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
             Address obj = addresses.get(0);
 
-            String add = obj.getAddressLine(0);
+            String location = obj.getAddressLine(0);
 
-            return add;
+            return location;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -92,7 +92,7 @@ public class MapAddress implements Parcelable {
     public void writeToParcel(Parcel out, int flags) {
         out.writeDouble(coordinates.latitude);
         out.writeDouble(coordinates.longitude);
-        out.writeString(addressName);
+        out.writeString(location);
     }
 
     public static final Parcelable.Creator<MapAddress> CREATOR = new Parcelable.Creator<MapAddress>() {

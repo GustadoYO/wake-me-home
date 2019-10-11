@@ -151,7 +151,7 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
         mMapsActivity.updateData(mapAddressData);
         // Setting the title for the marker.
         // This will be displayed on taping the marker
-        markerOptions.title(mapAddressData.getAddressName());
+        markerOptions.title(mapAddressData.getLocation());
 
         // Clears the previously touched position
         mMap.clear();
