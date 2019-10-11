@@ -117,12 +117,12 @@ public class DetailActivity extends AppCompatActivity {
                 public void onChanged(@Nullable AlarmEntry alarmEntry) {
                     // populate the UI
                     mViewModel.getAlarm().removeObserver(this);
-                    if(mapAddress != null) {
-                        alarmEntry.setLatitude(mapAddress.getlatitude());
-                        alarmEntry.setLongitude(mapAddress.getlongitude());
-                        alarmEntry.setLocation(mapAddress.getAddressName());
-                    }
                     populateUI(alarmEntry);
+                    if(mapAddress != null) {
+                        mDetailBinding.locationDetails.location.setText(mapAddress.getAddressName());
+                        mDetailBinding.locationDetails.latitude.setText(String.valueOf(mapAddress.getlatitude()));
+                        mDetailBinding.locationDetails.longitude.setText(String.valueOf(mapAddress.getlongitude()));
+                    }
                 }
             });
         }
@@ -175,8 +175,13 @@ public class DetailActivity extends AppCompatActivity {
         double radius = Double.parseDouble(radiusString);
 
         // "enabled" field is not shown on this screen - keep current value (if exists)
-        boolean enabled = (mViewModel == null) ||
-                Objects.requireNonNull(mViewModel.getAlarm().getValue()).isEnabled();
+        // new will set true
+        boolean enabled;
+        try{
+            enabled = mViewModel.getAlarm().getValue().isEnabled();
+        }catch(Exception e){
+            enabled = true;
+        }
 
         // Save the added/updated alarm entity
         final AlarmEntry alarm = new AlarmEntry(location, latitude, longitude, radius,
