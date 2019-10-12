@@ -27,7 +27,7 @@
     </string>
 
     <!-- This has a unicode character for "..." = "&#8230;" -->
-    <string name="edit_alarm_location" translatable="false">Human readable location&#8230;</string>
+    <string name="alarm_location_label" translatable="false"><u>Alarm location:</u></string>
     <string name="edit_alarm_latitude" translatable="false">Latitude</string>
     <string name="edit_alarm_longitude" translatable="false">Longitude</string>
     <string name="edit_alarm_radius" translatable="false">Radius</string>
@@ -82,5 +82,6 @@
     <string name="title_activity_google_maps" translatable="false">Map</string>
     <string name="select_location_button" translatable="false">Select location</string>
     <string name="title_activity_maps" translatable="false">Map</string>
+    <string name="label_radius_select" translatable="false">Select radius:</string>
 
 </resources>

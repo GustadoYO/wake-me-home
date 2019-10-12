@@ -20,6 +20,16 @@ public class AlarmEntry {
     private boolean vibrate;    // True if alarm should vibrate
     private String message;     // Message to show when alarm triggers
     private String alert;       // Audio alert to play when alarm triggers
+    public static final int DEFAULT_ALARM_ID = -1;
+    private static final double DEFAULT_VALUE_LATITUDE = 1000;
+    private static final double DEFAULT_VALUE_LONGITUDE = 1000;
+
+    @Ignore
+    public AlarmEntry(){
+        this.id = DEFAULT_ALARM_ID;
+        this.latitude = DEFAULT_VALUE_LATITUDE;
+        this.longitude = DEFAULT_VALUE_LONGITUDE;
+    }
 
     @Ignore
     public AlarmEntry(String location, double latitude, double longitude, double radius,
@@ -117,5 +127,13 @@ public class AlarmEntry {
 
     public void setAlert(String alert) {
         this.alert = alert;
+    }
+
+    public boolean isNewEntry(){
+        return this.id == DEFAULT_ALARM_ID;
+    }
+
+    public boolean isValidEntry(){
+        return !(this.latitude == DEFAULT_VALUE_LATITUDE || this.longitude == DEFAULT_VALUE_LONGITUDE || this.radius == 0);
     }
 }

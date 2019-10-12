@@ -11,5 +11,8 @@ public abstract class MapProvider {
     protected MapsActivity mMapsActivity;
     public MapProvider(MapsActivity mapsActivity){
         mMapsActivity = mapsActivity;
-    };
+    }
+    protected void drawCircle(LatLng coordinate,double radius){}
+    protected void setMarker(LatLng coordinate){}
+
 }

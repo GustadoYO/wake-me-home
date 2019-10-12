@@ -15,6 +15,39 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/radius_container_padding"
+        android:paddingLeft="@dimen/radius_container_padding"
+        android:paddingRight="@dimen/radius_container_padding">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_radius_select"
+            android:textSize="@dimen/radius_text_size"
+            android:textStyle="bold"/>
+
+        <SeekBar
+            android:id="@+id/radius_slider"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="2000"/>
+
+    </LinearLayout>
+
+        <TextView
+            android:id="@+id/seekBarInfoTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="@dimen/radius_text_size"
+            android:paddingBottom="@dimen/radius_container_padding"
+            android:textStyle="bold"/>
+
         <Button
             android:id="@+id/updateLocation"
             style="@style/TextAppearance.AppCompat.Large"
@@ -24,7 +57,6 @@
             android:background="@color/colorPrimary"
             android:text="@string/select_location_button"
             android:textColor="@android:color/primary_text_dark" />
-
 
     </LinearLayout>
 

@@ -5,12 +5,12 @@ import android.content.pm.PackageManager;
 
 import androidx.annotation.NonNull;
 
+import android.graphics.Color;
 import android.location.Geocoder;
 import android.location.Location;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
 
 import android.util.Log;
 
@@ -21,6 +21,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,8 +43,11 @@ import static com.gusta.wakemehome.MapAddress.getCoordinatesAddress;
 public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
+    private static final int circleWidth = 6;
+    private static final int circleDividorScale = 600;
     private GoogleMap mMap;
     private Geocoder mGeocoder;
+    private Circle mMapRadiusCircle;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -140,7 +145,7 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
 
     }
 
-    private void setMarker(LatLng coordinate){
+    protected void setMarker(LatLng coordinate){
         // Creating a marker
         MarkerOptions markerOptions = new MarkerOptions();
 
@@ -262,5 +267,41 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+    protected void drawCircle(LatLng coordinate,double radius){
+
+        //remove the old circle
+        if(mMapRadiusCircle != null) {
+            mMapRadiusCircle.remove();
+        }
+        // Instantiating CircleOptions to draw a circle around the marker
+        CircleOptions circleOptions = new CircleOptions();
+
+        // Specifying the center of the circle
+        circleOptions.center(coordinate);
+
+        // Radius of the circle
+        circleOptions.radius(radius);
+
+        // Border color of the circle
+        circleOptions.strokeColor(Color.BLACK);
+
+        // Border width of the circle
+        circleOptions.strokeWidth(circleWidth);
+
+        // Adding the circle to the GoogleMap
+        mMapRadiusCircle = mMap.addCircle(circleOptions);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                circleOptions.getCenter(), getZoomLevel(radius)));
+    }
+
+    public int getZoomLevel(double radius) {
+        int zoomLevel = DEFAULT_ZOOM;
+        if (radius > 0) {
+            double scale = radius / circleDividorScale;
+            zoomLevel = (int) (DEFAULT_ZOOM - Math.log(scale) / Math.log(2));
+        }
+        return zoomLevel;
     }
 }

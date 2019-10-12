@@ -5,8 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import static com.gusta.wakemehome.DetailActivity.DEFAULT_ALARM_ID;
+import com.gusta.wakemehome.database.AlarmEntry;
+
 import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_ID;
 
 
@@ -36,20 +40,52 @@ public class MapsActivity extends AppCompatActivity{
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
             // Set member alarm ID to wanted alarm (from intent)
-            mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID,DEFAULT_ALARM_ID);
+            mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, AlarmEntry.DEFAULT_ALARM_ID);
         }
 
+        SeekBar mRadiusSlider = (SeekBar) findViewById(R.id.radius_slider);
+        final TextView mRadiusText = (TextView) findViewById(R.id.seekBarInfoTextView);
+
+        mRadiusSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+        {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                double radius = seekBar.getProgress();
+                mMapAddress.setRadius(radius);
+                mRadiusText.setText(Double.toString(radius));
+                mMapProvider.drawCircle(mMapAddress.getCoordinates(),radius);
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                double radius = seekBar.getProgress();
+                mMapAddress.setRadius(radius);
+                mRadiusText.setText(Double.toString(radius));
+                mMapProvider.drawCircle(mMapAddress.getCoordinates(),radius);
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                double radius = seekBar.getProgress();
+                mMapAddress.setRadius(radius);
+                mRadiusText.setText(Double.toString(radius));
+                mMapProvider.drawCircle(mMapAddress.getCoordinates(),radius);
+            }
+        });
 
         // Set the RecyclerView to its corresponding view
         // Member variables for the adapter and RecyclerView
         mUpdateLocationButton = findViewById(R.id.updateLocation);
         mUpdateLocationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MapsActivity.this, DetailActivity.class);
-                intent.putExtra(DetailActivity.ALARM_COORDINATES, mMapAddress);
-                intent.putExtra(DetailActivity.EXTRA_ALARM_ID, mAlarmId);
-                startActivity(intent);
-                finish();
+                if(mMapAddress.isValidEntry()) {
+                    Intent intent = new Intent(MapsActivity.this, DetailActivity.class);
+                    intent.putExtra(DetailActivity.ALARM_COORDINATES, mMapAddress);
+                    intent.putExtra(DetailActivity.EXTRA_ALARM_ID, mAlarmId);
+                    startActivity(intent);
+                    finish();
+                }else{
+                    Toast.makeText(getApplicationContext(),R.string.mandatory_fields,Toast.LENGTH_SHORT)
+                            .show();
+                    return;
+                }
             }
         });
     }
