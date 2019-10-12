@@ -22,6 +22,8 @@ public class MapsActivity extends AppCompatActivity{
     private static final String TAG = MapsActivity.class.getSimpleName();
     private MapAddress mMapAddress;
     private MapProvider mMapProvider;
+    private TextView mRadiusText;
+    private SeekBar mRadiusSlider;
     private int mAlarmId;
 
     @Override
@@ -43,30 +45,21 @@ public class MapsActivity extends AppCompatActivity{
             mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, AlarmEntry.DEFAULT_ALARM_ID);
         }
 
-        SeekBar mRadiusSlider = (SeekBar) findViewById(R.id.radius_slider);
-        final TextView mRadiusText = (TextView) findViewById(R.id.seekBarInfoTextView);
+        mRadiusSlider = (SeekBar) findViewById(R.id.radius_slider);
+        mRadiusText = (TextView) findViewById(R.id.seekBarInfoTextView);
 
         mRadiusSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
         {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                double radius = seekBar.getProgress();
-                mMapAddress.setRadius(radius);
-                mRadiusText.setText(Double.toString(radius));
-                mMapProvider.drawCircle(mMapAddress.getCoordinates(),radius);
+                changeRadius(seekBar);
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {
-                double radius = seekBar.getProgress();
-                mMapAddress.setRadius(radius);
-                mRadiusText.setText(Double.toString(radius));
-                mMapProvider.drawCircle(mMapAddress.getCoordinates(),radius);
+                changeRadius(seekBar);
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                double radius = seekBar.getProgress();
-                mMapAddress.setRadius(radius);
-                mRadiusText.setText(Double.toString(radius));
-                mMapProvider.drawCircle(mMapAddress.getCoordinates(),radius);
+                changeRadius(seekBar);
             }
         });
 
@@ -102,5 +95,12 @@ public class MapsActivity extends AppCompatActivity{
 
     public MapAddress getData(){
         return mMapAddress;
+    }
+
+    private void changeRadius(SeekBar seekBar){
+        double radius = seekBar.getProgress();
+        mMapAddress.setRadius(radius);
+        mRadiusText.setText(Double.toString(radius));
+        mMapProvider.drawCircle(mMapAddress.getCoordinates(),radius);
     }
 }
