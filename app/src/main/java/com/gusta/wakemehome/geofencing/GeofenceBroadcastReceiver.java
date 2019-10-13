@@ -30,7 +30,6 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
      */
     @Override
     public void onReceive(Context context, Intent intent) {
-
         String action = intent.getAction();
         Log.d(TAG, "action is: " + action);
 
