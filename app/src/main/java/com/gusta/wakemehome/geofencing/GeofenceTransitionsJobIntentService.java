@@ -1,26 +1,20 @@
 package com.gusta.wakemehome.geofencing;
 
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.TaskStackBuilder;
 
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 import com.gusta.wakemehome.MainActivity;
 import com.gusta.wakemehome.R;
+import com.gusta.wakemehome.utilities.NotificationUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +33,6 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
 
     // TODO: Refactor use of constants
     private static final int JOB_ID = 573;
-    private static final String CHANNEL_ID = "channel_01";
-
     /**
      * Convenience method for enqueuing work in to this service.
      */
@@ -57,9 +49,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
     protected void onHandleWork(@NonNull Intent intent) {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         if (geofencingEvent.hasError()) {
-            String errorMessage = GeofenceErrorMessages.getErrorString(this,
-                    geofencingEvent.getErrorCode());
-            Log.e(TAG, errorMessage);
+            handleError(geofencingEvent);
             return;
         }
 
@@ -77,12 +67,38 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
             String geofenceTransitionDetails = getGeofenceTransitionDetails(geofenceTransition,
                     triggeringGeofences);
 
+            // Create an explicit content Intent that starts the main Activity.
+            Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+
             // Send notification and log the transition details.
-            sendNotification(geofenceTransitionDetails);
+            NotificationUtils.sendNotification(this, geofenceTransitionDetails,
+                    getString(R.string.geofence_transition_notification_text), notificationIntent);
             Log.i(TAG, geofenceTransitionDetails);
         } else {
             // Log the error.
             Log.e(TAG, getString(R.string.geofence_transition_invalid_type, geofenceTransition));
+        }
+    }
+
+    /**
+     * Handle geofencing intents that have errors.
+     *
+     * @param geofencingEvent The geofencing intent.
+     */
+    private void handleError(GeofencingEvent geofencingEvent) {
+        int errorCode = geofencingEvent.getErrorCode();
+        String errorMessage = GeofenceErrorMessages.getErrorString(this, errorCode);
+        Log.e(TAG, errorMessage);
+
+        if (errorCode == GeofenceStatusCodes.GEOFENCE_NOT_AVAILABLE) {
+            // TODO: Use JobScheduler to re-register geofences once location access is turned on
+
+            // Geofence service is not available now. Typically this is because the user turned off
+            // location access in settings > location access. Send error notification.
+            NotificationUtils.sendNotification(this,
+                    getString(R.string.geofence_not_available_title),
+                    getString(R.string.geofence_not_available_text),
+                    new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         }
     }
 
@@ -108,70 +124,6 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
                 TextUtils.join(", ",  triggeringGeofencesIdsList);
 
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
-    }
-
-    /**
-     * Posts a notification in the notification bar when a transition is detected.
-     * If the user clicks the notification, control goes to the MainActivity.
-     */
-    private void sendNotification(String notificationDetails) {
-        // Get an instance of the Notification manager
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // Android O requires a Notification Channel.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.app_name);
-            // Create the channel for the notification
-            NotificationChannel mChannel =
-                    new NotificationChannel(CHANNEL_ID, name,
-                            NotificationManager.IMPORTANCE_DEFAULT);
-
-            // Set the Notification Channel for the Notification Manager.
-            mNotificationManager.createNotificationChannel(mChannel);
-        }
-
-        // Create an explicit content Intent that starts the main Activity.
-        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
-
-        // Construct a task stack.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-
-        // Add the main Activity to the task stack as the parent.
-        stackBuilder.addParentStack(MainActivity.class);
-
-        // Push the content Intent onto the stack.
-        stackBuilder.addNextIntent(notificationIntent);
-
-        // Get a PendingIntent containing the entire back stack.
-        PendingIntent notificationPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Get a notification builder that's compatible with platform versions >= 4
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this, CHANNEL_ID);
-
-        // Define the notification settings.
-        builder.setSmallIcon(R.drawable.ic_launcher_foreground)
-                // In a real app, you may want to use a library like Volley
-                // to decode the Bitmap.
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
-                        R.drawable.ic_launcher_foreground))
-                .setColor(Color.RED)
-                .setContentTitle(notificationDetails)
-                .setContentText(getString(R.string.geofence_transition_notification_text))
-                .setContentIntent(notificationPendingIntent);
-
-        // Set the Channel ID for Android O.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setChannelId(CHANNEL_ID); // Channel ID
-        }
-
-        // Dismiss notification once the user touches it.
-        builder.setAutoCancel(true);
-
-        // Issue the notification
-        mNotificationManager.notify(0, builder.build());
     }
 
     /**
