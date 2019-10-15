@@ -1,18 +1,14 @@
 package com.gusta.wakemehome.geofencing;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 
 import com.google.android.gms.location.Geofence;
@@ -21,16 +17,15 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.snackbar.Snackbar;
-import com.gusta.wakemehome.BuildConfig;
 import com.gusta.wakemehome.R;
 import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.NotificationUtils;
+import com.gusta.wakemehome.utilities.PermissionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GeofenceManager {
+public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
 
     //===========//
     // CONSTANTS //
@@ -89,9 +84,10 @@ public class GeofenceManager {
      * specified geofences. Handles the success or failure results returned by addGeofences().
      */
     public void addGeofences() {
-        if (missingPermissions()) {
+        if (PermissionUtils.missingPermissions(mContextWrapper)) {
             mPendingGeofenceTask = PendingGeofenceTask.ADD;
-            requestPermissions();
+            if (mContextWrapper instanceof Activity)
+                PermissionUtils.requestPermissions((Activity) mContextWrapper);
             return;
         }
         addGeofencesTask();
@@ -102,9 +98,10 @@ public class GeofenceManager {
      * previously registered geofences.
      */
     public void removeGeofences() {
-        if (missingPermissions()) {
+        if (PermissionUtils.missingPermissions(mContextWrapper)) {
             mPendingGeofenceTask = PendingGeofenceTask.REMOVE;
-            requestPermissions();
+            if (mContextWrapper instanceof Activity)
+                PermissionUtils.requestPermissions((Activity) mContextWrapper);
             return;
         }
         removeGeofencesTask();
@@ -114,9 +111,10 @@ public class GeofenceManager {
      * Update geofences client according to current list.
      */
     public void updateGeofences() {
-        if (missingPermissions()) {
+        if (PermissionUtils.missingPermissions(mContextWrapper)) {
             mPendingGeofenceTask = PendingGeofenceTask.UPDATE;
-            requestPermissions();
+            if (mContextWrapper instanceof Activity)
+                PermissionUtils.requestPermissions((Activity) mContextWrapper);
             return;
         }
         updateGeofencesTask();
@@ -193,8 +191,10 @@ public class GeofenceManager {
      * permission.
      */
     private void addGeofencesTask() {
-        if (missingPermissions()) {
-            showSnackbar(mContextWrapper.getString(R.string.insufficient_permissions));
+        if (PermissionUtils.missingPermissions(mContextWrapper)) {
+            if (mContextWrapper instanceof Activity)
+                NotificationUtils.showSnackbar((Activity) mContextWrapper,
+                        mContextWrapper.getString(R.string.insufficient_permissions));
             return;
         }
 
@@ -229,8 +229,10 @@ public class GeofenceManager {
      * permission.
      */
     private void removeGeofencesTask() {
-        if (missingPermissions()) {
-            showSnackbar(mContextWrapper.getString(R.string.insufficient_permissions));
+        if (PermissionUtils.missingPermissions(mContextWrapper)) {
+            if (mContextWrapper instanceof Activity)
+                NotificationUtils.showSnackbar((Activity) mContextWrapper,
+                        mContextWrapper.getString(R.string.insufficient_permissions));
             return;
         }
 
@@ -255,8 +257,10 @@ public class GeofenceManager {
      * permission.
      */
     private void updateGeofencesTask() {
-        if (missingPermissions()) {
-            showSnackbar(mContextWrapper.getString(R.string.insufficient_permissions));
+        if (PermissionUtils.missingPermissions(mContextWrapper)) {
+            if (mContextWrapper instanceof Activity)
+                NotificationUtils.showSnackbar((Activity) mContextWrapper,
+                        mContextWrapper.getString(R.string.insufficient_permissions));
             return;
         }
 
@@ -279,7 +283,7 @@ public class GeofenceManager {
 
         // If the context wrapper is an activity, the error can be shown on screen
         if (mContextWrapper instanceof Activity) {
-            showSnackbar(R.string.geofence_not_available_title, R.string.settings,
+            NotificationUtils.showSnackbar((Activity) mContextWrapper, R.string.geofence_not_available_title, R.string.settings,
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -294,85 +298,9 @@ public class GeofenceManager {
     }
 
     /**
-     * Shows a {@link Snackbar} using {@code text}.
-     *
-     * @param text The Snackbar text.
-     */
-    private void showSnackbar(final String text) {
-        // Abort if the context wrapper is not an activity (can't show messages to the user)
-        if (!(mContextWrapper instanceof Activity)) return;
-        Activity activity = (Activity) mContextWrapper;
-
-        // Show the message to the user
-        View container = activity.findViewById(android.R.id.content);
-        if (container != null) {
-            Snackbar.make(container, text, Snackbar.LENGTH_LONG).show();
-        }
-    }
-
-    /**
-     * Shows a {@link Snackbar}.
-     *
-     * @param mainTextStringId The id for the string resource for the Snackbar text.
-     * @param actionStringId   The text of the action item.
-     * @param listener         The listener associated with the Snackbar action.
-     */
-    private void showSnackbar(final int mainTextStringId, final int actionStringId,
-                              View.OnClickListener listener) {
-        // Abort if the context wrapper is not an activity (can't show messages to the user)
-        if (!(mContextWrapper instanceof Activity)) return;
-        Activity activity = (Activity) mContextWrapper;
-
-        // Show the message to the user
-        Snackbar.make(
-                activity.findViewById(android.R.id.content),
-                mContextWrapper.getString(mainTextStringId),
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(mContextWrapper.getString(actionStringId), listener).show();
-    }
-
-    /**
-     * Ask the user for permission.
-     */
-    private void requestPermissions() {
-        // Abort if the context wrapper is not an activity (can't show messages to the user)
-        if (!(mContextWrapper instanceof Activity)) return;
-
-        // Request permissions from the user
-        final Activity activity = (Activity) mContextWrapper;
-        boolean shouldProvideRationale =
-                ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                        Manifest.permission.ACCESS_FINE_LOCATION);
-
-        // Provide an additional rationale to the user. This would happen if the user denied the
-        // request previously, but didn't check the "Don't ask again" checkbox.
-        if (shouldProvideRationale) {
-            Log.i(TAG, "Displaying permission rationale to provide additional context.");
-            showSnackbar(R.string.permission_rationale,
-                    android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // Request permission
-                            ActivityCompat.requestPermissions(activity,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                    Constants.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE);
-                        }
-                    });
-        } else {
-            Log.i(TAG, "Requesting permission");
-            // Request permission. It's possible this can be auto answered if device policy
-            // sets the permission in a given state or the user denied the permission
-            // previously and checked "Never ask again".
-            ActivityCompat.requestPermissions(activity,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    Constants.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE);
-        }
-    }
-
-    /**
      * Performs the geofencing task that was pending until location permission was granted.
      */
-    private void performPendingGeofenceTask() {
+    public void performPendingTask() {
         switch (mPendingGeofenceTask) {
             case ADD:
                 addGeofencesTask();
@@ -384,57 +312,7 @@ public class GeofenceManager {
                 updateGeofencesTask();
                 break;
         }
+        mPendingGeofenceTask = GeofenceManager.PendingGeofenceTask.NONE;
     }
 
-    // TODO: Export permissions logic to a utility class
-    /**
-     * Return the current state of the permissions needed.
-     */
-    private boolean missingPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(mContextWrapper,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        return permissionState != PackageManager.PERMISSION_GRANTED;
-    }
-
-    /**
-     * Callback received when a permissions request has been completed. Redirected from activity.
-     */
-    public void onRequestPermissionsResult(@NonNull int[] grantResults) {
-        if (grantResults.length <= 0) {
-            // If user interaction was interrupted, the permission request is cancelled and you
-            // receive empty arrays.
-            Log.i(TAG, "User interaction was cancelled.");
-        } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "Permission granted.");
-            performPendingGeofenceTask();
-        } else {
-            // Permission denied.
-
-            // Notify the user via a SnackBar that they have rejected a core permission for the
-            // app, which makes the Activity useless. In a real app, core permissions would
-            // typically be best requested during a welcome-screen flow.
-
-            // Additionally, it is important to remember that a permission might have been
-            // rejected without asking the user for permission (device policy or "Never ask
-            // again" prompts). Therefore, a user interface affordance is typically implemented
-            // when permissions are denied. Otherwise, your app could appear unresponsive to
-            // touches or interactions which have required permissions.
-            showSnackbar(R.string.permission_denied_explanation, R.string.settings,
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // Build intent that displays the App settings screen.
-                            Intent intent = new Intent();
-                            intent.setAction(
-                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                            Uri uri = Uri.fromParts("package",
-                                    BuildConfig.APPLICATION_ID, null);
-                            intent.setData(uri);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            mContextWrapper.startActivity(intent);
-                        }
-                    });
-            mPendingGeofenceTask = PendingGeofenceTask.NONE;
-        }
-    }
 }

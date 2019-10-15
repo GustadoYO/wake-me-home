@@ -24,6 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.geofencing.GeofenceManager;
+import com.gusta.wakemehome.utilities.PermissionUtils;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.MainViewModel;
 
@@ -211,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements
                                            @NonNull int[] grantResults) {
         Log.i(TAG, "onRequestPermissionResult");
         if (requestCode == ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE) {
-            mGeofenceManager.onRequestPermissionsResult(grantResults);
+            PermissionUtils.handleResult(this, mGeofenceManager, grantResults);
         }
     }
 

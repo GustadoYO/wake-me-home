@@ -1,5 +1,6 @@
 package com.gusta.wakemehome.utilities;
 
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,10 +9,12 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
+import android.view.View;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.gusta.wakemehome.MainActivity;
 import com.gusta.wakemehome.R;
 
@@ -80,6 +83,36 @@ public final class NotificationUtils {
 
         // Issue the notification
         mNotificationManager.notify(0, builder.build());
+    }
+
+    /**
+     * Shows a {@link Snackbar} using {@code text}.
+     *
+     * @param text The Snackbar text.
+     */
+    public static void showSnackbar(Activity activity, final String text) {
+        // Show the message to the user
+        View container = activity.findViewById(android.R.id.content);
+        if (container != null) {
+            Snackbar.make(container, text, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Shows a {@link Snackbar}.
+     *
+     * @param mainTextStringId The id for the string resource for the Snackbar text.
+     * @param actionStringId   The text of the action item.
+     * @param listener         The listener associated with the Snackbar action.
+     */
+    public static void showSnackbar(Activity activity, final int mainTextStringId, final int actionStringId,
+                                    View.OnClickListener listener) {
+        // Show the message to the user
+        Snackbar.make(
+                activity.findViewById(android.R.id.content),
+                activity.getString(mainTextStringId),
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(activity.getString(actionStringId), listener).show();
     }
 
 }
