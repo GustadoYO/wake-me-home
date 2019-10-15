@@ -1,37 +1,40 @@
 package com.gusta.wakemehome;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
+import com.gusta.wakemehome.geofencing.GeofenceManager;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.MainViewModel;
 
 import java.util.List;
 
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
+import static com.gusta.wakemehome.utilities.Constants.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE;
 
 public class MainActivity extends AppCompatActivity implements
-        AlarmAdapter.ItemClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        AlarmAdapter.AlarmAdapterListeners,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     //===========//
     // CONSTANTS //
@@ -40,16 +43,17 @@ public class MainActivity extends AppCompatActivity implements
     // Constant for logging
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    //===========//
-    // VARIABLES //
-    //===========//
-
-    private AlarmAdapter mAdapter;  // The RecyclerView adapter
-    private AppDatabase mDb;        // The database member
-
     //=========//
-    // METHODS //
+    // MEMBERS //
     //=========//
+
+    private AlarmAdapter mAdapter;              // The RecyclerView adapter
+    private AppDatabase mDb;                    // The database member
+    private GeofenceManager mGeofenceManager;   // The geofence manager
+
+    //===================//
+    // LIFECYCLE METHODS //
+    //===================//
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,15 +142,22 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Start observing the "alarms list" model in order to  update UI of any change
+     * Start observing the "alarms list" model in order to update UI and geofences of any change
      * */
     private void setupViewModel() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        if (mGeofenceManager == null)
+            mGeofenceManager = new GeofenceManager(this, viewModel.getAlarms());
+
         viewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
             @Override
             public void onChanged(@Nullable List<AlarmEntry> alarmEntries) {
-                Log.d(TAG, "Updating list of tasks from LiveData in ViewModel");
+                // Update UI
+                Log.d(TAG, "Updating list of alarms from LiveData in ViewModel");
                 mAdapter.setAlarms(alarmEntries);
+
+                // Update geofence manger to current alarms list
+                mGeofenceManager.updateGeofences();
             }
         });
     }
@@ -188,6 +199,22 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    //====================//
+    // PERMISSION METHODS //
+    //====================//
+
+    /**
+     * Callback received when a permissions request has been completed.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        Log.i(TAG, "onRequestPermissionResult");
+        if (requestCode == ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE) {
+            mGeofenceManager.onRequestPermissionsResult(grantResults);
+        }
+    }
+
     //===========================//
     // ItemClickListener METHODS //
     //===========================//
@@ -206,12 +233,30 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
+    /**
+     * This method is overridden by our MainActivity class in order to handle RecyclerView item
+     * enable.
+     *
+     * @param alarm The alarm that was enabled
+     */
+    @Override
+    public void onAlarmEnabledChangeListener(final AlarmEntry alarm) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.alarmDao().updateAlarm(alarm);
+            }
+        });
+    }
+
     //==========================================//
     // OnSharedPreferenceChangeListener METHODS //
     //==========================================//
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+
         mAdapter.notifyDataSetChanged();
     }
+
 }

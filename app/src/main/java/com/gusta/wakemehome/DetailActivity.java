@@ -44,9 +44,9 @@ public class DetailActivity extends AppCompatActivity {
     public static final String INSTANCE_ALARM_ID = "instanceAlarmId";
     // Constant for default alarm id to be used when not in update mode
 
-    //===========//
-    // VARIABLES //
-    //===========//
+    //=========//
+    // MEMBERS //
+    //=========//
 
     private AlarmEntry mAlarmEntry;                 // The current alarm entry
     private DetailViewModel mViewModel;             // The current alarm view model
@@ -188,6 +188,23 @@ public class DetailActivity extends AppCompatActivity {
         if (!mAlarmEntry.isValidEntry()) {
             Toast.makeText(getApplicationContext(),R.string.error_mandatory,Toast.LENGTH_SHORT)
                     .show();
+            return;
+        }
+
+        // Parse numeric fields to their appropriate types
+        double latitude = Double.parseDouble(latitudeString);
+        double longitude = Double.parseDouble(longitudeString);
+        float radius = Float.parseFloat(radiusString);
+
+        // Check if coordinates are valid: -90 < latitude < 90 && -180 < longitude < 180
+        if (latitude < -90 || latitude > 90) {
+            Toast.makeText(getApplicationContext(),
+                    R.string.error_latitude,Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (longitude < -180 || longitude > 180) {
+            Toast.makeText(getApplicationContext(),
+                    R.string.error_longitude,Toast.LENGTH_SHORT).show();
             return;
         }
 

@@ -5,15 +5,17 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.gusta.wakemehome.geofencing.GeofenceEntry;
+
 @Entity(tableName = "alarm")
-public class AlarmEntry {
+public class AlarmEntry implements GeofenceEntry {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String location;    // Human readable location string
     private double latitude;    // The location's latitude
     private double longitude;   // The location's longitude
-    private double radius;      // Radius from location to start alarm
+    private float radius;      // Radius from location to start alarm
     @ColumnInfo(name = "is_enabled")
     private boolean enabled;    // True if alarm is active
     @ColumnInfo(name = "should_vibrate")
@@ -32,7 +34,7 @@ public class AlarmEntry {
     }
 
     @Ignore
-    public AlarmEntry(String location, double latitude, double longitude, double radius,
+    public AlarmEntry(String location, double latitude, double longitude, float radius,
                       boolean enabled, boolean vibrate, String message, String alert) {
         this.location = location;
         this.latitude = latitude;
@@ -44,7 +46,7 @@ public class AlarmEntry {
         this.alert = alert;
     }
 
-    public AlarmEntry(int id, String location, double latitude, double longitude, double radius,
+    public AlarmEntry(int id, String location, double latitude, double longitude, float radius,
                       boolean enabled, boolean vibrate, String message, String alert) {
         this.id = id;
         this.location = location;
@@ -89,11 +91,11 @@ public class AlarmEntry {
         this.longitude = longitude;
     }
 
-    public double getRadius() {
+    public float getRadius() {
         return radius;
     }
 
-    public void setRadius(double radius) {
+    public void setRadius(float radius) {
         this.radius = radius;
     }
 
