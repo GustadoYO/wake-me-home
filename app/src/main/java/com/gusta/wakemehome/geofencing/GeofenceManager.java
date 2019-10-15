@@ -6,7 +6,6 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -192,8 +191,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      */
     private void addGeofencesTask() {
         if (PermissionUtils.missingPermissions(mContextWrapper)) {
-            if (mContextWrapper instanceof Activity)
-                NotificationUtils.showSnackbar((Activity) mContextWrapper,
+            NotificationUtils.notifyUser(mContextWrapper,
                         mContextWrapper.getString(R.string.insufficient_permissions));
             return;
         }
@@ -230,9 +228,8 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      */
     private void removeGeofencesTask() {
         if (PermissionUtils.missingPermissions(mContextWrapper)) {
-            if (mContextWrapper instanceof Activity)
-                NotificationUtils.showSnackbar((Activity) mContextWrapper,
-                        mContextWrapper.getString(R.string.insufficient_permissions));
+            NotificationUtils.notifyUser(mContextWrapper,
+                    mContextWrapper.getString(R.string.insufficient_permissions));
             return;
         }
 
@@ -258,9 +255,8 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      */
     private void updateGeofencesTask() {
         if (PermissionUtils.missingPermissions(mContextWrapper)) {
-            if (mContextWrapper instanceof Activity)
-                NotificationUtils.showSnackbar((Activity) mContextWrapper,
-                        mContextWrapper.getString(R.string.insufficient_permissions));
+            NotificationUtils.notifyUser(mContextWrapper,
+                    mContextWrapper.getString(R.string.insufficient_permissions));
             return;
         }
 
@@ -281,20 +277,9 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
         final Intent intent = new Intent();
         intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 
-        // If the context wrapper is an activity, the error can be shown on screen
-        if (mContextWrapper instanceof Activity) {
-            NotificationUtils.showSnackbar((Activity) mContextWrapper, R.string.geofence_not_available_title, R.string.settings,
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            mContextWrapper.startActivity(intent);
-                        }
-                    });
-        } else {    // The context wrapper is not an activity - a notification needs to be used
-            NotificationUtils.sendNotification(mContextWrapper,
-                    mContextWrapper.getString(R.string.geofence_not_available_title),
-                    mContextWrapper.getString(R.string.geofence_not_available_text), intent);
-        }
+        // Notify the user about the error
+        NotificationUtils.notifyUser(mContextWrapper, R.string.geofence_not_available_title,
+                R.string.geofence_not_available_text, R.string.settings, intent);
     }
 
     /**

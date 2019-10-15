@@ -45,7 +45,7 @@ public final class PermissionUtils {
         // request previously, but didn't check the "Don't ask again" checkbox.
         if (shouldProvideRationale) {
             Log.i(TAG, "Displaying permission rationale to provide additional context.");
-            NotificationUtils.showSnackbar(activity, R.string.permission_rationale,
+            NotificationUtils.notifyUser(activity, R.string.permission_rationale,
                     android.R.string.ok, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -90,8 +90,8 @@ public final class PermissionUtils {
             // again" prompts). Therefore, a user interface affordance is typically implemented
             // when permissions are denied. Otherwise, your app could appear unresponsive to
             // touches or interactions which have required permissions.
-            NotificationUtils.showSnackbar(activity, R.string.permission_denied_explanation, R.string.settings,
-                    new View.OnClickListener() {
+            NotificationUtils.notifyUser(activity, R.string.permission_denied_explanation,
+                    R.string.settings, new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             // Build intent that displays the App settings screen.
