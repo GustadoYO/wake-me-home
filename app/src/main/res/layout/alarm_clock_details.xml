@@ -17,7 +17,7 @@
         <!-- This guideline divides the layout into a left and right half and is used for alignment -->
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/horizontal_middle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.4" />
@@ -52,16 +52,14 @@
             app:layout_constraintBottom_toBottomOf="@+id/alert"/>
 
         <!-- Alert edit -->
-        <EditText
+        <Button
             android:id="@+id/alert"
             style="@style/DetailEdit"
             android:hint="@string/edit_alarm_alert"
             android:paddingBottom="@dimen/detail_vertical_padding"
             app:layout_constraintTop_toBottomOf="@+id/message"
             app:layout_constraintLeft_toLeftOf="@+id/horizontal_middle"
-            tools:text="Morning Flower"
-            android:importantForAutofill="no"
-            android:inputType="text" />
+            android:importantForAutofill="no"/>
 
         <!-- Vibrate label -->
         <TextView

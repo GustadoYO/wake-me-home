@@ -1,15 +1,10 @@
 package com.gusta.wakemehome;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,12 +12,21 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.DetailViewModel;
 import com.gusta.wakemehome.viewmodel.DetailViewModelFactory;
+
+import java.util.Objects;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -63,11 +67,20 @@ public class DetailActivity extends AppCompatActivity {
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
         // Init the save button
-        Button openMapButton = mDetailBinding.OpenMapButton;
-        openMapButton.setOnClickListener(new View.OnClickListener() {
+       Button mMapButton = mDetailBinding.locationDetails.OpenMapButton;
+        mMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onOpenMapButtonClicked();
+            }
+        });
+
+        // Init the save button
+        Button mAlertButton = mDetailBinding.clockDetails.alert;
+        mAlertButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onRingtoneSelect();
             }
         });
 
@@ -173,18 +186,14 @@ public class DetailActivity extends AppCompatActivity {
 
         // Show error and abort save if one of the mandatory fields is empty
         if (!mAlarmEntry.isValidEntry()) {
-            Toast.makeText(getApplicationContext(),R.string.mandatory_fields,Toast.LENGTH_SHORT)
+            Toast.makeText(getApplicationContext(),R.string.error_mandatory,Toast.LENGTH_SHORT)
                     .show();
             return;
         }
 
         // "enabled" field is not shown on this screen - keep current value (if exists)
-        // new will set true
-        try{
-            mAlarmEntry.setEnabled(mViewModel.getAlarm().getValue().isEnabled());
-        }catch(Exception e){
-            mAlarmEntry.setEnabled(true);
-        }
+        boolean enabled = (mViewModel == null) ||
+                Objects.requireNonNull(mViewModel.getAlarm().getValue()).isEnabled();
 
         // Save the added/updated alarm entity
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
@@ -218,6 +227,13 @@ public class DetailActivity extends AppCompatActivity {
         addTaskIntent.putExtra(EXTRA_ALARM_ID, mAlarmEntry.getId());
         startActivity(addTaskIntent);
         finish();
+    }
+
+    private void onRingtoneSelect() {
+        Intent intent_upload = new Intent();
+        intent_upload.setType("audio/*");
+        intent_upload.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent_upload, 1);
     }
 
     //=====================//

@@ -75,7 +75,7 @@ public class MapsActivity extends AppCompatActivity{
                     startActivity(intent);
                     finish();
                 }else{
-                    Toast.makeText(getApplicationContext(),R.string.mandatory_fields,Toast.LENGTH_SHORT)
+                    Toast.makeText(getApplicationContext(),R.string.error_mandatory,Toast.LENGTH_SHORT)
                             .show();
                     return;
                 }
