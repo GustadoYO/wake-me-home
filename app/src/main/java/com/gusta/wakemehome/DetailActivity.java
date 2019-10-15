@@ -67,7 +67,7 @@ public class DetailActivity extends AppCompatActivity {
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
         // Init the save button
-       Button mMapButton = mDetailBinding.locationDetails.OpenMapButton;
+        Button mMapButton = mDetailBinding.OpenMapButton;
         mMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
