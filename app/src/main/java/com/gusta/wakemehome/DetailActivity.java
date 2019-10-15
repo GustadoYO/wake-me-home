@@ -192,9 +192,9 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         // Parse numeric fields to their appropriate types
-        double latitude = Double.parseDouble(latitudeString);
-        double longitude = Double.parseDouble(longitudeString);
-        float radius = Float.parseFloat(radiusString);
+        double latitude = mAlarmEntry.getLatitude();
+        double longitude = mAlarmEntry.getLongitude();
+        float radius = mAlarmEntry.getRadius();
 
         // Check if coordinates are valid: -90 < latitude < 90 && -180 < longitude < 180
         if (latitude < -90 || latitude > 90) {

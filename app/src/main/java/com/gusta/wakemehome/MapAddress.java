@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MapAddress implements Parcelable {
     private LatLng coordinates;
-    private double radius;
+    private float radius;
     private String location;
 
     public MapAddress(LatLng coordinates, Geocoder geocoder) {
@@ -31,7 +31,7 @@ public class MapAddress implements Parcelable {
         double latitude = in.readDouble();
         double longitude = in.readDouble();
         coordinates = new LatLng(latitude,longitude);
-        radius = in.readDouble();
+        radius = in.readFloat();
         location = in.readString();
     }
 
@@ -41,7 +41,7 @@ public class MapAddress implements Parcelable {
     public void setCoordinates(LatLng coordinates) {
         this.coordinates = coordinates;
     }
-    public void setRadius(double radius) {
+    public void setRadius(float radius) {
         this.radius = radius;
     }
 
@@ -57,7 +57,7 @@ public class MapAddress implements Parcelable {
     public String getLocation() {
         return location;
     }
-    public double getRadius() {
+    public float getRadius() {
         return radius;
     }
 
@@ -105,7 +105,7 @@ public class MapAddress implements Parcelable {
     public void writeToParcel(Parcel out, int flags) {
         out.writeDouble(coordinates.latitude);
         out.writeDouble(coordinates.longitude);
-        out.writeDouble(radius);
+        out.writeFloat(radius);
         out.writeString(location);
     }
 

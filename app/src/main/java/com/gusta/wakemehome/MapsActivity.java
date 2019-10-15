@@ -98,9 +98,9 @@ public class MapsActivity extends AppCompatActivity{
     }
 
     private void changeRadius(SeekBar seekBar){
-        double radius = seekBar.getProgress();
+        float radius = seekBar.getProgress();
         mMapAddress.setRadius(radius);
-        mRadiusText.setText(Double.toString(radius));
+        mRadiusText.setText(Float.toString(radius));
         mMapProvider.drawCircle(mMapAddress.getCoordinates(),radius);
     }
 }
