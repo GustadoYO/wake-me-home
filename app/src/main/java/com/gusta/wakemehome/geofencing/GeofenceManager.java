@@ -77,7 +77,8 @@ public class GeofenceManager {
     // PUBLIC METHODS //
     //================//
 
-    public GeofenceManager(ContextWrapper activity, LiveData<? extends List<? extends GeofenceEntry>> liveData) {
+    public GeofenceManager(ContextWrapper activity,
+                           LiveData<? extends List<? extends GeofenceEntry>> liveData) {
         mContextWrapper = activity;
         mLiveData = liveData;
         mGeofencingClient = LocationServices.getGeofencingClient(activity);

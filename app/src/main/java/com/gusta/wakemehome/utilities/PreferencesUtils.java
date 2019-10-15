@@ -2,11 +2,12 @@ package com.gusta.wakemehome.utilities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import androidx.preference.PreferenceManager;
 
 import com.gusta.wakemehome.R;
 
-final class WakeMeHomePreferences {
+final class PreferencesUtils {
 
     /**
      * Returns true if the user has selected metric length display.

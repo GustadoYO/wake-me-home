@@ -72,7 +72,7 @@
 
 
     <!-- - - - - - - - - - - - - - - -->
-    <!-- Used by WakeMeHomeUnitsUtils-->
+    <!-- Used by UnitsUtils-->
     <!-- - - - - - - - - - - - - - - -->
 
     <!-- Length format in Kilometres [CHAR LIMIT=5] -->

@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gusta.wakemehome.database.AlarmEntry;
-import com.gusta.wakemehome.utilities.WakeMeHomeUnitsUtils;
+import com.gusta.wakemehome.utilities.UnitsUtils;
 
 import java.util.List;
 
@@ -80,7 +80,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         final AlarmEntry alarmEntry = mAlarmEntries.get(position);
         String location = alarmEntry.getLocation();
         String radius =
-                WakeMeHomeUnitsUtils.formatLength(mContext, alarmEntry.getRadius()) + " radius";
+                UnitsUtils.formatLength(mContext, alarmEntry.getRadius()) + " radius";
         boolean enabled = alarmEntry.isEnabled();
         String message = alarmEntry.getMessage();
 
