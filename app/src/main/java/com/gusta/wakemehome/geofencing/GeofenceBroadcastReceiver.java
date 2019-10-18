@@ -6,7 +6,8 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.util.Log;
 
-import com.gusta.wakemehome.ReRegisterGeofencesJobIntentService;
+import com.gusta.wakemehome.services.GeofenceTransitionsJobIntentService;
+import com.gusta.wakemehome.services.ReRegisterGeofencesJobIntentService;
 import com.gusta.wakemehome.utilities.Constants;
 
 /**

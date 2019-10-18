@@ -1,4 +1,4 @@
-package com.gusta.wakemehome;
+package com.gusta.wakemehome.services;
 
 import android.content.Context;
 import android.content.Intent;

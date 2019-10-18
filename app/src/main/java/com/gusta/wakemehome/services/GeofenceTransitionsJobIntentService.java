@@ -1,4 +1,4 @@
-package com.gusta.wakemehome.geofencing;
+package com.gusta.wakemehome.services;
 
 
 import android.content.Context;
@@ -14,6 +14,7 @@ import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 import com.gusta.wakemehome.MainActivity;
 import com.gusta.wakemehome.R;
+import com.gusta.wakemehome.geofencing.GeofenceErrorMessages;
 import com.gusta.wakemehome.utilities.NotificationUtils;
 
 import java.util.ArrayList;
