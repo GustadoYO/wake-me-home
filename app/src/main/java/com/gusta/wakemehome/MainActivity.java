@@ -46,8 +46,8 @@ public class MainActivity extends AppCompatActivity implements
     //=========//
 
     private AlarmAdapter mAdapter;              // The RecyclerView adapter
-    private AppDatabase mDb;                    // The database member
     private GeofenceManager mGeofenceManager;   // The geofence manager
+    private MainViewModel mViewModel;           // The view model
 
     //===================//
     // LIFECYCLE METHODS //
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements
                     public void run() {
                         int position = viewHolder.getAdapterPosition();
                         List<AlarmEntry> alarms = mAdapter.getAlarms();
-                        mDb.alarmDao().deleteAlarm(alarms.get(position));
+                        mViewModel.deleteAlarm(alarms.get(position));
                     }
                 });
             }
@@ -127,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         // Init the database member and the model
-        mDb = AppDatabase.getInstance(getApplicationContext());
         setupViewModel();
     }
 
@@ -135,11 +134,11 @@ public class MainActivity extends AppCompatActivity implements
      * Start observing the "alarms list" model in order to update UI and geofences of any change
      * */
     private void setupViewModel() {
-        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         if (mGeofenceManager == null)
-            mGeofenceManager = new GeofenceManager(this, viewModel.getAlarms());
+            mGeofenceManager = new GeofenceManager(this, mViewModel.getAlarms());
 
-        viewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
+        mViewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
             @Override
             public void onChanged(@Nullable List<AlarmEntry> alarmEntries) {
                 // Update UI
@@ -225,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                mDb.alarmDao().updateAlarm(alarm);
+                mViewModel.updateAlarm(alarm);
             }
         });
     }

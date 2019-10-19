@@ -42,21 +42,20 @@ public class DetailActivity extends AppCompatActivity {
 
     // Constant for logging
     private static final String TAG = DetailActivity.class.getSimpleName();
-    // Extra for the alarm ID to be received in the intent
+    //Extra alarm id from main activity
     public static final String EXTRA_ALARM_ID = "extraAlarmId";
-    // Extra for the alarm ID to be received in the intent
+    //extra alarm from map provider
     public static final String EXTRA_ALARM_COORDINATES = "alarmCoordinates";
-    // Extra for the alarm ID to be received after rotation
+    //ui element which suppose to save on rotate
     public static final String INSTANCE_ALARM_ID = "instanceAlarmId";
     public static final String INSTANCE_ALARM_MESSAGE = "instanceAlarmMessage";
     public static final String INSTANCE_ALARM_ALERT = "instanceAlarmAlert";
     public static final String INSTANCE_ALARM_VIBRATE = "instanceAlarmVibrate";
 
+    //temp png will be for unsaved snapshots on save it'll change to  map id.png
     public static final String TEMP_IMAGE_FILE = "temp.png";
     // map intent request code
     private static final int MAP_REQUEST_CODE = 1;
-    //preferences key
-
 
     //=========//
     // MEMBERS //
@@ -249,17 +248,17 @@ public class DetailActivity extends AppCompatActivity {
 
         File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
         // Create imageDir
-        File file = new File(alarm.getImage());
+        File source = new File(alarm.getImage());
 
         // File (or directory) with new name
-        File file2 = new File(directory,alarm.getId() + ".png");
+        File dest = new File(directory,alarm.getId() + ".png");
 
-        if (file2.exists())
-            file2.delete();
+        if (dest.exists())
+            dest.delete();
 
         // Rename file (or directory)
-        boolean success = file.renameTo(file2);
-        return file2.getAbsolutePath();
+        source.renameTo(dest);
+        return dest.getAbsolutePath();
     }
     /**
      * This method uses the URI scheme for showing the alarm on a

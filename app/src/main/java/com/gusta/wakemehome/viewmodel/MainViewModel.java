@@ -26,6 +26,7 @@ public class MainViewModel extends AndroidViewModel {
     //=========//
 
     private LiveData<List<AlarmEntry>> alarms;
+    private AppDatabase database;
 
     //===================//
     // GETTERS & SETTERS //
@@ -43,8 +44,14 @@ public class MainViewModel extends AndroidViewModel {
         super(application);
 
         // Retrieve the alarms list from the db into a LiveData object
-        AppDatabase database = AppDatabase.getInstance(this.getApplication());
+        database = AppDatabase.getInstance(this.getApplication());
         Log.d(TAG, "Actively retrieving the alarms from the DataBase");
         alarms = database.alarmDao().loadAllAlarms();
+    }
+    public void updateAlarm(AlarmEntry alarm){
+        database.alarmDao().updateAlarm(alarm);
+    }
+    public void deleteAlarm(AlarmEntry alarm){
+        database.alarmDao().deleteAlarm(alarm);
     }
 }

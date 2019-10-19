@@ -18,11 +18,10 @@ import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_COORDINATES;
 
 public class MapsActivity extends AppCompatActivity{
 
+    private static final String TAG = MapsActivity.class.getSimpleName();
     public static final String INSTANCE_MAPS_SELECTION = "instanceMapsSelection";
-    public static final String EXTRA_ALARM_IMAGE = "extraAlarmImage";
 
     private Button mUpdateLocationButton;
-    private static final String TAG = MapsActivity.class.getSimpleName();
     private MapProvider mMapProvider;
     private TextView mRadiusText;
     private SeekBar mRadiusSlider;
@@ -35,8 +34,8 @@ public class MapsActivity extends AppCompatActivity{
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mRadiusSlider = (SeekBar) findViewById(R.id.radius_slider);
-        mRadiusText = (TextView) findViewById(R.id.seekBarInfoTextView);
+        mRadiusSlider = findViewById(R.id.radius_slider);
+        mRadiusText = findViewById(R.id.seekBarInfoTextView);
         mMapProvider = new GoogleMaps(this);
 
         // Check for saved state (like after phone orientation change) - and load it
@@ -68,8 +67,6 @@ public class MapsActivity extends AppCompatActivity{
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        // Set the RecyclerView to its corresponding view
-        // Member variables for the adapter and RecyclerView
         mUpdateLocationButton = findViewById(R.id.updateLocation);
         mUpdateLocationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
