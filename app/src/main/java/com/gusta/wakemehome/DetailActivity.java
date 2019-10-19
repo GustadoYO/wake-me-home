@@ -112,7 +112,7 @@ public class DetailActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
             setAlarmData(intent);
         }
-        updateLocation();
+//        updateLocation();
         updateMapImage();
     }
 
@@ -183,10 +183,10 @@ public class DetailActivity extends AppCompatActivity {
         if (alarm == null) {
             return;
         }
-        mDetailBinding.location.setText(alarm.getLocation());
+//        mDetailBinding.location.setText(alarm.getLocation());
         mDetailBinding.clockDetails.vibrate.setChecked(alarm.isVibrate());
         mDetailBinding.clockDetails.message.setText(alarm.getMessage());
-        updateLocation();
+//        updateLocation();
         updateMapImage();
     }
 
@@ -305,7 +305,7 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         }
-        updateLocation();
+//        updateLocation();
         updateMapImage();
     }
 
