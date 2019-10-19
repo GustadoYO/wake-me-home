@@ -1,7 +1,6 @@
 package com.gusta.wakemehome;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -33,8 +32,7 @@ import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
 import static com.gusta.wakemehome.utilities.Constants.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE;
 
 public class MainActivity extends AppCompatActivity implements
-        AlarmAdapter.AlarmAdapterListeners,
-        SharedPreferences.OnSharedPreferenceChangeListener{
+        AlarmAdapter.AlarmAdapterListeners{
 
     //===========//
     // CONSTANTS //
@@ -116,14 +114,6 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.d(TAG, "onCreate: registering preference changed listener");
 
-        /*
-         * Register MainActivity as an OnPreferenceChangedListener to receive a callback when a
-         * SharedPreference has changed. Please note that we must unregister MainActivity as an
-         * OnSharedPreferenceChanged listener in onDestroy to avoid any memory leaks.
-         */
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .registerOnSharedPreferenceChangeListener(this);
-
         // Initialize the FloatingActionButton
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -160,15 +150,6 @@ public class MainActivity extends AppCompatActivity implements
                 mGeofenceManager.updateGeofences();
             }
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        /* Unregister MainActivity as an OnPreferenceChangedListener to avoid any memory leaks. */
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this);
     }
 
     //=====================//
@@ -247,16 +228,6 @@ public class MainActivity extends AppCompatActivity implements
                 mDb.alarmDao().updateAlarm(alarm);
             }
         });
-    }
-
-    //==========================================//
-    // OnSharedPreferenceChangeListener METHODS //
-    //==========================================//
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-
-        mAdapter.notifyDataSetChanged();
     }
 
 }

@@ -16,6 +16,10 @@
     <dimen name="radius_text_size">16sp</dimen>
     <dimen name="radius_length_margin">10dp</dimen>
 
+    <dimen name="detail_item_font_size">18sp</dimen>
+    <dimen name="detail_item_margin">14dp</dimen>
+    <dimen name="detail_item_padding">10dp</dimen>
+
     <!-- Loading indicator dimens -->
     <dimen name="loading_indicator_size">42dp</dimen>
 

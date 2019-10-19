@@ -25,13 +25,18 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/secondary_text</item>
         <item name="android:fontFamily">sans-serif</item>
+        <item name="android:padding">@dimen/detail_item_padding</item>
+        <item name="android:textSize">@dimen/detail_item_font_size</item>
     </style>
 
     <!-- Style used in the DetailActivity for the values of the alarm clock details -->
     <style name="DetailEdit" parent="@style/TextAppearance.AppCompat.Headline">
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">@dimen/detail_item_font_size</item>
+        <item name="android:layout_marginBottom">@dimen/detail_item_margin</item>
+        <item name="android:padding">@dimen/detail_item_padding</item>
     </style>
 
 </resources>

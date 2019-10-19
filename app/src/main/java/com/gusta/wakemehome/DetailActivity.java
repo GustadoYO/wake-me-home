@@ -1,14 +1,17 @@
 package com.gusta.wakemehome;
 
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,13 +23,16 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.gusta.wakemehome.database.AlarmEntry;
-import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
+import com.gusta.wakemehome.maps.MapAddress;
+import com.gusta.wakemehome.maps.MapsActivity;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.DetailViewModel;
-import com.gusta.wakemehome.viewmodel.DetailViewModelFactory;
 
+import java.io.File;
 import java.util.Objects;
+
+import static com.gusta.wakemehome.database.AlarmEntry.DEFAULT_ALARM_ID;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -39,10 +45,16 @@ public class DetailActivity extends AppCompatActivity {
     // Extra for the alarm ID to be received in the intent
     public static final String EXTRA_ALARM_ID = "extraAlarmId";
     // Extra for the alarm ID to be received in the intent
-    public static final String ALARM_COORDINATES = "alarmCoordinates";
+    public static final String EXTRA_ALARM_COORDINATES = "alarmCoordinates";
     // Extra for the alarm ID to be received after rotation
     public static final String INSTANCE_ALARM_ID = "instanceAlarmId";
-    // Constant for default alarm id to be used when not in update mode
+    public static final String INSTANCE_ALARM_MESSAGE = "instanceAlarmMessage";
+    public static final String INSTANCE_ALARM_ALERT = "instanceAlarmAlert";
+    public static final String INSTANCE_ALARM_VIBRATE = "instanceAlarmVibrate";
+    // map intent request code
+    private static final int MAP_REQUEST_CODE = 1;
+    //preferences key
+
 
     //=========//
     // MEMBERS //
@@ -50,8 +62,8 @@ public class DetailActivity extends AppCompatActivity {
 
     private AlarmEntry mAlarmEntry;                 // The current alarm entry
     private DetailViewModel mViewModel;             // The current alarm view model
-    private AppDatabase mDb;                        // The database member
     private ActivityDetailBinding mDetailBinding;   // The data binding object
+    private String mAlarmUri;   // The data binding object
 
     //=========//
     // METHODS //
@@ -62,6 +74,8 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mAlarmEntry = new AlarmEntry();
+
+        mViewModel = ViewModelProviders.of(this).get(DetailViewModel.class);
 
         // Init the data binding object
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
@@ -84,68 +98,51 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
-        // Init the database member
-        mDb = AppDatabase.getInstance(getApplicationContext());
-
         // Check for saved state (like after phone orientation change) - and load it
         if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_ALARM_ID)) {
-            mAlarmEntry.setId(savedInstanceState.getInt(INSTANCE_ALARM_ID, AlarmEntry.DEFAULT_ALARM_ID));
+            mAlarmEntry.setId(savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID));
+            mAlarmEntry.setMessage(savedInstanceState.getString(INSTANCE_ALARM_MESSAGE, ""));
+            mAlarmEntry.setVibrate(savedInstanceState.getBoolean(INSTANCE_ALARM_VIBRATE, false));
+            mAlarmEntry.setAlert(savedInstanceState.getString(INSTANCE_ALARM_ALERT, null));
         }
 
         // If ALARM_ID was sent, it is update mode (list item clicked)
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(ALARM_COORDINATES)) {
-            // get coordinates (from intent)
-            MapAddress mapAddress = intent.getParcelableExtra(ALARM_COORDINATES);
-            getAlarmData(intent,mapAddress);
-        }
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
-            getAlarmData(intent,null);
+            setAlarmData(intent);
         }
-        updateUIVisibility();
+        updateLocation();
+        updateMapImage();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // Save alarm ID to state (to keep it in case of phone orientation change for example)
         outState.putInt(INSTANCE_ALARM_ID, mAlarmEntry.getId());
+        outState.putString(INSTANCE_ALARM_MESSAGE, mDetailBinding.clockDetails.message.getText().toString());
+        outState.putString(INSTANCE_ALARM_ALERT, mDetailBinding.clockDetails.alert.getText().toString());
+        outState.putBoolean(INSTANCE_ALARM_VIBRATE, mDetailBinding.clockDetails.vibrate.isChecked());
         super.onSaveInstanceState(outState);
     }
 
-    private void getAlarmData(Intent intent, final MapAddress mapAddress){
+    private void setAlarmData(Intent intent){
         // If member alarm ID is still DEFAULT_ID, the alarm model should be loaded from db
-        if (mAlarmEntry.getId() == AlarmEntry.DEFAULT_ALARM_ID) {
-
-            // Set member alarm ID to wanted alarm (from intent)
-            mAlarmEntry.setId(intent.getIntExtra(EXTRA_ALARM_ID, AlarmEntry.DEFAULT_ALARM_ID));
-
-            // Load alarm model
-            DetailViewModelFactory factory = new DetailViewModelFactory(mDb, mAlarmEntry.getId());
-            mViewModel =
-                    ViewModelProviders.of(this, factory).get(DetailViewModel.class);
+        if (mAlarmEntry.getId() == DEFAULT_ALARM_ID) {
 
             // Observe changes in model in order to update UI
-            mViewModel.getAlarm().observe(this, new Observer<AlarmEntry>() {
+            mViewModel.getAlarm(intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID)).observe(this, new Observer<AlarmEntry>() {
                 @Override
                 public void onChanged(@Nullable AlarmEntry alarmEntry) {
-                    // populate the UI
                     mViewModel.getAlarm().removeObserver(this);
-                    if(alarmEntry != null) {
-                        mAlarmEntry = alarmEntry;
-                    }
-                    if(mapAddress != null) {
-                        mAlarmEntry.setLocation(mapAddress.getLocation());
-                        mAlarmEntry.setLongitude(mapAddress.getLongitude());
-                        mAlarmEntry.setLatitude(mapAddress.getLatitude());
-                        mAlarmEntry.setRadius(mapAddress.getRadius());
-                    }
+                    mAlarmEntry = alarmEntry;
+                    // populate the UI
                     populateUI(mAlarmEntry);
                 }
             });
         }
     }
 
-    private void updateUIVisibility(){
+    private void updateLocation(){
         TextView locationTextView = mDetailBinding.location;
         TextView locationTextViewLabel = mDetailBinding.locationLabel;
         if(mAlarmEntry.getLocation() == null) {
@@ -153,7 +150,26 @@ public class DetailActivity extends AppCompatActivity {
             locationTextViewLabel.setVisibility(View.GONE);
         }else {
             locationTextView.setVisibility(View.VISIBLE);
+            locationTextView.setText(mAlarmEntry.getLocation());
             locationTextViewLabel.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateMapImage(){
+        ImageView mapsImage = mDetailBinding.mapImage;
+        if (mAlarmUri == null){
+            mapsImage.setVisibility(View.GONE);
+        }else{
+            mapsImage.setVisibility(View.VISIBLE);
+            File imgFile = new  File(mAlarmUri+"/temp.png");
+
+            if(imgFile.exists()){
+
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
+                mapsImage.setImageBitmap(myBitmap);
+
+            }
         }
     }
 
@@ -170,7 +186,8 @@ public class DetailActivity extends AppCompatActivity {
         mDetailBinding.clockDetails.vibrate.setChecked(alarm.isVibrate());
         mDetailBinding.clockDetails.message.setText(alarm.getMessage());
         mDetailBinding.clockDetails.alert.setText(alarm.getAlert());
-        updateUIVisibility();
+        updateLocation();
+        updateMapImage();
     }
 
     /**
@@ -180,21 +197,20 @@ public class DetailActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void onSaveButtonClicked() {
         // Get user inputs
+        // Parse numeric fields to their appropriate types
+        double latitude = mAlarmEntry.getLatitude();
+        double longitude = mAlarmEntry.getLongitude();
+
         mAlarmEntry.setVibrate(mDetailBinding.clockDetails.vibrate.isChecked());
         mAlarmEntry.setMessage(mDetailBinding.clockDetails.message.getText().toString());
         mAlarmEntry.setAlert(mDetailBinding.clockDetails.alert.getText().toString());
 
         // Show error and abort save if one of the mandatory fields is empty
-        if (!mAlarmEntry.isValidEntry()) {
+        if (mAlarmEntry.getRadius() == 0 || mAlarmEntry.getLocation() == null) {
             Toast.makeText(getApplicationContext(),R.string.error_mandatory,Toast.LENGTH_SHORT)
                     .show();
             return;
         }
-
-        // Parse numeric fields to their appropriate types
-        double latitude = mAlarmEntry.getLatitude();
-        double longitude = mAlarmEntry.getLongitude();
-        float radius = mAlarmEntry.getRadius();
 
         // Check if coordinates are valid: -90 < latitude < 90 && -180 < longitude < 180
         if (latitude < -90 || latitude > 90) {
@@ -210,22 +226,40 @@ public class DetailActivity extends AppCompatActivity {
 
         // "enabled" field is not shown on this screen - keep current value (if exists)
         boolean enabled = (mViewModel == null) ||
-                Objects.requireNonNull(mViewModel.getAlarm().getValue()).isEnabled();
+                Objects.requireNonNull(mAlarmEntry.isEnabled());
 
+        mAlarmEntry.setEnabled(enabled);
         // Save the added/updated alarm entity
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                if(mAlarmEntry.isNewEntry()){
-                    mDb.alarmDao().insertAlarm(mAlarmEntry);
+                if(mAlarmEntry.getId() == DEFAULT_ALARM_ID){
+                    mViewModel.insertAlarm(mAlarmEntry);
                 }else{
-                    mDb.alarmDao().updateAlarm(mAlarmEntry);
+                    mViewModel.updateAlarm(mAlarmEntry);
+
                 }
+                setFileNameForSnapshot(mAlarmEntry);
                 finish();
             }
         });
     }
+    private void setFileNameForSnapshot(AlarmEntry alarm){
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
 
+        File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
+        // Create imageDir
+        File file = new File(directory,"temp.png");
+
+        // File (or directory) with new name
+        File file2 = new File(directory,alarm.getId() + ".png");
+
+        if (file2.exists())
+            file2.delete();
+
+        // Rename file (or directory)
+        boolean success = file.renameTo(file2);
+    }
     /**
      * This method uses the URI scheme for showing the alarm on a
      * map. This super-handy intent is detailed in the "Common Intents"
@@ -238,12 +272,40 @@ public class DetailActivity extends AppCompatActivity {
      */
     private void onOpenMapButtonClicked() {
 
-        // Create a new intent to start an DetailActivity
-        Intent addTaskIntent =
+
+        // Create a new intent to start an map activity
+        Intent mapIntent =
                 new Intent(DetailActivity.this, MapsActivity.class);
-        addTaskIntent.putExtra(EXTRA_ALARM_ID, mAlarmEntry.getId());
-        startActivity(addTaskIntent);
-        finish();
+        if (mAlarmEntry != null && mAlarmEntry.getLocation() != null && mAlarmEntry.getRadius() > 0){
+            MapAddress mapAddress = new MapAddress(mAlarmEntry.getLatitude(), mAlarmEntry.getLongitude(), mAlarmEntry.getLocation(),mAlarmEntry.getRadius());
+            mapIntent.putExtra(DetailActivity.EXTRA_ALARM_COORDINATES, mapAddress);
+        }
+        startActivityForResult(mapIntent, MAP_REQUEST_CODE);
+
+    }
+
+    // Call Back method  to get the Message form other Activity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == MAP_REQUEST_CODE)
+        {
+            if (data != null && data.hasExtra(EXTRA_ALARM_COORDINATES)) {
+                // get coordinates (from intent)
+                MapAddress mapAddress = data.getParcelableExtra(EXTRA_ALARM_COORDINATES);
+                // Set member alarm ID to wanted alarm (from intent)
+                if(mapAddress != null) {
+                    mAlarmEntry.setLocation(mapAddress.getLocation());
+                    mAlarmEntry.setLatitude(mapAddress.getLatitude());
+                    mAlarmEntry.setLongitude(mapAddress.getLongitude());
+                    mAlarmEntry.setRadius(mapAddress.getRadius());
+                    mAlarmUri = mapAddress.getLocationImgUri();
+                }
+            }
+        }
+        updateLocation();
+        updateMapImage();
     }
 
     private void onRingtoneSelect() {

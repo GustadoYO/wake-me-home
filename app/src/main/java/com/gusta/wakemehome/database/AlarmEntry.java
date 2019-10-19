@@ -10,6 +10,8 @@ import com.gusta.wakemehome.geofencing.GeofenceEntry;
 @Entity(tableName = "alarm")
 public class AlarmEntry implements GeofenceEntry {
 
+    public static final int DEFAULT_ALARM_ID = -1;
+
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String location;    // Human readable location string
@@ -22,17 +24,13 @@ public class AlarmEntry implements GeofenceEntry {
     private boolean vibrate;    // True if alarm should vibrate
     private String message;     // Message to show when alarm triggers
     private String alert;       // Audio alert to play when alarm triggers
-    public static final int DEFAULT_ALARM_ID = -1;
-    private static final double DEFAULT_VALUE_LATITUDE = 1000;
-    private static final double DEFAULT_VALUE_LONGITUDE = 1000;
+//    private String imageUri;       // Audio alert to play when alarm triggers
 
     @Ignore
-    public AlarmEntry(){
-        this.id = DEFAULT_ALARM_ID;
-        this.latitude = DEFAULT_VALUE_LATITUDE;
-        this.longitude = DEFAULT_VALUE_LONGITUDE;
+    public AlarmEntry() {
+        id = DEFAULT_ALARM_ID;
+        enabled = true;
     }
-
     @Ignore
     public AlarmEntry(String location, double latitude, double longitude, float radius,
                       boolean enabled, boolean vibrate, String message, String alert) {
@@ -44,8 +42,8 @@ public class AlarmEntry implements GeofenceEntry {
         this.vibrate = vibrate;
         this.message = message;
         this.alert = alert;
+//        this.imageUri = imageUri;
     }
-
     public AlarmEntry(int id, String location, double latitude, double longitude, float radius,
                       boolean enabled, boolean vibrate, String message, String alert) {
         this.id = id;
@@ -57,6 +55,7 @@ public class AlarmEntry implements GeofenceEntry {
         this.vibrate = vibrate;
         this.message = message;
         this.alert = alert;
+//        this.imageUri = imageUri;
     }
 
     public int getId() {
@@ -131,11 +130,11 @@ public class AlarmEntry implements GeofenceEntry {
         this.alert = alert;
     }
 
-    public boolean isNewEntry(){
-        return this.id == DEFAULT_ALARM_ID;
-    }
-
-    public boolean isValidEntry(){
-        return !(this.latitude == DEFAULT_VALUE_LATITUDE || this.longitude == DEFAULT_VALUE_LONGITUDE || this.radius == 0);
-    }
+//    public String getImageUri() {
+//        return imageUri;
+//    }
+//
+//    public void setImageUri(String imageUri) {
+//        this.imageUri = imageUri;
+//    }
 }

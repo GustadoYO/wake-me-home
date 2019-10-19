@@ -41,6 +41,11 @@
             android:textSize="@dimen/detail_item_disable_text_size"
             android:paddingBottom="@dimen/detail_vertical_padding" />
 
+        <ImageView android:id="@+id/mapImage"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent">
+        </ImageView>
+
         <!-- Add button -->
         <Button
             android:id="@+id/OpenMapButton"

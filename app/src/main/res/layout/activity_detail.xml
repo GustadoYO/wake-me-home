@@ -54,11 +54,16 @@
             android:paddingBottom="@dimen/detail_vertical_padding" />
 
 
+        <ImageView android:id="@+id/mapImage"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent">
+        </ImageView>
+
         <include
             android:id="@+id/clock_details"
             layout="@layout/alarm_clock_details"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"/>
 
         <!-- Add button -->

@@ -1,12 +1,11 @@
-package com.gusta.wakemehome;
+package com.gusta.wakemehome.maps;
 
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 
 import androidx.annotation.NonNull;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.location.Geocoder;
 import android.location.Location;
 
 import androidx.core.app.ActivityCompat;
@@ -33,27 +32,25 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.gusta.wakemehome.R;
 
 import java.util.Arrays;
-import java.util.Locale;
 
-import static com.gusta.wakemehome.MapAddress.getCoordinatesAddress;
+import static com.gusta.wakemehome.maps.MapAddress.getCoordinatesAddress;
 
-
-public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
+public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final int circleWidth = 6;
     private static final int circleDividorScale = 600;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+
     private GoogleMap mMap;
-    private Geocoder mGeocoder;
     private Circle mMapRadiusCircle;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
-
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
 
     // The geographical location where the device is currently located. That is, the last-known
@@ -62,7 +59,6 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
 
     public GoogleMaps(MapsActivity mapsActivity){
         super(mapsActivity);
-        mGeocoder = new Geocoder(mMapsActivity, Locale.getDefault());
 
         SupportMapFragment mapFragment = (SupportMapFragment) mMapsActivity.getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -102,8 +98,6 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
 
     }
 
-
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -128,9 +122,7 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
             }
         });
 
-        MapAddress mapAddressData = mMapsActivity.getData();
-
-        if(mapAddressData == null) {
+        if(isDefaultAddress()) {
             // Prompt the user for permission.
             getLocationPermission();
 
@@ -140,23 +132,22 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
             // Get the current location of the device and set the position of the map.
             getDeviceLocation();
         }else{
-            setMarker(mapAddressData.getCoordinates());
+            updateSelectedLocation(mMapAddress.getRadius());
         }
 
     }
 
-    protected void setMarker(LatLng coordinate){
+    private void setMarker(LatLng coordinate){
         // Creating a marker
         MarkerOptions markerOptions = new MarkerOptions();
 
         // Setting the position for the marker
         markerOptions.position(coordinate);
 
-        MapAddress mapAddressData = new MapAddress(coordinate,mGeocoder);
-        mMapsActivity.updateData(mapAddressData);
+        mMapAddress.setCoordinates(coordinate,mGeocoder);
         // Setting the title for the marker.
         // This will be displayed on taping the marker
-        markerOptions.title(mapAddressData.getLocation());
+        markerOptions.title(mMapAddress.getLocation());
 
         // Clears the previously touched position
         mMap.clear();
@@ -269,12 +260,17 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
         }
     }
 
-    protected void drawCircle(LatLng coordinate,double radius){
+    public void updateSelectedLocation(float radius){
 
         //remove the old circle
         if(mMapRadiusCircle != null) {
             mMapRadiusCircle.remove();
         }
+        if(radius > 0){
+            mMapAddress.setRadius(radius);
+        }
+        LatLng coordinate = mMapAddress.getCoordinates();
+
         // Instantiating CircleOptions to draw a circle around the marker
         CircleOptions circleOptions = new CircleOptions();
 
@@ -285,18 +281,22 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
         circleOptions.radius(radius);
 
         // Border color of the circle
-        circleOptions.strokeColor(Color.BLACK);
+        circleOptions.strokeColor(Color.BLUE)
+                         .fillColor(0x220000FF);
 
         // Border width of the circle
         circleOptions.strokeWidth(circleWidth);
 
+        setMarker(coordinate);
         // Adding the circle to the GoogleMap
         mMapRadiusCircle = mMap.addCircle(circleOptions);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 circleOptions.getCenter(), getZoomLevel(radius)));
+
+        CaptureMapScreen();
     }
 
-    public int getZoomLevel(double radius) {
+    private int getZoomLevel(float radius) {
         int zoomLevel = DEFAULT_ZOOM;
         if (radius > 0) {
             double scale = radius / circleDividorScale;
@@ -304,4 +304,19 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback {
         }
         return zoomLevel;
     }
+
+    private void CaptureMapScreen()
+    {
+        GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
+
+            @Override
+            public void onSnapshotReady(Bitmap snapshot) {
+                // TODO Auto-generated method stub
+                mMapAddress.setLocationImgUri(saveToInternalStorage(snapshot,"temp"));
+            }
+        };
+
+        mMap.snapshot(callback);
+    }
+
 }
