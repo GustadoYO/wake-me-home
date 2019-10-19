@@ -243,6 +243,7 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
     }
+    //TODO: Move it to utils
     private String setFileNameForSnapshot(AlarmEntry alarm){
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
 

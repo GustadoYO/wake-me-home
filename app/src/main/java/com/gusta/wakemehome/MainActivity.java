@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gusta.wakemehome.database.AlarmEntry;
-import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.geofencing.GeofenceManager;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.MainViewModel;
@@ -106,7 +104,8 @@ public class MainActivity extends AppCompatActivity implements
                     public void run() {
                         int position = viewHolder.getAdapterPosition();
                         List<AlarmEntry> alarms = mAdapter.getAlarms();
-                        mViewModel.deleteAlarm(alarms.get(position));
+                        AlarmEntry alarm = alarms.get(position);
+                        mViewModel.deleteAlarm(alarm);
                     }
                 });
             }

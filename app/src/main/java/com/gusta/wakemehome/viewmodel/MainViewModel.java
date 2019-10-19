@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 
+import java.io.File;
 import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {
@@ -53,5 +54,12 @@ public class MainViewModel extends AndroidViewModel {
     }
     public void deleteAlarm(AlarmEntry alarm){
         database.alarmDao().deleteAlarm(alarm);
+
+        //TODO: Move it to utils
+        //delete images for deleted alarms
+        File file = new File(alarm.getImage());
+
+        if (file.exists())
+            file.delete();
     }
 }

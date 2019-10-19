@@ -48,8 +48,7 @@ public abstract class MapProvider {
         return false;
     }
 
-    //TODO: Handle deleted alarms should be in separate process which will check the storage
-    // every week/day.
+    //TODO: Move it to utils
     protected String saveToInternalStorage(Bitmap bitmapImage,String filename){
         File path;
         if(mMapAddress.getLocationImgUri() == null) {
