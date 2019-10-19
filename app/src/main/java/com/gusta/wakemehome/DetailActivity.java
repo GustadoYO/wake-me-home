@@ -51,6 +51,8 @@ public class DetailActivity extends AppCompatActivity {
     public static final String INSTANCE_ALARM_MESSAGE = "instanceAlarmMessage";
     public static final String INSTANCE_ALARM_ALERT = "instanceAlarmAlert";
     public static final String INSTANCE_ALARM_VIBRATE = "instanceAlarmVibrate";
+
+    public static final String TEMP_IMAGE_FILE = "temp.png";
     // map intent request code
     private static final int MAP_REQUEST_CODE = 1;
     //preferences key
@@ -63,7 +65,6 @@ public class DetailActivity extends AppCompatActivity {
     private AlarmEntry mAlarmEntry;                 // The current alarm entry
     private DetailViewModel mViewModel;             // The current alarm view model
     private ActivityDetailBinding mDetailBinding;   // The data binding object
-    private String mAlarmUri;   // The data binding object
 
     //=========//
     // METHODS //
@@ -120,7 +121,7 @@ public class DetailActivity extends AppCompatActivity {
         // Save alarm ID to state (to keep it in case of phone orientation change for example)
         outState.putInt(INSTANCE_ALARM_ID, mAlarmEntry.getId());
         outState.putString(INSTANCE_ALARM_MESSAGE, mDetailBinding.clockDetails.message.getText().toString());
-        outState.putString(INSTANCE_ALARM_ALERT, mDetailBinding.clockDetails.alert.getText().toString());
+        outState.putString(INSTANCE_ALARM_ALERT, mAlarmEntry.getAlert());
         outState.putBoolean(INSTANCE_ALARM_VIBRATE, mDetailBinding.clockDetails.vibrate.isChecked());
         super.onSaveInstanceState(outState);
     }
@@ -157,12 +158,12 @@ public class DetailActivity extends AppCompatActivity {
 
     private void updateMapImage(){
         ImageView mapsImage = mDetailBinding.mapImage;
-        if (mAlarmUri == null){
+        if (mAlarmEntry.getImage() == null){
             mapsImage.setVisibility(View.GONE);
         }else{
             mapsImage.setVisibility(View.VISIBLE);
-            File imgFile = new  File(mAlarmUri+"/temp.png");
 
+            File imgFile = new File(mAlarmEntry.getImage());
             if(imgFile.exists()){
 
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
@@ -185,7 +186,6 @@ public class DetailActivity extends AppCompatActivity {
         mDetailBinding.location.setText(alarm.getLocation());
         mDetailBinding.clockDetails.vibrate.setChecked(alarm.isVibrate());
         mDetailBinding.clockDetails.message.setText(alarm.getMessage());
-        mDetailBinding.clockDetails.alert.setText(alarm.getAlert());
         updateLocation();
         updateMapImage();
     }
@@ -234,22 +234,22 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if(mAlarmEntry.getId() == DEFAULT_ALARM_ID){
+                    mAlarmEntry.setImage(setFileNameForSnapshot(mAlarmEntry));
                     mViewModel.insertAlarm(mAlarmEntry);
                 }else{
                     mViewModel.updateAlarm(mAlarmEntry);
 
                 }
-                setFileNameForSnapshot(mAlarmEntry);
                 finish();
             }
         });
     }
-    private void setFileNameForSnapshot(AlarmEntry alarm){
+    private String setFileNameForSnapshot(AlarmEntry alarm){
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
 
         File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
         // Create imageDir
-        File file = new File(directory,"temp.png");
+        File file = new File(alarm.getImage());
 
         // File (or directory) with new name
         File file2 = new File(directory,alarm.getId() + ".png");
@@ -259,6 +259,7 @@ public class DetailActivity extends AppCompatActivity {
 
         // Rename file (or directory)
         boolean success = file.renameTo(file2);
+        return file2.getAbsolutePath();
     }
     /**
      * This method uses the URI scheme for showing the alarm on a
@@ -300,7 +301,7 @@ public class DetailActivity extends AppCompatActivity {
                     mAlarmEntry.setLatitude(mapAddress.getLatitude());
                     mAlarmEntry.setLongitude(mapAddress.getLongitude());
                     mAlarmEntry.setRadius(mapAddress.getRadius());
-                    mAlarmUri = mapAddress.getLocationImgUri();
+                    mAlarmEntry.setImage(mapAddress.getLocationImgUri());
                 }
             }
         }

@@ -51,28 +51,35 @@ public abstract class MapProvider {
     //TODO: Handle deleted alarms should be in separate process which will check the storage
     // every week/day.
     protected String saveToInternalStorage(Bitmap bitmapImage,String filename){
-        ContextWrapper cw = new ContextWrapper(mMapsActivity.getApplicationContext());
-        // path to /data/data/yourapp/app_data/imageDir
-        File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
-        // Create imageDir
-        File mypath = new File(directory,filename + ".png");
+        File path;
+        if(mMapAddress.getLocationImgUri() == null) {
+            ContextWrapper cw = new ContextWrapper(mMapsActivity.getApplicationContext());
+            // path to /data/data/yourapp/app_data/imageDir
+            File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
+            // Create imageDir
+            path = new File(directory, filename);
+        }else{
+            path = new File(mMapAddress.getLocationImgUri());
+        }
 
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(mypath);
+            fos = new FileOutputStream(path);
             // Use the compress method on the BitMap object to write image to the OutputStream
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         } finally {
             try {
                 fos.flush();
                 fos.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                return null;
             }
         }
-        return directory.getAbsolutePath();
+        return path.getAbsolutePath();
     }
 
 }

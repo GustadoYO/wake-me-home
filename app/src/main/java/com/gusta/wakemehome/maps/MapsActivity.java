@@ -23,7 +23,6 @@ public class MapsActivity extends AppCompatActivity{
 
     private Button mUpdateLocationButton;
     private static final String TAG = MapsActivity.class.getSimpleName();
-    private int mAlarmId;
     private MapProvider mMapProvider;
     private TextView mRadiusText;
     private SeekBar mRadiusSlider;

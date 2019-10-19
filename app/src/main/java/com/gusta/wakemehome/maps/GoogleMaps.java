@@ -36,6 +36,7 @@ import com.gusta.wakemehome.R;
 
 import java.util.Arrays;
 
+import static com.gusta.wakemehome.DetailActivity.TEMP_IMAGE_FILE;
 import static com.gusta.wakemehome.maps.MapAddress.getCoordinatesAddress;
 
 public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
@@ -312,7 +313,7 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
             @Override
             public void onSnapshotReady(Bitmap snapshot) {
                 // TODO Auto-generated method stub
-                mMapAddress.setLocationImgUri(saveToInternalStorage(snapshot,"temp"));
+                mMapAddress.setLocationImgUri(saveToInternalStorage(snapshot,TEMP_IMAGE_FILE));
             }
         };
 
