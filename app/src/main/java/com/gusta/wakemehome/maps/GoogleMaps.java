@@ -313,7 +313,7 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
             @Override
             public void onSnapshotReady(Bitmap snapshot) {
                 // TODO Auto-generated method stub
-                mMapAddress.setLocationImgUri(saveToInternalStorage(snapshot,TEMP_IMAGE_FILE));
+                mMapAddress.setImage(saveToInternalStorage(snapshot,TEMP_IMAGE_FILE));
             }
         };
 

@@ -14,7 +14,7 @@ public class MapAddress implements Parcelable {
     private LatLng coordinates;
     private float radius;
     private String location;
-    private String locationImgUri;
+    private String image;
 
     public MapAddress(LatLng coordinates, float radius, Geocoder geocoder) {
         this.coordinates = coordinates;
@@ -27,10 +27,11 @@ public class MapAddress implements Parcelable {
         if(location != null)
             this.coordinates = getCoordinatesAddress(geocoder,location);
     }
-    public MapAddress(double latitude,double longitude, String location, float radius) {
+    public MapAddress(double latitude,double longitude, String location, float radius,String image) {
         this.coordinates = new LatLng(latitude,longitude);
         this.location = location;
         this.radius = radius;
+        this.image = image;
     }
 
     public void setLocation(String location) {
@@ -48,12 +49,12 @@ public class MapAddress implements Parcelable {
         this.radius = radius;
     }
 
-    public String getLocationImgUri() {
-        return locationImgUri;
+    public String getImage() {
+        return image;
     }
 
-    public void setLocationImgUri(String locationImgUri) {
-        this.locationImgUri = locationImgUri;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public LatLng getCoordinates() {
@@ -114,7 +115,7 @@ public class MapAddress implements Parcelable {
         coordinates = new LatLng(latitude,longitude);
         radius = in.readFloat();
         location = in.readString();
-        locationImgUri = in.readString();
+        image = in.readString();
     }
 
     public int describeContents() {
@@ -126,7 +127,7 @@ public class MapAddress implements Parcelable {
         out.writeDouble(coordinates.longitude);
         out.writeFloat(radius);
         out.writeString(location);
-        out.writeString(locationImgUri);
+        out.writeString(image);
     }
 
     public static final Parcelable.Creator<MapAddress> CREATOR = new Parcelable.Creator<MapAddress>() {

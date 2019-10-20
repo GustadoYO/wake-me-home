@@ -19,7 +19,7 @@ import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_COORDINATES;
 public class MapsActivity extends AppCompatActivity{
 
     private static final String TAG = MapsActivity.class.getSimpleName();
-    public static final String INSTANCE_MAPS_SELECTION = "instanceMapsSelection";
+    public static final String INSTANCE_MAPS_ADDRESS_DATA = "instanceMapsAddressData";
 
     private Button mUpdateLocationButton;
     private MapProvider mMapProvider;
@@ -39,8 +39,8 @@ public class MapsActivity extends AppCompatActivity{
         mMapProvider = new GoogleMaps(this);
 
         // Check for saved state (like after phone orientation change) - and load it
-        if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_MAPS_SELECTION)) {
-            MapAddress address = savedInstanceState.getParcelable(INSTANCE_MAPS_SELECTION);
+        if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_MAPS_ADDRESS_DATA)) {
+            MapAddress address = savedInstanceState.getParcelable(INSTANCE_MAPS_ADDRESS_DATA);
             mMapProvider.setMapAddress(address);
             float radius  = address.getRadius();
             mRadiusSlider.setProgress((int)radius);
@@ -87,7 +87,7 @@ public class MapsActivity extends AppCompatActivity{
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(INSTANCE_MAPS_SELECTION, mMapProvider.getMapAddress());
+        outState.putParcelable(INSTANCE_MAPS_ADDRESS_DATA, mMapProvider.getMapAddress());
         super.onSaveInstanceState(outState);
     }
 

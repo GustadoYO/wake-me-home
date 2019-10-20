@@ -51,14 +51,14 @@ public abstract class MapProvider {
     //TODO: Move it to utils
     protected String saveToInternalStorage(Bitmap bitmapImage,String filename){
         File path;
-        if(mMapAddress.getLocationImgUri() == null) {
+        if(mMapAddress.getImage() == null) {
             ContextWrapper cw = new ContextWrapper(mMapsActivity.getApplicationContext());
             // path to /data/data/yourapp/app_data/imageDir
             File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
             // Create imageDir
             path = new File(directory, filename);
         }else{
-            path = new File(mMapAddress.getLocationImgUri());
+            path = new File(mMapAddress.getImage());
         }
 
         FileOutputStream fos = null;

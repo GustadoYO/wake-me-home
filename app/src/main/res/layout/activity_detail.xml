@@ -31,25 +31,25 @@
       - twice.                                                                               -
       - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-<!--        <TextView-->
-<!--            android:id="@+id/location_label"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:gravity="start"-->
-<!--            android:importantForAutofill="no"-->
-<!--            android:text="@string/alarm_location_label"-->
-<!--            android:textSize="@dimen/detail_item_disable_text_size"-->
-<!--            android:layout_gravity="center"-->
-<!--            android:textStyle="bold" />-->
+        <TextView
+            android:id="@+id/location_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:importantForAutofill="no"
+            android:text="@string/alarm_location_label"
+            android:textSize="@dimen/detail_item_disable_text_size"
+            android:layout_gravity="center"
+            android:textStyle="bold" />
 
 
-<!--        <TextView-->
-<!--            android:id="@+id/location"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:gravity="start"-->
-<!--            android:importantForAutofill="no"-->
-<!--            android:textSize="@dimen/detail_item_disable_text_size"/>-->
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:importantForAutofill="no"
+            android:textSize="@dimen/detail_item_disable_text_size"/>
 
 
         <ImageView android:id="@+id/mapImage"

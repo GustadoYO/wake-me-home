@@ -51,6 +51,7 @@ public class DetailActivity extends AppCompatActivity {
     public static final String INSTANCE_ALARM_MESSAGE = "instanceAlarmMessage";
     public static final String INSTANCE_ALARM_ALERT = "instanceAlarmAlert";
     public static final String INSTANCE_ALARM_VIBRATE = "instanceAlarmVibrate";
+    public static final String INSTANCE_ALARM_ADDRESS_DATA = "instanceAlarmAddressData";
 
     //temp png will be for unsaved snapshots on save it'll change to  map id.png
     public static final String TEMP_IMAGE_FILE = "temp.png";
@@ -99,11 +100,23 @@ public class DetailActivity extends AppCompatActivity {
         });
 
         // Check for saved state (like after phone orientation change) - and load it
-        if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_ALARM_ID)) {
-            mAlarmEntry.setId(savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID));
-            mAlarmEntry.setMessage(savedInstanceState.getString(INSTANCE_ALARM_MESSAGE, ""));
-            mAlarmEntry.setVibrate(savedInstanceState.getBoolean(INSTANCE_ALARM_VIBRATE, false));
-            mAlarmEntry.setAlert(savedInstanceState.getString(INSTANCE_ALARM_ALERT, null));
+        if (savedInstanceState != null) {
+            if(savedInstanceState.containsKey(INSTANCE_ALARM_ID))
+                mAlarmEntry.setId(savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID));
+            if(savedInstanceState.containsKey(INSTANCE_ALARM_MESSAGE))
+                mAlarmEntry.setMessage(savedInstanceState.getString(INSTANCE_ALARM_MESSAGE, ""));
+            if(savedInstanceState.containsKey(INSTANCE_ALARM_VIBRATE))
+                mAlarmEntry.setVibrate(savedInstanceState.getBoolean(INSTANCE_ALARM_VIBRATE, false));
+            if(savedInstanceState.containsKey(INSTANCE_ALARM_ALERT))
+                mAlarmEntry.setAlert(savedInstanceState.getString(INSTANCE_ALARM_ALERT, null));
+            if(savedInstanceState.containsKey(INSTANCE_ALARM_ADDRESS_DATA)){
+                MapAddress address = savedInstanceState.getParcelable(INSTANCE_ALARM_ADDRESS_DATA);
+                mAlarmEntry.setLocation(address.getLocation());
+                mAlarmEntry.setLatitude(address.getLatitude());
+                mAlarmEntry.setLongitude(address.getLongitude());
+                mAlarmEntry.setImage(address.getImage());
+                mAlarmEntry.setRadius(address.getRadius());
+            }
         }
 
         // If ALARM_ID was sent, it is update mode (list item clicked)
@@ -118,6 +131,8 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // Save alarm ID to state (to keep it in case of phone orientation change for example)
+        MapAddress address = new MapAddress(mAlarmEntry.getLatitude(),mAlarmEntry.getLongitude(),mAlarmEntry.getLocation(),mAlarmEntry.getRadius(),mAlarmEntry.getImage());
+        outState.putParcelable(INSTANCE_ALARM_ADDRESS_DATA, address);
         outState.putInt(INSTANCE_ALARM_ID, mAlarmEntry.getId());
         outState.putString(INSTANCE_ALARM_MESSAGE, mDetailBinding.clockDetails.message.getText().toString());
         outState.putString(INSTANCE_ALARM_ALERT, mAlarmEntry.getAlert());
@@ -278,7 +293,7 @@ public class DetailActivity extends AppCompatActivity {
         Intent mapIntent =
                 new Intent(DetailActivity.this, MapsActivity.class);
         if (mAlarmEntry != null && mAlarmEntry.getLocation() != null && mAlarmEntry.getRadius() > 0){
-            MapAddress mapAddress = new MapAddress(mAlarmEntry.getLatitude(), mAlarmEntry.getLongitude(), mAlarmEntry.getLocation(),mAlarmEntry.getRadius());
+            MapAddress mapAddress = new MapAddress(mAlarmEntry.getLatitude(), mAlarmEntry.getLongitude(), mAlarmEntry.getLocation(),mAlarmEntry.getRadius(),mAlarmEntry.getImage());
             mapIntent.putExtra(DetailActivity.EXTRA_ALARM_COORDINATES, mapAddress);
         }
         startActivityForResult(mapIntent, MAP_REQUEST_CODE);
@@ -301,7 +316,7 @@ public class DetailActivity extends AppCompatActivity {
                     mAlarmEntry.setLatitude(mapAddress.getLatitude());
                     mAlarmEntry.setLongitude(mapAddress.getLongitude());
                     mAlarmEntry.setRadius(mapAddress.getRadius());
-                    mAlarmEntry.setImage(mapAddress.getLocationImgUri());
+                    mAlarmEntry.setImage(mapAddress.getImage());
                 }
             }
         }
