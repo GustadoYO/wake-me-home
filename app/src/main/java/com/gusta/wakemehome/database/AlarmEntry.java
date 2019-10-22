@@ -10,8 +10,6 @@ import com.gusta.wakemehome.geofencing.GeofenceEntry;
 @Entity(tableName = "alarm")
 public class AlarmEntry implements GeofenceEntry {
 
-    public static final int DEFAULT_ALARM_ID = -1;
-
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String location;    // Human readable location string
@@ -27,10 +25,7 @@ public class AlarmEntry implements GeofenceEntry {
     private String image;       // Audio alert to play when alarm triggers
 
     @Ignore
-    public AlarmEntry() {
-        id = DEFAULT_ALARM_ID;
-        enabled = true;
-    }
+    public AlarmEntry() {}
     @Ignore
     public AlarmEntry(String location, double latitude, double longitude, float radius,
                       boolean enabled, boolean vibrate, String message, String alert,String image) {

@@ -40,7 +40,8 @@
             android:text="@string/alarm_location_label"
             android:textSize="@dimen/detail_item_disable_text_size"
             android:layout_gravity="center"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
 
         <TextView
@@ -49,7 +50,8 @@
             android:layout_height="wrap_content"
             android:gravity="start"
             android:importantForAutofill="no"
-            android:textSize="@dimen/detail_item_disable_text_size"/>
+            android:textSize="@dimen/detail_item_disable_text_size"
+            android:visibility="gone"/>
 
 
         <ImageView android:id="@+id/mapImage"

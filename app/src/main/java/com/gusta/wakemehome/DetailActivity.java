@@ -32,8 +32,6 @@ import com.gusta.wakemehome.viewmodel.DetailViewModel;
 import java.io.File;
 import java.util.Objects;
 
-import static com.gusta.wakemehome.database.AlarmEntry.DEFAULT_ALARM_ID;
-
 public class DetailActivity extends AppCompatActivity {
 
     //===========//
@@ -42,6 +40,8 @@ public class DetailActivity extends AppCompatActivity {
 
     // Constant for logging
     private static final String TAG = DetailActivity.class.getSimpleName();
+    //default value for alarm id
+    public static final int DEFAULT_ALARM_ID = -1;
     //Extra alarm id from main activity
     public static final String EXTRA_ALARM_ID = "extraAlarmId";
     //extra alarm from map provider
@@ -77,6 +77,7 @@ public class DetailActivity extends AppCompatActivity {
         mAlarmEntry = new AlarmEntry();
 
         mViewModel = ViewModelProviders.of(this).get(DetailViewModel.class);
+        mViewModel.setNewEntry(true);
 
         // Init the data binding object
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
@@ -141,14 +142,18 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setAlarmData(Intent intent){
-        // If member alarm ID is still DEFAULT_ID, the alarm model should be loaded from db
-        if (mAlarmEntry.getId() == DEFAULT_ALARM_ID) {
+        // If member alarm is new and there is ID from intent it should load from db
+        if (mViewModel.isNewEntry()) {
 
             // Observe changes in model in order to update UI
             mViewModel.getAlarm(intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID)).observe(this, new Observer<AlarmEntry>() {
                 @Override
                 public void onChanged(@Nullable AlarmEntry alarmEntry) {
                     mViewModel.getAlarm().removeObserver(this);
+                    if (alarmEntry == null) {
+                        return;
+                    }
+                    mViewModel.setNewEntry(false);
                     mAlarmEntry = alarmEntry;
                     // populate the UI
                     populateUI(mAlarmEntry);
@@ -194,9 +199,6 @@ public class DetailActivity extends AppCompatActivity {
      * @param alarm the alarmEntry to populate the UI
      */
     private void populateUI(AlarmEntry alarm) {
-        if (alarm == null) {
-            return;
-        }
 //        mDetailBinding.location.setText(alarm.getLocation());
         mDetailBinding.clockDetails.vibrate.setChecked(alarm.isVibrate());
         mDetailBinding.clockDetails.message.setText(alarm.getMessage());
@@ -239,20 +241,19 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         // "enabled" field is not shown on this screen - keep current value (if exists)
-        boolean enabled = (mViewModel == null) ||
-                Objects.requireNonNull(mAlarmEntry.isEnabled());
+        // otherwise it'll be true for new entry
+        boolean enabled = mViewModel.isNewEntry() || mAlarmEntry.isEnabled();
 
         mAlarmEntry.setEnabled(enabled);
         // Save the added/updated alarm entity
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                if(mAlarmEntry.getId() == DEFAULT_ALARM_ID){
+                if(mViewModel.isNewEntry()){
                     mAlarmEntry.setImage(setFileNameForSnapshot(mAlarmEntry));
                     mViewModel.insertAlarm(mAlarmEntry);
                 }else{
                     mViewModel.updateAlarm(mAlarmEntry);
-
                 }
                 finish();
             }

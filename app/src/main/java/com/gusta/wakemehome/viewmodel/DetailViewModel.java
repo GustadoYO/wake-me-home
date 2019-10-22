@@ -16,6 +16,7 @@ import com.gusta.wakemehome.database.AppDatabase;
 
 public class DetailViewModel extends AndroidViewModel {
 
+    private boolean isNewEntry;
     private LiveData<AlarmEntry> mAlarm;
     private AppDatabase database;
 
@@ -32,11 +33,16 @@ public class DetailViewModel extends AndroidViewModel {
         return mAlarm;
     }
     public void insertAlarm(AlarmEntry alarm) {
-        //clear default
-        alarm.setId(0);
         database.alarmDao().insertAlarm(alarm);
     }
     public void updateAlarm(AlarmEntry alarm) {
         database.alarmDao().updateAlarm(alarm);
+    }
+    public boolean isNewEntry(){
+        return isNewEntry;
+    }
+
+    public void setNewEntry(boolean newEntry) {
+        isNewEntry = newEntry;
     }
 }
