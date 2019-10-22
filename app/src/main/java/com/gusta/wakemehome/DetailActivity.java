@@ -75,9 +75,9 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mAlarmEntry = new AlarmEntry();
-
+        mAlarmEntry.setId(DEFAULT_ALARM_ID);
+        
         mViewModel = ViewModelProviders.of(this).get(DetailViewModel.class);
-        mViewModel.setNewEntry(true);
 
         // Init the data binding object
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
@@ -143,7 +143,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private void setAlarmData(Intent intent){
         // If member alarm is new and there is ID from intent it should load from db
-        if (mViewModel.isNewEntry()) {
+        if (mAlarmEntry.getId() == DEFAULT_ALARM_ID) {
 
             // Observe changes in model in order to update UI
             mViewModel.getAlarm(intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID)).observe(this, new Observer<AlarmEntry>() {
@@ -153,7 +153,6 @@ public class DetailActivity extends AppCompatActivity {
                     if (alarmEntry == null) {
                         return;
                     }
-                    mViewModel.setNewEntry(false);
                     mAlarmEntry = alarmEntry;
                     // populate the UI
                     populateUI(mAlarmEntry);
@@ -242,15 +241,15 @@ public class DetailActivity extends AppCompatActivity {
 
         // "enabled" field is not shown on this screen - keep current value (if exists)
         // otherwise it'll be true for new entry
-        boolean enabled = mViewModel.isNewEntry() || mAlarmEntry.isEnabled();
+        boolean enabled = mAlarmEntry.getId() == DEFAULT_ALARM_ID || mAlarmEntry.isEnabled();
 
         mAlarmEntry.setEnabled(enabled);
         // Save the added/updated alarm entity
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                if(mViewModel.isNewEntry()){
-                    mAlarmEntry.setImage(setFileNameForSnapshot(mAlarmEntry));
+                if(mAlarmEntry.getId() == DEFAULT_ALARM_ID){
+                    mAlarmEntry.setImage(changeSnapshotToAlarm(mAlarmEntry));
                     mViewModel.insertAlarm(mAlarmEntry);
                 }else{
                     mViewModel.updateAlarm(mAlarmEntry);
@@ -260,7 +259,7 @@ public class DetailActivity extends AppCompatActivity {
         });
     }
     //TODO: Move it to utils
-    private String setFileNameForSnapshot(AlarmEntry alarm){
+    private String changeSnapshotToAlarm(AlarmEntry alarm){
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
 
         File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
