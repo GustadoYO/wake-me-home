@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -46,6 +47,19 @@ public final class NotificationUtils {
                                   View.OnClickListener listener) {
         notifyUser(activity, activity.getString(mainTextStringId), null,
                 activity.getString(actionTextStringId), listener, null);
+    }
+
+    /**
+     * Show a text message to the user.
+     *
+     * @param service       The service asking to show the message.
+     * @param mainText      The message's main text.
+     * @param secondaryText The message's secondary text.
+     * @param intent        Intent to be called when message is pressed.
+     */
+    public static void notifyUser(Service service, String mainText, String secondaryText,
+                                  Intent intent) {
+        notifyUser(service, mainText, secondaryText, null, null, intent);
     }
 
     /**

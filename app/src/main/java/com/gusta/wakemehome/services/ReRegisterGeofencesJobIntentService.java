@@ -60,6 +60,7 @@ public class ReRegisterGeofencesJobIntentService extends JobIntentService {
             AppDatabase database = AppDatabase.getInstance(this.getApplication());
             Log.d(TAG, "Actively retrieving the alarms from the DataBase");
             LiveData<List<AlarmEntry>> alarms = database.alarmDao().loadAllAlarms();
+
             mGeofenceManager = new GeofenceManager(this, alarms);
         }
 
