@@ -23,18 +23,25 @@ public final class PermissionUtils {
     private static final String TAG = GeofenceManager.class.getSimpleName();
 
     /**
-     * Return the current state of the permissions needed.
+     * The interface to handle a task waiting for permission
      */
-    public static boolean missingPermissions(Context context) {
+    public interface PendingTaskHandler {
+        void performPendingTask();
+    }
+
+    /**
+     * Return the current state of the location permissions needed.
+     */
+    public static boolean missingLocationPermissions(Context context) {
         int permissionState = ActivityCompat.checkSelfPermission(context,
                 Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState != PackageManager.PERMISSION_GRANTED;
     }
 
     /**
-     * Ask the user for permission.
+     * Ask the user for location permission.
      */
-    public static void requestPermissions(final Activity activity) {
+    public static void requestLocationPermissions(final Activity activity) {
 
         // Request permissions from the user
         boolean shouldProvideRationale =
@@ -106,12 +113,5 @@ public final class PermissionUtils {
                         }
                     });
         }
-    }
-
-    /**
-     * The interface to handle a task waiting for permission
-     */
-    public interface PendingTaskHandler {
-        void performPendingTask();
     }
 }
