@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.gusta.wakemehome.DetailActivity;
 import com.gusta.wakemehome.R;
 
-import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_COORDINATES;
+import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_ADDRESS;
 
 
 public class MapsActivity extends AppCompatActivity{
@@ -35,7 +35,7 @@ public class MapsActivity extends AppCompatActivity{
 
         mRadiusSlider = findViewById(R.id.radius_slider);
         mRadiusText = findViewById(R.id.seekBarInfoTextView);
-        mMapProvider = new GoogleMaps(this);
+        mMapProvider = new GoogleMapsProvider(this);
 
         // Check for saved state (like after phone orientation change) - and load it
         if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_MAPS_ADDRESS_DATA)) {
@@ -46,8 +46,8 @@ public class MapsActivity extends AppCompatActivity{
             mRadiusText.setText(Float.toString(radius));
         }
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(EXTRA_ALARM_COORDINATES)) {
-            MapAddress address = intent.getParcelableExtra(EXTRA_ALARM_COORDINATES);
+        if (intent != null && intent.hasExtra(EXTRA_ALARM_ADDRESS)) {
+            MapAddress address = intent.getParcelableExtra(EXTRA_ALARM_ADDRESS);
             mMapProvider.setMapAddress(address);
 
             float radius  = address.getRadius();
@@ -72,7 +72,7 @@ public class MapsActivity extends AppCompatActivity{
                 MapAddress address = mMapProvider.getMapAddress();
                 if(address != null && address.isValidEntry()) {
                     Intent intent = new Intent(MapsActivity.this, DetailActivity.class);
-                    intent.putExtra(DetailActivity.EXTRA_ALARM_COORDINATES, address);
+                    intent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, address);
                     setResult(1,intent );
                     finish();
                 }else{
@@ -97,6 +97,11 @@ public class MapsActivity extends AppCompatActivity{
         return isOptionSelected;
     }
     private void changeRadius(SeekBar seekBar){
+        if(mMapProvider.isDefaultAddress()){
+            Toast.makeText(getApplicationContext(), R.string.selection_order, Toast.LENGTH_LONG).show();
+            seekBar.setProgress(0);
+            return;
+        }
         float radius = seekBar.getProgress();
         mRadiusText.setText(Float.toString(radius));
         mMapProvider.updateRadius(radius);

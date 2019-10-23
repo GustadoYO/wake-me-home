@@ -14,28 +14,27 @@ import androidx.lifecycle.ViewModel;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 
-public class DetailViewModel extends AndroidViewModel {
+public class DetailViewModel extends ViewModel {
 
     private LiveData<AlarmEntry> mAlarm;
-    private AppDatabase database;
+    private AppDatabase mDb;
 
-    public DetailViewModel(@NonNull Application application) {
-        super(application);
-        database = AppDatabase.getInstance(this.getApplication());
+    public DetailViewModel(AppDatabase db,int alarmId) {
+        mDb = db;
+        mAlarm = mDb.alarmDao().loadAlarmById(alarmId);
     }
 
     public LiveData<AlarmEntry> getAlarm() {
         return mAlarm;
     }
-    public LiveData<AlarmEntry> getAlarm(int alarmId) {
-        mAlarm = database.alarmDao().loadAlarmById(alarmId);
-        return mAlarm;
-    }
+
+    //TODO use app executor
     public int insertAlarm(AlarmEntry alarm) {
-        return (int)database.alarmDao().insertAlarm(alarm);
+        return (int)mDb.alarmDao().insertAlarm(alarm);
     }
+    //TODO use app executor
     public void updateAlarm(AlarmEntry alarm) {
-        database.alarmDao().updateAlarm(alarm);
+        mDb.alarmDao().updateAlarm(alarm);
     }
 
 }

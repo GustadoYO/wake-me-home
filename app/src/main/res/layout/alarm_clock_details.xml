@@ -45,7 +45,7 @@
         <TextView
             android:id="@+id/vibrate_label"
             style="@style/DetailLabel"
-            android:text="@string/vibrate_label"
+            android:text="@string/label_vibrate"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/vibrate"
             app:layout_constraintBottom_toBottomOf="@+id/vibrate"/>

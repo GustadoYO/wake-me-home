@@ -35,10 +35,8 @@ import com.gusta.wakemehome.R;
 
 import java.util.Arrays;
 
-import static com.gusta.wakemehome.maps.MapAddress.getAddress;
-
 //TODO refactor user permissions from global utils
-public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
+public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallback{
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final int CIRCLE_WIDTH = 6;
@@ -57,7 +55,7 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
 
-    public GoogleMaps(MapsActivity mapsActivity){
+    public GoogleMapsProvider(MapsActivity mapsActivity){
         super(mapsActivity);
 
         SupportMapFragment mapFragment = (SupportMapFragment) mMapsActivity.getSupportFragmentManager().findFragmentById(R.id.map);
@@ -84,7 +82,7 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
             @Override
             public void onPlaceSelected(Place place) {
 
-                LatLng cord = getAddress(mGeocoder, place.getName());
+                LatLng cord = MapAddress.getCoordinatesAddress(mGeocoder, place.getName());
                 setMarker(cord);
                 Log.d(TAG, "Place: " + place.getName() + ", " + place.getId());
             }
@@ -182,7 +180,7 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         LatLng coordinates;
-                        if (task.isSuccessful()) {
+                        if (task.isSuccessful() && task.getResult() != null) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
                             coordinates = new LatLng(mLastKnownLocation.getLatitude(),
@@ -197,7 +195,6 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
                                     .newLatLngZoom(DEFAULT_LOCATION, DEFAULT_ZOOM));
                             mMap.getUiSettings().setMyLocationButtonEnabled(false);
                         }
-                        setMarker(coordinates);
                     }
                 });
             }
@@ -273,6 +270,10 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
         //remove the old circle
         if(mMapRadiusCircle != null) {
             mMapRadiusCircle.remove();
+        }
+
+        if(radius > 0){
+            mMapAddress.setRadius(radius);
         }
 
         LatLng coordinate = mMapAddress.getCoordinates();

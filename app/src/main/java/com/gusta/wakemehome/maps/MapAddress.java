@@ -25,7 +25,7 @@ public class MapAddress implements Parcelable {
         this.location = location;
         this.radius = radius;
         if(location != null)
-            this.coordinates = getAddress(geocoder,location);
+            this.coordinates = getCoordinatesAddress(geocoder,location);
     }
     public MapAddress(double latitude,double longitude, String location, float radius) {
         this.coordinates = new LatLng(latitude, longitude);
@@ -79,20 +79,20 @@ public class MapAddress implements Parcelable {
             String location = obj.getAddressLine(0);
 
             return location;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    static LatLng getAddress(Geocoder geocoder, String address) {
+    static LatLng getCoordinatesAddress(Geocoder geocoder, String address) {
         try {
             List<Address> addresses = geocoder.getFromLocationName(address, 1);
             Address obj = addresses.get(0);
 
             LatLng coordinates = new LatLng(obj.getLatitude(),obj.getLongitude());
             return coordinates;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

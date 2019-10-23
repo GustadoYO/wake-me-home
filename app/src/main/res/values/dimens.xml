@@ -11,15 +11,14 @@
     <dimen name="list_item_location_start_margin">@dimen/list_item_location_left_margin</dimen>
     <dimen name="list_item_enabled_margin">12dp</dimen>
     <dimen name="list_item_enabled_text_size">12sp</dimen>
-    <dimen name="detail_item_disable_text_size">18sp</dimen>
-    <dimen name="radius_container_padding">16dp</dimen>
-    <dimen name="radius_text_size">16sp</dimen>
-    <dimen name="radius_length_margin">10dp</dimen>
+    <dimen name="maps_activity_radius_container_padding">16dp</dimen>
+    <dimen name="maps_activity_radius_text_size">16sp</dimen>
 
-    <dimen name="detail_item_font_size">18sp</dimen>
-    <dimen name="detail_item_margin">14dp</dimen>
-    <dimen name="detail_item_padding">10dp</dimen>
+    <dimen name="detail_activity_font_size">18sp</dimen>
+    <dimen name="detail_activity_margin">14dp</dimen>
+    <dimen name="detail_activity_padding">10dp</dimen>
 
+    <!--TODO remove progress bar-->
     <!-- Loading indicator dimens -->
     <dimen name="loading_indicator_size">42dp</dimen>
 

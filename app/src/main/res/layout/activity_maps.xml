@@ -19,15 +19,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="@dimen/radius_container_padding"
-        android:paddingLeft="@dimen/radius_container_padding"
-        android:paddingRight="@dimen/radius_container_padding">
+        android:paddingTop="@dimen/maps_activity_radius_container_padding"
+        android:paddingLeft="@dimen/maps_activity_radius_container_padding"
+        android:paddingRight="@dimen/maps_activity_radius_container_padding">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_radius_select"
-            android:textSize="@dimen/radius_text_size"
+            android:textSize="@dimen/maps_activity_radius_text_size"
             android:textStyle="bold"/>
 
         <SeekBar
@@ -44,8 +44,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="@dimen/radius_text_size"
-            android:paddingBottom="@dimen/radius_container_padding"
+            android:textSize="@dimen/maps_activity_radius_text_size"
+            android:paddingBottom="@dimen/maps_activity_radius_container_padding"
             android:textStyle="bold"/>
 
         <Button
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@color/colorPrimary"
-            android:text="@string/select_location_button"
+            android:text="@string/button_select_location"
             android:textColor="@android:color/primary_text_dark" />
 
     </LinearLayout>

@@ -52,10 +52,13 @@ public class MainViewModel extends AndroidViewModel {
         alarms = database.alarmDao().loadAllAlarms();
     }
 
+    //update enable only on main view model
     public void updateAlarm(AlarmEntry alarm){
         database.alarmDao().updateAlarm(alarm);
     }
 
+    //delete file is not part of db but it's a part of data presentation
+    //that's the reason why to use it inside the view model
     public void deleteAlarm(AlarmEntry alarm){
         database.alarmDao().deleteAlarm(alarm);
 
@@ -83,4 +86,5 @@ public class MainViewModel extends AndroidViewModel {
     private String getImagePath(AlarmEntry alarm){
         return getLocalMapDir() + "/" + alarm.getId() + ".png";
     }
+
 }

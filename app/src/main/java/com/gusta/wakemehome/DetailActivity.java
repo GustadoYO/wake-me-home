@@ -22,11 +22,13 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.gusta.wakemehome.database.AlarmEntry;
+import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
 import com.gusta.wakemehome.maps.MapAddress;
 import com.gusta.wakemehome.maps.MapsActivity;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.DetailViewModel;
+import com.gusta.wakemehome.viewmodel.DetailViewModelFactory;
 
 import java.io.File;
 import java.util.Objects;
@@ -41,13 +43,15 @@ public class DetailActivity extends AppCompatActivity {
     private static final String TAG = DetailActivity.class.getSimpleName();
     //default value for alarm id
     public static final int DEFAULT_ALARM_ID = -1;
-    //Extra alarm id from main activity
+    // Extra for the alarm ID to be received in the intent
     public static final String EXTRA_ALARM_ID = "extraAlarmId";
-    //extra alarm from map provider
-    public static final String EXTRA_ALARM_COORDINATES = "alarmCoordinates";
-    //ui element which suppose to save on rotate
+    // Extra for alarm address object from map provider
+    public static final String EXTRA_ALARM_ADDRESS = "alarmCoordinates";
+    // save alarm ID to be received after rotation
     public static final String INSTANCE_ALARM_ID = "instanceAlarmId";
+    // save alarm alert to be received after rotation
     public static final String INSTANCE_ALARM_ALERT = "instanceAlarmAlert";
+    // save alarm address to be received after rotation
     public static final String INSTANCE_ALARM_ADDRESS_DATA = "instanceAlarmAddressData";
 
     //temp png will be for unsaved snapshots on save it'll change to  map id.png
@@ -75,7 +79,6 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mAlarmId = DEFAULT_ALARM_ID;
-        mViewModel = ViewModelProviders.of(this).get(DetailViewModel.class);
 
         // Init the data binding object
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
@@ -120,8 +123,15 @@ public class DetailActivity extends AppCompatActivity {
         // If member alarm is new and there is ID from intent it should load from db
         if (mAlarmId == DEFAULT_ALARM_ID) {
 
+            mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
+            // factory view model is used for sending parameters to the view model in our case
+            // with alarm entry id to make sure we have one entity on our viewModel
+            DetailViewModelFactory factory = new DetailViewModelFactory(AppDatabase.getInstance(this),mAlarmId);
+            mViewModel =
+                    ViewModelProviders.of(this, factory).get(DetailViewModel.class);
+
             // Observe changes in model in order to update UI
-            mViewModel.getAlarm(intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID)).observe(this, new Observer<AlarmEntry>() {
+            mViewModel.getAlarm().observe(this, new Observer<AlarmEntry>() {
                 @Override
                 public void onChanged(@Nullable AlarmEntry alarmEntry) {
                     mViewModel.getAlarm().removeObserver(this);
@@ -262,7 +272,7 @@ public class DetailActivity extends AppCompatActivity {
                 new Intent(DetailActivity.this, MapsActivity.class);
         if (mMapAddress != null && mMapAddress.getLocation() != null && mMapAddress.getRadius() > 0){
             MapAddress mapAddress = new MapAddress(mMapAddress.getLatitude(), mMapAddress.getLongitude(), mMapAddress.getLocation(),mMapAddress.getRadius());
-            mapIntent.putExtra(DetailActivity.EXTRA_ALARM_COORDINATES, mapAddress);
+            mapIntent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, mapAddress);
         }
         startActivityForResult(mapIntent, MAP_REQUEST_CODE);
 
@@ -275,9 +285,9 @@ public class DetailActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == MAP_REQUEST_CODE)
         {
-            if (data != null && data.hasExtra(EXTRA_ALARM_COORDINATES)) {
+            if (data != null && data.hasExtra(EXTRA_ALARM_ADDRESS)) {
                 // get coordinates (from intent)
-                mMapAddress = data.getParcelableExtra(EXTRA_ALARM_COORDINATES);
+                mMapAddress = data.getParcelableExtra(EXTRA_ALARM_ADDRESS);
             }
         }
         updateMapImage(false);

@@ -1,5 +1,7 @@
 package com.gusta.wakemehome;
 
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +26,7 @@ import com.gusta.wakemehome.geofencing.GeofenceManager;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.MainViewModel;
 
+import java.io.File;
 import java.util.List;
 
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
@@ -125,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        // Init the database member and the model
+        // Init the model
         setupViewModel();
     }
 
