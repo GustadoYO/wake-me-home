@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.JobIntentService;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
@@ -14,7 +13,6 @@ import com.google.android.gms.location.GeofencingEvent;
 import com.gusta.wakemehome.MainActivity;
 import com.gusta.wakemehome.R;
 import com.gusta.wakemehome.database.AlarmEntry;
-import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.geofencing.GeofenceErrorMessages;
 import com.gusta.wakemehome.utilities.NotificationUtils;
 
@@ -27,13 +25,19 @@ import java.util.List;
  * the transition type and geofence id(s) that triggered the transition. Creates a notification
  * as the output.
  */
-public class GeofenceTransitionsJobIntentService extends JobIntentService {
+public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentService {
 
     // Constant for logging
     private static final String TAG = GeofenceTransitionsJobIntentService.class.getSimpleName();
 
     // TODO: Refactor use of constants
     private static final int JOB_ID = 573;
+
+    @Override
+    protected String getTag() {
+        return TAG;
+    }
+
     /**
      * Convenience method for enqueuing work in to this service.
      */
@@ -126,11 +130,8 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
         // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
 
-        // TODO: Move to parent abstract class
-        // Retrieve the alarms list from the db
-        AppDatabase database = AppDatabase.getInstance(this.getApplication());
-        Log.d(TAG, "Actively retrieving the alarms from the DataBase");
-        List<AlarmEntry> alarms = database.alarmDao().loadAllAlarms().getValue();
+        // Get all alarms from database
+        List<AlarmEntry> alarms = getAlarmsFromDb().getValue();
         assert alarms != null;
 
         // We want a notification for every triggering geofence

@@ -71,11 +71,11 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
     // PUBLIC METHODS //
     //================//
 
-    public GeofenceManager(ContextWrapper activity,
+    public GeofenceManager(ContextWrapper contextWrapper,
                            LiveData<? extends List<? extends GeofenceEntry>> liveData) {
-        mContextWrapper = activity;
+        mContextWrapper = contextWrapper;
         mLiveData = liveData;
-        mGeofencingClient = LocationServices.getGeofencingClient(activity);
+        mGeofencingClient = LocationServices.getGeofencingClient(contextWrapper);
     }
 
     /**

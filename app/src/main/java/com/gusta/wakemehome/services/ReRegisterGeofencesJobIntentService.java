@@ -2,14 +2,11 @@ package com.gusta.wakemehome.services;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.JobIntentService;
 import androidx.lifecycle.LiveData;
 
 import com.gusta.wakemehome.database.AlarmEntry;
-import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.geofencing.GeofenceManager;
 
 import java.util.List;
@@ -17,7 +14,7 @@ import java.util.List;
 /**
  * Listener for events that the system cannot recover the geofences in.
  */
-public class ReRegisterGeofencesJobIntentService extends JobIntentService {
+public class ReRegisterGeofencesJobIntentService extends GeofencingJobIntentService {
 
     //===========//
     // CONSTANTS //
@@ -39,6 +36,11 @@ public class ReRegisterGeofencesJobIntentService extends JobIntentService {
     // METHODS //
     //=========//
 
+    @Override
+    protected String getTag() {
+        return null;
+    }
+
     /**
      * Convenience method for enqueuing work in to this service.
      */
@@ -56,10 +58,10 @@ public class ReRegisterGeofencesJobIntentService extends JobIntentService {
 
         // Init the geofence manager if needed
         if (mGeofenceManager == null) {
-            // Retrieve the alarms list from the db into a LiveData object
-            AppDatabase database = AppDatabase.getInstance(this.getApplication());
-            Log.d(TAG, "Actively retrieving the alarms from the DataBase");
-            LiveData<List<AlarmEntry>> alarms = database.alarmDao().loadAllAlarms();
+
+            // Get all alarms from database
+            LiveData<List<AlarmEntry>> alarms = getAlarmsFromDb();
+            assert alarms != null;
 
             mGeofenceManager = new GeofenceManager(this, alarms);
         }
