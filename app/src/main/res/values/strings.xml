@@ -116,7 +116,7 @@
         Click notification to return to app
     </string>
     <string name="geofence_not_available_title">
-        Location services are unavailable - alarms will not trigger!
+        Location services are unavailable - ALARMS WILL NOT TRIGGER!
     </string>
     <string name="geofence_not_available_text">
         Was location access turned off? Click notification to go to settings
@@ -127,7 +127,7 @@
         Location permission is needed for core functionality
     </string>
     <string name="permission_denied_explanation">
-        Permission was denied, but is needed for core functionality.
+        Location permission wad denied - ALARMS WILL NOT TRIGGER!
     </string>
     <string name="settings">Settings</string>
 

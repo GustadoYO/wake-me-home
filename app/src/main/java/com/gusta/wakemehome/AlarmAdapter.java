@@ -79,8 +79,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         // Determine the values of the wanted data
         final AlarmEntry alarmEntry = mAlarmEntries.get(position);
         String location = alarmEntry.getLocation();
-        String radius =
-                UnitsUtils.formatLength(mContext, alarmEntry.getRadius()) + " radius";
+        String radius = UnitsUtils.formatLength(mContext, alarmEntry.getRadius());
         boolean enabled = alarmEntry.isEnabled();
         String message = alarmEntry.getMessage();
 
@@ -91,11 +90,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         holder.enabledElement.setChecked(enabled);
         holder.enabledElement.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // do something, the isChecked will be
-                // true if the switch is in the On position
-                Log.d(TAG, "switch change from " + !isChecked + " -> " + isChecked);
-                // Save the added/updated alarm entity
 
+                Log.d(TAG, "switch change from " + !isChecked + " -> " + isChecked);
+
+                // Update alarm "enabled" field
                 alarmEntry.setEnabled(isChecked);
                 mAlarmListeners.onAlarmEnabledChangeListener(alarmEntry);
             }
@@ -131,7 +129,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     }
 
     /**
-     * The interface that receives onClick messages.
+     * The interface that receives user events on the adapter.
      */
     public interface AlarmAdapterListeners {
         void onItemClickListener(int itemId);

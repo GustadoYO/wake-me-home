@@ -40,7 +40,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
     /**
      * Tracks whether the user requested to add or remove geofences, or to do neither.
      */
-    private enum PendingGeofenceTask {
+    private enum GeofenceTask {
         ADD, REMOVE, NONE, UPDATE
     }
 
@@ -65,7 +65,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      */
     private PendingIntent mGeofencePendingIntent;
 
-    private PendingGeofenceTask mPendingGeofenceTask = PendingGeofenceTask.NONE;
+    private GeofenceTask mPendingGeofenceTask = GeofenceTask.NONE;
 
     //================//
     // PUBLIC METHODS //
@@ -83,13 +83,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      * specified geofences. Handles the success or failure results returned by addGeofences().
      */
     public void addGeofences() {
-        if (PermissionUtils.missingPermissions(mContextWrapper)) {
-            mPendingGeofenceTask = PendingGeofenceTask.ADD;
-            if (mContextWrapper instanceof Activity)
-                PermissionUtils.requestPermissions((Activity) mContextWrapper);
-            return;
-        }
-        addGeofencesTask();
+        modifyGeofences(GeofenceTask.ADD);
     }
 
     /**
@@ -97,31 +91,41 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      * previously registered geofences.
      */
     public void removeGeofences() {
-        if (PermissionUtils.missingPermissions(mContextWrapper)) {
-            mPendingGeofenceTask = PendingGeofenceTask.REMOVE;
-            if (mContextWrapper instanceof Activity)
-                PermissionUtils.requestPermissions((Activity) mContextWrapper);
-            return;
-        }
-        removeGeofencesTask();
+        modifyGeofences(GeofenceTask.REMOVE);
     }
 
     /**
      * Update geofences client according to current list.
      */
     public void updateGeofences() {
-        if (PermissionUtils.missingPermissions(mContextWrapper)) {
-            mPendingGeofenceTask = PendingGeofenceTask.UPDATE;
-            if (mContextWrapper instanceof Activity)
-                PermissionUtils.requestPermissions((Activity) mContextWrapper);
-            return;
-        }
-        updateGeofencesTask();
+        modifyGeofences(GeofenceTask.UPDATE);
     }
 
     //=================//
     // PRIVATE METHODS //
     //=================//
+
+    /**
+     * Perform a wanted modify to the geofences list.
+     *
+     * @param geofenceTask The wanted modify task.
+     */
+    private void modifyGeofences(GeofenceTask geofenceTask) {
+
+        // Remember task to perform
+        mPendingGeofenceTask = geofenceTask;
+
+        // Check permission and request if missing
+        if (PermissionUtils.missingLocationPermissions(mContextWrapper)) {
+            // TODO: Handle non-activity case
+            if (mContextWrapper instanceof Activity)
+                PermissionUtils.requestLocationPermissions((Activity) mContextWrapper);
+            return;
+        }
+
+        // Perform task (if permission was not missing)
+        performPendingTask();
+    }
 
     /**
      * Builds and returns a GeofencingRequest. Specifies the list of geofences to be monitored.
@@ -190,7 +194,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      * permission.
      */
     private void addGeofencesTask() {
-        if (PermissionUtils.missingPermissions(mContextWrapper)) {
+        if (PermissionUtils.missingLocationPermissions(mContextWrapper)) {
             NotificationUtils.notifyUser(mContextWrapper,
                         mContextWrapper.getString(R.string.insufficient_permissions));
             return;
@@ -227,7 +231,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      * permission.
      */
     private void removeGeofencesTask() {
-        if (PermissionUtils.missingPermissions(mContextWrapper)) {
+        if (PermissionUtils.missingLocationPermissions(mContextWrapper)) {
             NotificationUtils.notifyUser(mContextWrapper,
                     mContextWrapper.getString(R.string.insufficient_permissions));
             return;
@@ -254,7 +258,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      * permission.
      */
     private void updateGeofencesTask() {
-        if (PermissionUtils.missingPermissions(mContextWrapper)) {
+        if (PermissionUtils.missingLocationPermissions(mContextWrapper)) {
             NotificationUtils.notifyUser(mContextWrapper,
                     mContextWrapper.getString(R.string.insufficient_permissions));
             return;
@@ -283,7 +287,8 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
     }
 
     /**
-     * Performs the geofencing task that was pending until location permission was granted.
+     * Performs the geofencing task that was pending until location permission was granted or
+     * checked.
      */
     public void performPendingTask() {
         switch (mPendingGeofenceTask) {
@@ -297,7 +302,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
                 updateGeofencesTask();
                 break;
         }
-        mPendingGeofenceTask = GeofenceManager.PendingGeofenceTask.NONE;
+        mPendingGeofenceTask = GeofenceTask.NONE;
     }
 
 }
