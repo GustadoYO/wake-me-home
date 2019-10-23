@@ -3,6 +3,9 @@ package com.gusta.wakemehome.services;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -67,8 +70,33 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
             // Get the geofences that were triggered. A single event can trigger multiple geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
 
-            // Send a notification for each triggered geofence
-            sendNotifications(geofenceTransition, triggeringGeofences);
+            // Get the closest alarm that triggered
+            AlarmEntry alarm = getRelevantAlarm(geofenceTransition, triggeringGeofences);
+
+
+            //this will sound the alarm tone
+            //this will sound the alarm once, if you wish to
+            //raise alarm in loop continuously then use MediaPlayer and setLooping(true)
+            Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            if (alarmUri == null) {
+                alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            }
+            Ringtone ringtone = RingtoneManager.getRingtone(this, alarmUri);
+            ringtone.play();
+
+
+
+            // Get the transition details as a string
+            String geofenceTransitionString = getTransitionString(geofenceTransition);
+
+            // Create an explicit content Intent that starts the main Activity.
+            Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+
+            // Send notification and log the transition details.
+            String NotificationTitle = geofenceTransitionString + " " + alarm.getLocation();
+            NotificationUtils.notifyUser(this, NotificationTitle, alarm.getMessage(),
+                    notificationIntent);
+            Log.i(TAG, NotificationTitle);
 
         } else {
             // Log the error.
@@ -118,35 +146,32 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
     }
 
     /**
-     * Send a notification for each triggered geofence.
+     * Get the closest alarm that triggered.
      *
      * @param geofenceTransition  The geofencing transition that occurred
      * @param triggeringGeofences The list of geofences that triggered
      */
-    private void sendNotifications(int geofenceTransition, List<Geofence> triggeringGeofences) {
-
-        String geofenceTransitionString = getTransitionString(geofenceTransition);
-
-        // Create an explicit content Intent that starts the main Activity.
-        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+    private AlarmEntry getRelevantAlarm(int geofenceTransition, List<Geofence> triggeringGeofences) {
 
         // Get all alarms from database
         List<AlarmEntry> alarms = getAlarmsFromDb().getValue();
         assert alarms != null;
 
-        // We want a notification for every triggering geofence
+        // Find the closest alarm that triggered
+        AlarmEntry relevantAlarm = null;
         for (Geofence geofence : triggeringGeofences) {
 
             // The geofence id is the same as the matching alarm id - get the matching alarm
-            AlarmEntry alarm =
+            AlarmEntry currAlarm =
                     alarms.get(alarms.indexOf(new AlarmEntry(
                             Integer.parseInt(geofence.getRequestId()))));
 
-            // Send notification and log the transition details.
-            String NotificationTitle = geofenceTransitionString + " " + alarm.getLocation();
-            NotificationUtils.notifyUser(this, NotificationTitle, alarm.getMessage(),
-                    notificationIntent);
-            Log.i(TAG, NotificationTitle);
+            // Choose alarm based on radius
+            if (relevantAlarm == null || relevantAlarm.getRadius() > currAlarm.getRadius()) {
+                relevantAlarm = currAlarm;
+            }
         }
+
+        return relevantAlarm;
     }
 }
