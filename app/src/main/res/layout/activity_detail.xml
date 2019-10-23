@@ -15,69 +15,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingTop="@dimen/detail_vertical_padding"
-        android:paddingBottom="@dimen/detail_vertical_padding"
-        android:paddingLeft="@dimen/detail_horizontal_padding"
-        android:paddingRight="@dimen/detail_horizontal_padding"
-        android:paddingStart="@dimen/detail_horizontal_padding">
+        android:weightSum="1">
 
-
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      - To efficiently re-use complete layouts, you can use the <include/> tags to embed     -
-      - another complete layout inside the current layout. In WakeMeHome, this allows us to  -
-      - conveniently create layouts for both the portrait and landscape layouts for the      -
-      - DetailActivity. If we hadn't have used <include/> tags, we would have duplicated     -
-      - layout code all over the place, and any changes we wanted to make, we'd have to make -
-      - twice.                                                                               -
-      - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-        <TextView
-            android:id="@+id/location_label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:importantForAutofill="no"
-            android:text="@string/alarm_location_label"
-            android:textSize="@dimen/detail_item_disable_text_size"
-            android:layout_gravity="center"
-            android:textStyle="bold"
-            android:visibility="gone"/>
-
-
-        <TextView
-            android:id="@+id/location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:importantForAutofill="no"
-            android:textSize="@dimen/detail_item_disable_text_size"
-            android:visibility="gone"/>
-
-
-        <ImageView android:id="@+id/mapImage"
-            android:layout_height="400dp"
-            android:layout_width="match_parent">
-        </ImageView>
+        <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+          - To efficiently re-use complete layouts, you can use the <include/> tags to embed     -
+          - another complete layout inside the current layout. In WakeMeHome, this allows us to  -
+          - conveniently create layouts for both the portrait and landscape layouts for the      -
+          - DetailActivity. If we hadn't have used <include/> tags, we would have duplicated     -
+          - layout code all over the place, and any changes we wanted to make, we'd have to make -
+          - twice.                                                                               -
+          - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
         <include
             android:id="@+id/clock_details"
             layout="@layout/alarm_clock_details"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_height="0dp"
+            android:layout_weight=".25"/>
 
-        <!-- Add button -->
-        <Button
-            android:id="@+id/OpenMapButton"
-            style="@style/TextAppearance.AppCompat.Large"
+
+        <include
+            android:id="@+id/location_details"
+            layout="@layout/alarm_location_details"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@color/colorPrimary"
-            android:text="@string/open_map_button"
-            android:textColor="@android:color/primary_text_dark"
-            android:layout_marginTop="@dimen/detail_vertical_padding"
-            />
+            android:layout_height="0dp"
+            android:layout_weight=".75"/>
+
 
     </LinearLayout>
 

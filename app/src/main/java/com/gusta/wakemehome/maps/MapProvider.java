@@ -15,51 +15,46 @@ import java.util.Locale;
 public abstract class MapProvider {
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
-    protected final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
-    protected static final int DEFAULT_ZOOM = 15;
+    static final LatLng DEFAULT_LOCATION = new LatLng(-33.8523341, 151.2106085);
+    static final int DEFAULT_ZOOM = 15;
 
-    protected MapsActivity mMapsActivity;
-    protected MapAddress mMapAddress;
-    protected Geocoder mGeocoder;
+    MapsActivity mMapsActivity;
+    MapAddress mMapAddress;
+    Geocoder mGeocoder;
 
-    public MapProvider(MapsActivity mapsActivity){
+    MapProvider(MapsActivity mapsActivity){
         mMapsActivity = mapsActivity;
         mGeocoder = new Geocoder(mMapsActivity, Locale.getDefault());
         //default selection
-        mMapAddress = new MapAddress(mDefaultLocation,0,mGeocoder);
+        mMapAddress = new MapAddress(DEFAULT_LOCATION,0,mGeocoder);
     }
-    public void updateSelectedLocation(float radius){}
 
-    public MapAddress getMapAddress() {
+    void updateRadius(float radius){
+        if(radius > 0){
+            mMapAddress.setRadius(radius);
+        }
+    }
+
+    MapAddress getMapAddress() {
         if(mMapAddress == null || !mMapAddress.isValidEntry()){
             return null;
         }
         return mMapAddress;
     }
 
-    public void setMapAddress(MapAddress mMapAddress) {
+    void setMapAddress(MapAddress mMapAddress) {
         this.mMapAddress = mMapAddress;
     }
 
-    protected boolean isDefaultAddress(){
-        if(mMapAddress.getCoordinates() == mDefaultLocation){
-            return true;
-        }
-        return false;
+    boolean isDefaultAddress(){
+        return mMapAddress.getCoordinates() == DEFAULT_LOCATION;
     }
 
     //TODO: Move it to utils
-    protected String saveToInternalStorage(Bitmap bitmapImage,String filename){
-        File path;
-        if(mMapAddress.getImage() == null) {
-            ContextWrapper cw = new ContextWrapper(mMapsActivity.getApplicationContext());
-            // path to /data/data/yourapp/app_data/imageDir
-            File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
-            // Create imageDir
-            path = new File(directory, filename);
-        }else{
-            path = new File(mMapAddress.getImage());
-        }
+    void saveToInternalStorage(Bitmap bitmapImage){
+        String dirPath = getLocalMapDir();
+        // Create imageDir
+        File path = new File(dirPath + "/" + com.gusta.wakemehome.DetailActivity.TEMP_IMAGE_FILE);
 
         FileOutputStream fos = null;
         try {
@@ -68,17 +63,22 @@ public abstract class MapProvider {
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         } finally {
             try {
+                assert fos != null;
                 fos.flush();
                 fos.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                return null;
             }
         }
-        return path.getAbsolutePath();
     }
 
+    //TODO: Move it to utils
+    private String getLocalMapDir(){
+        ContextWrapper cw = new ContextWrapper(mMapsActivity);
+
+        File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
+        return directory.getAbsolutePath();
+    }
 }

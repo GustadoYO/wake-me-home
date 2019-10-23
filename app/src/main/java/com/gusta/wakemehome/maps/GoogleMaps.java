@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import androidx.annotation.NonNull;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.location.Location;
 
 import androidx.core.app.ActivityCompat;
@@ -36,14 +35,14 @@ import com.gusta.wakemehome.R;
 
 import java.util.Arrays;
 
-import static com.gusta.wakemehome.DetailActivity.TEMP_IMAGE_FILE;
-import static com.gusta.wakemehome.maps.MapAddress.getCoordinatesAddress;
+import static com.gusta.wakemehome.maps.MapAddress.getAddress;
 
+//TODO refactor user permissions from global utils
 public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
 
     private static final String TAG = MapsActivity.class.getSimpleName();
-    private static final int circleWidth = 6;
-    private static final int circleDividorScale = 600;
+    private static final int CIRCLE_WIDTH = 6;
+    private static final int CIRCLE_DIVIDOR_SCALE = 600;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
     private GoogleMap mMap;
@@ -85,7 +84,7 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
             @Override
             public void onPlaceSelected(Place place) {
 
-                LatLng cord = getCoordinatesAddress(mGeocoder, place.getName());
+                LatLng cord = getAddress(mGeocoder, place.getName());
                 setMarker(cord);
                 Log.d(TAG, "Place: " + place.getName() + ", " + place.getId());
             }
@@ -102,11 +101,13 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
+     * This is where we can add markers or lines, add listeners or move the camera.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
+     * In this case we'll provide option to select coordinates by click on map
+     * By default it'll take the current position and in case of existing
+     * alarm it'll select the existing position
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -119,11 +120,13 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
             public void onMapClick(LatLng coordinates) {
 
                 setMarker(coordinates);
+                updateRadius(mMapAddress.getRadius());
 
             }
         });
 
         if(isDefaultAddress()) {
+
             // Prompt the user for permission.
             getLocationPermission();
 
@@ -132,8 +135,12 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
 
             // Get the current location of the device and set the position of the map.
             getDeviceLocation();
+
         }else{
-            updateSelectedLocation(mMapAddress.getRadius());
+
+            setMarker(mMapAddress.getCoordinates());
+            updateRadius(mMapAddress.getRadius());
+
         }
 
     }
@@ -185,9 +192,9 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
-                            coordinates = mDefaultLocation;
+                            coordinates = DEFAULT_LOCATION;
                             mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+                                    .newLatLngZoom(DEFAULT_LOCATION, DEFAULT_ZOOM));
                             mMap.getUiSettings().setMyLocationButtonEnabled(false);
                         }
                         setMarker(coordinates);
@@ -261,15 +268,13 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
         }
     }
 
-    public void updateSelectedLocation(float radius){
+    void updateRadius(float radius){
 
         //remove the old circle
         if(mMapRadiusCircle != null) {
             mMapRadiusCircle.remove();
         }
-        if(radius > 0){
-            mMapAddress.setRadius(radius);
-        }
+
         LatLng coordinate = mMapAddress.getCoordinates();
 
         // Instantiating CircleOptions to draw a circle around the marker
@@ -282,13 +287,12 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
         circleOptions.radius(radius);
 
         // Border color of the circle
-        circleOptions.strokeColor(Color.BLUE)
-                         .fillColor(0x220000FF);
+        circleOptions.strokeColor(R.color.colorPrimary)
+                         .fillColor(R.color.colorPrimaryLight);
 
         // Border width of the circle
-        circleOptions.strokeWidth(circleWidth);
+        circleOptions.strokeWidth(CIRCLE_WIDTH);
 
-        setMarker(coordinate);
         // Adding the circle to the GoogleMap
         mMapRadiusCircle = mMap.addCircle(circleOptions);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
@@ -297,10 +301,16 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
         CaptureMapScreen();
     }
 
+    /**
+     * update zoon level calculate the different from default zoom level and radius selection for
+     * zoom out in selection of radius
+     * @param radius
+     * @return
+     */
     private int getZoomLevel(float radius) {
         int zoomLevel = DEFAULT_ZOOM;
         if (radius > 0) {
-            double scale = radius / circleDividorScale;
+            double scale = radius / CIRCLE_DIVIDOR_SCALE;
             zoomLevel = (int) (DEFAULT_ZOOM - Math.log(scale) / Math.log(2));
         }
         return zoomLevel;
@@ -312,8 +322,9 @@ public class GoogleMaps extends MapProvider implements OnMapReadyCallback{
 
             @Override
             public void onSnapshotReady(Bitmap snapshot) {
-                // TODO Auto-generated method stub
-                mMapAddress.setImage(saveToInternalStorage(snapshot,TEMP_IMAGE_FILE));
+                //save to internal storage as temp.png and in case of alarm saving
+                //it'll change to alarm id.png so it'll be max 1 temp map snapshot file
+                saveToInternalStorage(snapshot);
             }
         };
 

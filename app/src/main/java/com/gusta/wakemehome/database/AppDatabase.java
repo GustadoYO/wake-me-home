@@ -7,6 +7,8 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 @Database(entities = {AlarmEntry.class}, version = 2, exportSchema = false)
@@ -23,7 +25,6 @@ public abstract class AppDatabase extends RoomDatabase {
                 Log.d(LOG_TAG, "Creating new database instance");
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
                         AppDatabase.class, AppDatabase.DATABASE_NAME)
-                        .addMigrations(MIGRATION_1_2)
                         .build();
             }
         }
@@ -31,14 +32,5 @@ public abstract class AppDatabase extends RoomDatabase {
         return sInstance;
     }
 
-    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
-        @Override
-        public void migrate(SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE alarm"
-                    + " ADD COLUMN image TEXT");
-        }
-    };
-
     public abstract AlarmDao alarmDao();
-
 }

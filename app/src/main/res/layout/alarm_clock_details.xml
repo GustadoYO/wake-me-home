@@ -6,7 +6,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clock_details"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/detail_vertical_padding"
+        android:paddingLeft="@dimen/detail_horizontal_padding"
+        android:paddingRight="@dimen/detail_horizontal_padding"
+        android:paddingTop="@dimen/detail_vertical_padding">
 
         <!-- This guideline divides the layout into a left and right half and is used for alignment -->
         <androidx.constraintlayout.widget.Guideline

@@ -29,7 +29,6 @@ public class MapsActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Init the data binding object
         setContentView(R.layout.activity_maps);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -93,12 +92,13 @@ public class MapsActivity extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean isOptionSelected = super.onOptionsItemSelected(item);
         finish();
-        return super.onOptionsItemSelected(item);
+        return isOptionSelected;
     }
     private void changeRadius(SeekBar seekBar){
         float radius = seekBar.getProgress();
         mRadiusText.setText(Float.toString(radius));
-        mMapProvider.updateSelectedLocation(radius);
+        mMapProvider.updateRadius(radius);
     }
 }

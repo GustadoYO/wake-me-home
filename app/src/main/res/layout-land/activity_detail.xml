@@ -11,48 +11,35 @@
   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
-        <ImageView android:id="@+id/mapImage"
-            android:layout_height="match_parent"
+        <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+          - To efficiently re-use complete layouts, you can use the <include/> tags to embed     -
+          - another complete layout inside the current layout. In WakeMeHome, this allows us to  -
+          - conveniently create layouts for both the portrait and landscape layouts for the      -
+          - DetailActivity. If we hadn't have used <include/> tags, we would have duplicated     -
+          - layout code all over the place, and any changes we wanted to make, we'd have to make -
+          - twice.                                                                               -
+          - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+        <include
+            android:id="@+id/location_details"
+            layout="@layout/alarm_location_details"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_gravity="left">
-        </ImageView>
-
-        <LinearLayout
-            android:id="@+id/linearLayout3"
             android:layout_height="match_parent"
+            android:layout_weight=".55"/>
+
+        <include
+            android:id="@+id/clock_details"
+            layout="@layout/alarm_clock_details"
             android:layout_width="0dp"
-            android:orientation="vertical"
-            android:layout_weight="1"
-            android:layout_gravity="right">
+            android:layout_height="match_parent"
+            android:layout_weight=".45"/>
 
-            <include
-                android:id="@+id/clock_details"
-                layout="@layout/alarm_clock_details"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                />
-
-            <!-- Add button -->
-            <Button
-                android:id="@+id/OpenMapButton"
-                style="@style/TextAppearance.AppCompat.Large"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
-                android:text="@string/open_map_button"
-                android:textColor="@android:color/primary_text_dark"
-                android:layout_marginTop="@dimen/detail_vertical_padding"
-                />
-
-            </LinearLayout>
     </LinearLayout>
 
 </layout>

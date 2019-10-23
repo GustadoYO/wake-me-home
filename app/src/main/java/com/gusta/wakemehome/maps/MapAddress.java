@@ -14,7 +14,6 @@ public class MapAddress implements Parcelable {
     private LatLng coordinates;
     private float radius;
     private String location;
-    private String image;
 
     public MapAddress(LatLng coordinates, float radius, Geocoder geocoder) {
         this.coordinates = coordinates;
@@ -24,14 +23,14 @@ public class MapAddress implements Parcelable {
     }
     public MapAddress(String location, float radius, Geocoder geocoder) {
         this.location = location;
+        this.radius = radius;
         if(location != null)
-            this.coordinates = getCoordinatesAddress(geocoder,location);
+            this.coordinates = getAddress(geocoder,location);
     }
-    public MapAddress(double latitude,double longitude, String location, float radius,String image) {
-        this.coordinates = new LatLng(latitude,longitude);
+    public MapAddress(double latitude,double longitude, String location, float radius) {
+        this.coordinates = new LatLng(latitude, longitude);
         this.location = location;
         this.radius = radius;
-        this.image = image;
     }
 
     public void setLocation(String location) {
@@ -42,19 +41,9 @@ public class MapAddress implements Parcelable {
         if(coordinates != null)
             this.location = getAddress(geocoder,coordinates.latitude,coordinates.longitude);
     }
-    public void setCoordinates(LatLng coordinates) {
-        this.coordinates = coordinates;
-    }
+
     public void setRadius(float radius) {
         this.radius = radius;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public LatLng getCoordinates() {
@@ -78,11 +67,11 @@ public class MapAddress implements Parcelable {
         return location + " " + coordinates.toString();
     }
 
-    public boolean isValidEntry(){
-        return !( getCoordinates() == null || getLocation().isEmpty() || getRadius() == 0 );
+    boolean isValidEntry(){
+        return !( getCoordinates() == null || getLocation() == null || getLocation().isEmpty() || getRadius() <= 0 );
     }
 
-    public static String getAddress(Geocoder geocoder, double lat,double lng) {
+    static String getAddress(Geocoder geocoder, double lat, double lng) {
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
             Address obj = addresses.get(0);
@@ -96,7 +85,7 @@ public class MapAddress implements Parcelable {
         }
     }
 
-    public static LatLng getCoordinatesAddress(Geocoder geocoder, String address) {
+    static LatLng getAddress(Geocoder geocoder, String address) {
         try {
             List<Address> addresses = geocoder.getFromLocationName(address, 1);
             Address obj = addresses.get(0);
@@ -109,13 +98,16 @@ public class MapAddress implements Parcelable {
         }
     }
 
+    /////////////////////////////
+    // Parcelable METHODS ///////
+    /////////////////////////////
+
     private MapAddress(Parcel in) {
         double latitude = in.readDouble();
         double longitude = in.readDouble();
         coordinates = new LatLng(latitude,longitude);
         radius = in.readFloat();
         location = in.readString();
-        image = in.readString();
     }
 
     public int describeContents() {
@@ -127,7 +119,6 @@ public class MapAddress implements Parcelable {
         out.writeDouble(coordinates.longitude);
         out.writeFloat(radius);
         out.writeString(location);
-        out.writeString(image);
     }
 
     public static final Parcelable.Creator<MapAddress> CREATOR = new Parcelable.Creator<MapAddress>() {

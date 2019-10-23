@@ -1,6 +1,8 @@
 package com.gusta.wakemehome.viewmodel;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -49,17 +51,36 @@ public class MainViewModel extends AndroidViewModel {
         Log.d(TAG, "Actively retrieving the alarms from the DataBase");
         alarms = database.alarmDao().loadAllAlarms();
     }
+
     public void updateAlarm(AlarmEntry alarm){
         database.alarmDao().updateAlarm(alarm);
     }
+
     public void deleteAlarm(AlarmEntry alarm){
         database.alarmDao().deleteAlarm(alarm);
 
         //TODO: Move it to utils
         //delete images for deleted alarms
-        File file = new File(alarm.getImage());
+        File file = new File(getImagePath(alarm));
 
-        if (file.exists())
-            file.delete();
+        if (file.exists()) {
+            if (!file.delete()) {
+                //TODO handle error
+                Log.w(TAG,"image delete failed");
+            }
+        }
+    }
+
+    //TODO: Move it to utils
+    private String getLocalMapDir(){
+        ContextWrapper cw = new ContextWrapper(getApplication().getApplicationContext());
+
+        File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
+        return directory.getAbsolutePath();
+    }
+
+    //TODO: Move it to utils
+    private String getImagePath(AlarmEntry alarm){
+        return getLocalMapDir() + "/" + alarm.getId() + ".png";
     }
 }

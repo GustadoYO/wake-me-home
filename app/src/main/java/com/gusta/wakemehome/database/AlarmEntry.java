@@ -22,13 +22,10 @@ public class AlarmEntry implements GeofenceEntry {
     private boolean vibrate;    // True if alarm should vibrate
     private String message;     // Message to show when alarm triggers
     private String alert;       // Audio alert to play when alarm triggers
-    private String image;       // Audio alert to play when alarm triggers
 
     @Ignore
-    public AlarmEntry() {}
-    @Ignore
     public AlarmEntry(String location, double latitude, double longitude, float radius,
-                      boolean enabled, boolean vibrate, String message, String alert,String image) {
+                      boolean enabled, boolean vibrate, String message, String alert) {
         this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -37,10 +34,9 @@ public class AlarmEntry implements GeofenceEntry {
         this.vibrate = vibrate;
         this.message = message;
         this.alert = alert;
-        this.image = image;
     }
     public AlarmEntry(int id, String location, double latitude, double longitude, float radius,
-                      boolean enabled, boolean vibrate, String message, String alert,String image) {
+                      boolean enabled, boolean vibrate, String message, String alert) {
         this.id = id;
         this.location = location;
         this.latitude = latitude;
@@ -50,7 +46,6 @@ public class AlarmEntry implements GeofenceEntry {
         this.vibrate = vibrate;
         this.message = message;
         this.alert = alert;
-        this.image = image;
     }
 
     public int getId() {
@@ -125,11 +120,4 @@ public class AlarmEntry implements GeofenceEntry {
         this.alert = alert;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
 }

@@ -31,10 +31,8 @@ public class DetailViewModel extends AndroidViewModel {
         mAlarm = database.alarmDao().loadAlarmById(alarmId);
         return mAlarm;
     }
-    public void insertAlarm(AlarmEntry alarm) {
-        //reset id if there was default id
-        alarm.setId(0);
-        database.alarmDao().insertAlarm(alarm);
+    public int insertAlarm(AlarmEntry alarm) {
+        return (int)database.alarmDao().insertAlarm(alarm);
     }
     public void updateAlarm(AlarmEntry alarm) {
         database.alarmDao().updateAlarm(alarm);

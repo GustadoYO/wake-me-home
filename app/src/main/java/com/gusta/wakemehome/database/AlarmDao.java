@@ -17,7 +17,7 @@ public interface AlarmDao {
     LiveData<List<AlarmEntry>> loadAllAlarms();
 
     @Insert
-    void insertAlarm(AlarmEntry alarmEntry);
+    long insertAlarm(AlarmEntry alarmEntry);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateAlarm(AlarmEntry alarmEntry);
