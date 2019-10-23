@@ -37,6 +37,7 @@
         android:textSize="20sp"
         android:visibility="invisible" />
 
+    <!--TODO remove progress bar-->
     <!-- A progress bar that will be shown to users to indicate that weather data is loading -->
     <ProgressBar
         android:id="@+id/pb_loading_indicator"

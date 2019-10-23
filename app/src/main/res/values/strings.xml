@@ -27,25 +27,26 @@
     <string name="error_mandatory">
         Please select location and radius in order to save the alarm
     </string>
+    <string name="selection_order">
+        Please select location before changing radius
+    </string>
     <!-- "&#176;" = unicode character for degree symbol -->
     <string name="error_latitude">Latitude must be between -90&#176; and +90&#176;</string>
     <string name="error_longitude">Longitude must be between -180&#176; and +180&#176;</string>
 
-    <!-- "&#8230;" = unicode character for "..." -->
-    <string name="edit_alarm_location">Human readable location&#8230;</string>
-    <string name="edit_alarm_latitude">Latitude</string>
-    <string name="edit_alarm_longitude">Longitude</string>
-    <string name="edit_alarm_radius">Radius</string>
-    <string name="edit_alarm_enabled">Enabled?</string>
-    <string name="edit_alarm_vibrate">Vibrate?</string>
-    <string name="edit_alarm_message">None</string>
-    <string name="edit_alarm_alert">Alert</string>
+    <string name="edit_alarm_latitude" >Latitude</string>
+    <string name="edit_alarm_longitude" >Longitude</string>
+    <string name="edit_alarm_radius" >Radius</string>
+    <string name="edit_alarm_enabled" >Enabled?</string>
+    <string name="edit_alarm_vibrate" >Vibrate?</string>
+    <string name="edit_alarm_message" >Enter a message..</string>
+    <string name="edit_alarm_ringtone" >Select ringtone</string>
 
-    <string name="message_label">Alarm name</string>
-    <string name="alert_label">Alarm sound</string>
-    <string name="vibrate_label">Vibration</string>
+    <string name="label_vibrate">Vibration</string>
 
-    <string name="open_map_button">Find On Map</string>
+    <string name="button_open_map">Find On Map</string>
+    <string name="button_select_location">Select Location</string>
+    <string name="label_radius_select">Select Radius:</string>
 
 
     <!-- - - - - - - - - - - -->
@@ -130,5 +131,6 @@
         Permission was denied, but is needed for core functionality.
     </string>
     <string name="settings">Settings</string>
+
 
 </resources>

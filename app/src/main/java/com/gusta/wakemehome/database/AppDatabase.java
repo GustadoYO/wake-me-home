@@ -3,10 +3,15 @@ package com.gusta.wakemehome.database;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
-@Database(entities = {AlarmEntry.class}, version = 1, exportSchema = false)
+@Database(entities = {AlarmEntry.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static final String LOG_TAG = AppDatabase.class.getSimpleName();
@@ -28,5 +33,4 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     public abstract AlarmDao alarmDao();
-
 }

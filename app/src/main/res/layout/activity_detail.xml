@@ -14,7 +14,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="1">
 
         <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
           - To efficiently re-use complete layouts, you can use the <include/> tags to embed     -
@@ -26,18 +27,20 @@
           - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
         <include
-            android:id="@+id/location_details"
-            layout="@layout/alarm_location_details"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-
-        <include
             android:id="@+id/clock_details"
             layout="@layout/alarm_clock_details"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight=".25"/>
+
+
+        <include
+            android:id="@+id/location_details"
+            layout="@layout/alarm_location_details"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".75"/>
+
 
     </LinearLayout>
 
