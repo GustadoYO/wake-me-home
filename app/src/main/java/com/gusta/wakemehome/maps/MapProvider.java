@@ -16,8 +16,8 @@ abstract class MapProvider {
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     static final LatLng DEFAULT_LOCATION = new LatLng(-33.8523341, 151.2106085);
-    //an non valid value to split the case of grant permission or doesn't
-    static final LatLng DEFAULT_INVALID_LOCATION = new LatLng(999, 999);
+    //first usage of maps
+    static boolean isFirstUsage = false;
     static final int DEFAULT_ZOOM = 15;
 
     MapsActivity mMapsActivity;
@@ -27,14 +27,13 @@ abstract class MapProvider {
     MapProvider(MapsActivity mapsActivity){
         mMapsActivity = mapsActivity;
         mGeocoder = new Geocoder(mMapsActivity, Locale.getDefault());
-        //default selection
-        mMapAddress = new MapAddress(DEFAULT_INVALID_LOCATION,0,mGeocoder);
+        isFirstUsage = true;
     }
 
     abstract void updateRadius(float radius);
 
     MapAddress getMapAddress() {
-        if(mMapAddress == null || !mMapAddress.isValidEntry() || mMapAddress.getCoordinates() != DEFAULT_INVALID_LOCATION){
+        if(mMapAddress == null || !mMapAddress.isValidEntry()){
             return null;
         }
         return mMapAddress;
@@ -42,10 +41,6 @@ abstract class MapProvider {
 
     void setMapAddress(MapAddress mMapAddress) {
         this.mMapAddress = mMapAddress;
-    }
-
-    boolean isDefaultAddress(){
-        return mMapAddress.getCoordinates() == DEFAULT_INVALID_LOCATION;
     }
 
     //TODO: Move it to utils

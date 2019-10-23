@@ -69,6 +69,7 @@ public class DetailActivity extends AppCompatActivity {
     private String mAlarmAlert;                     // The current alarm alert
     private DetailViewModel mViewModel;             // The current alarm view model
     private ActivityDetailBinding mDetailBinding;   // The data binding object
+    private AppDatabase mDb;                        // db instance
 
     //=========//
     // METHODS //
@@ -79,6 +80,8 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mAlarmId = DEFAULT_ALARM_ID;
+
+        mDb = AppDatabase.getInstance(this);
 
         // Init the data binding object
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
@@ -126,7 +129,7 @@ public class DetailActivity extends AppCompatActivity {
             mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
             // factory view model is used for sending parameters to the view model in our case
             // with alarm entry id to make sure we have one entity on our viewModel
-            DetailViewModelFactory factory = new DetailViewModelFactory(AppDatabase.getInstance(this),mAlarmId);
+            DetailViewModelFactory factory = new DetailViewModelFactory(mDb,mAlarmId);
             mViewModel =
                     ViewModelProviders.of(this, factory).get(DetailViewModel.class);
 
@@ -212,7 +215,6 @@ public class DetailActivity extends AppCompatActivity {
         boolean enabled = (mViewModel == null) || (mViewModel.getAlarm() == null) ||
                 Objects.requireNonNull(mViewModel.getAlarm().getValue()).isEnabled();
 
-
         // Save the added/updated alarm entity
         //TODO add alert
         final AlarmEntry alarm;
@@ -228,9 +230,9 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if(mAlarmId == DEFAULT_ALARM_ID){
-                    mAlarmId = mViewModel.insertAlarm(alarm);
+                    mAlarmId = (int)mDb.alarmDao().insertAlarm(alarm);
                 }else{
-                    mViewModel.updateAlarm(alarm);
+                    mDb.alarmDao().updateAlarm(alarm);
                 }
                 updateSnapshotToAlarm(mAlarmId);
                 finish();

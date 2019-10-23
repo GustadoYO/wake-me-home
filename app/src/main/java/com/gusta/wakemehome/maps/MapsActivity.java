@@ -97,8 +97,8 @@ public class MapsActivity extends AppCompatActivity{
         return isOptionSelected;
     }
     private void changeRadius(SeekBar seekBar){
-        if(mMapProvider.isDefaultAddress()){
-            Toast.makeText(getApplicationContext(), R.string.selection_order, Toast.LENGTH_LONG).show();
+        if(mMapProvider.getMapAddress() == null){
+            Toast.makeText(getApplicationContext(), R.string.selection_order, Toast.LENGTH_SHORT).show();
             seekBar.setProgress(0);
             return;
         }

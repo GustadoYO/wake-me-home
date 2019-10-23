@@ -28,13 +28,4 @@ public class DetailViewModel extends ViewModel {
         return mAlarm;
     }
 
-    //TODO use app executor
-    public int insertAlarm(AlarmEntry alarm) {
-        return (int)mDb.alarmDao().insertAlarm(alarm);
-    }
-    //TODO use app executor
-    public void updateAlarm(AlarmEntry alarm) {
-        mDb.alarmDao().updateAlarm(alarm);
-    }
-
 }

@@ -68,7 +68,7 @@ public class MapAddress implements Parcelable {
     }
 
     boolean isValidEntry(){
-        return !( getCoordinates() == null || getLocation() == null || getLocation().isEmpty() || getRadius() <= 0 );
+        return !( getCoordinates() == null || getLocation() == null || getLocation().isEmpty() || getRadius() < 0 );
     }
 
     static String getAddress(Geocoder geocoder, double lat, double lng) {

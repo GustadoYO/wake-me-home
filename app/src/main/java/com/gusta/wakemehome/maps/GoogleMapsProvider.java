@@ -123,7 +123,11 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
             }
         });
 
-        if(isDefaultAddress()) {
+        // Check for first time and it's not came from detail activity
+        if(isFirstUsage && mMapAddress == null) {
+
+            // Set is not first time for next usage
+            isFirstUsage = false;
 
             // Prompt the user for permission.
             getLocationPermission();
@@ -150,7 +154,11 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         // Setting the position for the marker
         markerOptions.position(coordinate);
 
-        mMapAddress.setCoordinates(coordinate,mGeocoder);
+        if(mMapAddress == null){
+            mMapAddress = new MapAddress(coordinate, 0, mGeocoder);
+        }else {
+            mMapAddress.setCoordinates(coordinate, mGeocoder);
+        }
         // Setting the title for the marker.
         // This will be displayed on taping the marker
         markerOptions.title(mMapAddress.getLocation());
