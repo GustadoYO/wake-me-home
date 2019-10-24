@@ -15,4 +15,7 @@ public final class Constants {
 
     public static final int ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE = 34;
 
+    //temp png will be for unsaved snapshots on save it'll change to  map id.png
+    public static final String MAPS_DIR = "mapsDir";
+    public static final String TEMP_IMAGE_FILE = "temp.png";
 }

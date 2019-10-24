@@ -1,7 +1,5 @@
 package com.gusta.wakemehome;
 
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -27,10 +25,10 @@ import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.geofencing.GeofenceManager;
 import com.gusta.wakemehome.utilities.PermissionUtils;
+import com.gusta.wakemehome.utilities.fileUtils;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.MainViewModel;
 
-import java.io.File;
 import java.util.List;
 
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
@@ -62,6 +60,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //save the map dir in app data path
+        fileUtils.setMapsDir(this);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -114,16 +116,7 @@ public class MainActivity extends AppCompatActivity implements
                         List<AlarmEntry> alarms = mAdapter.getAlarms();
                         AlarmEntry alarm = alarms.get(position);
                         mDb.alarmDao().deleteAlarm(alarm);
-                        //TODO: Move it to utils
-                        //delete images for deleted alarms
-                        File file = new File(getImagePath(alarm));
-
-                        if (file.exists()) {
-                            if (!file.delete()) {
-                                //TODO handle error
-                                Log.w(TAG, "image delete failed");
-                            }
-                        }
+                        fileUtils.deleteMapImage(alarm.getId());
                     }
                 });
             }
@@ -272,20 +265,6 @@ public class MainActivity extends AppCompatActivity implements
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 
         mAdapter.notifyDataSetChanged();
-    }
-
-
-    //TODO: Move it to utils
-    private String getLocalMapDir() {
-        ContextWrapper cw = new ContextWrapper(getApplication().getApplicationContext());
-
-        File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
-        return directory.getAbsolutePath();
-    }
-
-    //TODO: Move it to utils
-    private String getImagePath(AlarmEntry alarm) {
-        return getLocalMapDir() + "/" + alarm.getId() + ".png";
     }
 
 }

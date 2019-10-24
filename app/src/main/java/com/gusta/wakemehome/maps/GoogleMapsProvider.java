@@ -28,6 +28,7 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.gusta.wakemehome.R;
+import com.gusta.wakemehome.utilities.fileUtils;
 
 import java.util.Arrays;
 
@@ -329,7 +330,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
             public void onSnapshotReady(Bitmap snapshot) {
                 //save to internal storage as temp.png and in case of alarm saving
                 //it'll change to alarm id.png so it'll be max 1 temp map snapshot file
-                saveToInternalStorage(snapshot);
+                fileUtils.createTempMapImage(snapshot);
             }
         };
 
