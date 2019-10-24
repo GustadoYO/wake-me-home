@@ -26,6 +26,7 @@ public class MapsActivity extends AppCompatActivity {
     private MapProvider mMapProvider;
     private TextView mRadiusText;
     private SeekBar mRadiusSlider;
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +80,10 @@ public class MapsActivity extends AppCompatActivity {
                     setResult(1, intent);
                     finish();
                 } else {
-                    Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT)
-                            .show();
-                    return;
+                    if(toast != null)
+                        toast.cancel();
+                    toast = Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             }
         });
@@ -101,11 +103,18 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void changeRadius(SeekBar seekBar) {
+        //if address doesn't exist
         if (mMapProvider.getMapAddress() == null) {
-            Toast.makeText(getApplicationContext(), R.string.selection_order, Toast.LENGTH_SHORT).show();
+            //keep toast to avoid multiple toasts on the screen
+            if(toast != null)
+                toast.cancel();
+            //create toast for radius without selection on map
+            toast = Toast.makeText(getApplicationContext(), R.string.selection_order, Toast.LENGTH_SHORT);
+            toast.show();
             seekBar.setProgress(0);
             return;
         }
+        toast = null;
         float radius = seekBar.getProgress();
         mRadiusText.setText(Float.toString(radius));
         mMapProvider.updateRadius(radius);
