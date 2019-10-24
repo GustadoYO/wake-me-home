@@ -30,16 +30,14 @@
             android:id="@+id/clock_details"
             layout="@layout/alarm_clock_details"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight=".25" />
+            android:layout_height="wrap_content" />
 
 
         <include
             android:id="@+id/location_details"
             layout="@layout/alarm_location_details"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight=".75" />
+            android:layout_height="wrap_content" />
 
 
     </LinearLayout>
