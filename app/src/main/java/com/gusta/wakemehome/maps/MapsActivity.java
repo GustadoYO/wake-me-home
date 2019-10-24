@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.gusta.wakemehome.DetailActivity;
 import com.gusta.wakemehome.R;
+import com.gusta.wakemehome.utilities.UnitsUtils;
 
 import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_ADDRESS;
 
@@ -45,7 +46,7 @@ public class MapsActivity extends AppCompatActivity {
             mMapProvider.setMapAddress(address);
             float radius = address.getRadius();
             mRadiusSlider.setProgress((int) radius);
-            mRadiusText.setText(Float.toString(radius));
+            mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         }
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ADDRESS)) {
@@ -54,7 +55,7 @@ public class MapsActivity extends AppCompatActivity {
 
             float radius = address.getRadius();
             mRadiusSlider.setProgress((int) radius);
-            mRadiusText.setText(Float.toString(radius));
+            mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         }
 
 
@@ -116,7 +117,8 @@ public class MapsActivity extends AppCompatActivity {
         }
         toast = null;
         float radius = seekBar.getProgress();
-        mRadiusText.setText(Float.toString(radius));
+        mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         mMapProvider.updateRadius(radius);
     }
+
 }
