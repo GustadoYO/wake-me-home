@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clock_details"
@@ -28,17 +27,17 @@
             android:hint="@string/edit_alarm_ringtone"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:importantForAutofill="no"/>
+            android:importantForAutofill="no" />
 
         <!-- Message edit -->
         <EditText
-        android:id="@+id/message"
-        style="@style/DetailEdit"
-        android:hint="@string/edit_alarm_message"
-        app:layout_constraintTop_toBottomOf="@+id/alert"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:importantForAutofill="no"
-        android:inputType="text" />
+            android:id="@+id/message"
+            style="@style/DetailEdit"
+            android:hint="@string/edit_alarm_message"
+            app:layout_constraintTop_toBottomOf="@+id/alert"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:importantForAutofill="no"
+            android:inputType="text" />
 
 
         <!-- Vibrate label -->

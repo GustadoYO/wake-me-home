@@ -1,16 +1,13 @@
 package com.gusta.wakemehome.maps;
 
 import android.content.pm.PackageManager;
-
-import androidx.annotation.NonNull;
-
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import android.util.Log;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -26,7 +23,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
@@ -36,7 +32,7 @@ import com.gusta.wakemehome.R;
 import java.util.Arrays;
 
 //TODO refactor user permissions from global utils
-public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallback{
+public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallback {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final int CIRCLE_WIDTH = 6;
@@ -55,7 +51,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
 
-    public GoogleMapsProvider(MapsActivity mapsActivity){
+    public GoogleMapsProvider(MapsActivity mapsActivity) {
         super(mapsActivity);
 
         SupportMapFragment mapFragment = (SupportMapFragment) mMapsActivity.getSupportFragmentManager().findFragmentById(R.id.map);
@@ -124,7 +120,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         });
 
         // Check for first time and it's not came from detail activity
-        if(isFirstUsage && mMapAddress == null) {
+        if (isFirstUsage && mMapAddress == null) {
 
             // Set is not first time for next usage
             isFirstUsage = false;
@@ -138,7 +134,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
             // Get the current location of the device and set the position of the map.
             getDeviceLocation();
 
-        }else{
+        } else {
 
             setMarker(mMapAddress.getCoordinates());
             updateRadius(mMapAddress.getRadius());
@@ -147,16 +143,16 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
 
     }
 
-    private void setMarker(LatLng coordinate){
+    private void setMarker(LatLng coordinate) {
         // Creating a marker
         MarkerOptions markerOptions = new MarkerOptions();
 
         // Setting the position for the marker
         markerOptions.position(coordinate);
 
-        if(mMapAddress == null){
+        if (mMapAddress == null) {
             mMapAddress = new MapAddress(coordinate, 0, mGeocoder);
-        }else {
+        } else {
             mMapAddress.setCoordinates(coordinate, mGeocoder);
         }
         // Setting the title for the marker.
@@ -194,7 +190,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
                             coordinates = new LatLng(mLastKnownLocation.getLatitude(),
                                     mLastKnownLocation.getLongitude());
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    coordinates , DEFAULT_ZOOM));
+                                    coordinates, DEFAULT_ZOOM));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -206,7 +202,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -236,7 +232,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
      * Handles the result of the request for location permissions.
      */
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
+                                           @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
         switch (requestCode) {
@@ -268,19 +264,19 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
                 mLastKnownLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
 
-    void updateRadius(float radius){
+    void updateRadius(float radius) {
 
         //remove the old circle
-        if(mMapRadiusCircle != null) {
+        if (mMapRadiusCircle != null) {
             mMapRadiusCircle.remove();
         }
 
-        if(radius > 0){
+        if (radius > 0) {
             mMapAddress.setRadius(radius);
         }
 
@@ -297,7 +293,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
 
         // Border color of the circle
         circleOptions.strokeColor(R.color.colorPrimary)
-                         .fillColor(R.color.colorPrimaryLight);
+                .fillColor(R.color.colorPrimaryLight);
 
         // Border width of the circle
         circleOptions.strokeWidth(CIRCLE_WIDTH);
@@ -313,6 +309,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
     /**
      * update zoon level calculate the different from default zoom level and radius selection for
      * zoom out in selection of radius
+     *
      * @param radius
      * @return
      */
@@ -325,8 +322,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         return zoomLevel;
     }
 
-    private void CaptureMapScreen()
-    {
+    private void CaptureMapScreen() {
         GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
 
             @Override

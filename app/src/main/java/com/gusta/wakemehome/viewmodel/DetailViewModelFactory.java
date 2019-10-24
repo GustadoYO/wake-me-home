@@ -1,9 +1,8 @@
 package com.gusta.wakemehome.viewmodel;
 
-import androidx.lifecycle.AndroidViewModel;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.annotation.NonNull;
 
 import com.gusta.wakemehome.database.AppDatabase;
 
@@ -21,6 +20,6 @@ public class DetailViewModelFactory extends ViewModelProvider.NewInstanceFactory
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         //noinspection unchecked
-        return (T) new DetailViewModel(mDb,mAlarmId);
+        return (T) new DetailViewModel(mDb, mAlarmId);
     }
 }

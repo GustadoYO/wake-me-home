@@ -17,12 +17,12 @@
         android:paddingRight="@dimen/detail_horizontal_padding"
         android:paddingTop="@dimen/detail_vertical_padding">
 
-        <ImageView android:id="@+id/mapImage"
+        <ImageView
+            android:id="@+id/mapImage"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:layout_weight="1.0"
-            android:layout_gravity="center">
-        </ImageView>
+            android:layout_gravity="center"></ImageView>
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -40,8 +40,7 @@
                 android:layout_gravity="center"
                 android:background="@color/colorPrimary"
                 android:text="@string/button_open_map"
-                android:textColor="@android:color/primary_text_dark"
-                />
+                android:textColor="@android:color/primary_text_dark" />
 
         </LinearLayout>
 

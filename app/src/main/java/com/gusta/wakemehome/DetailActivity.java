@@ -97,9 +97,9 @@ public class DetailActivity extends AppCompatActivity {
 
         // Check for saved state (like after phone orientation change) - and load it
         if (savedInstanceState != null) {
-            if(savedInstanceState.containsKey(INSTANCE_ALARM_ID))
+            if (savedInstanceState.containsKey(INSTANCE_ALARM_ID))
                 mAlarmId = savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID);
-            if(savedInstanceState.containsKey(INSTANCE_ALARM_ADDRESS_DATA)){
+            if (savedInstanceState.containsKey(INSTANCE_ALARM_ADDRESS_DATA)) {
                 mMapAddress = savedInstanceState.getParcelable(INSTANCE_ALARM_ADDRESS_DATA);
             }
         }
@@ -122,14 +122,14 @@ public class DetailActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    private void setAlarmData(Intent intent){
+    private void setAlarmData(Intent intent) {
         // If member alarm is new and there is ID from intent it should load from db
         if (mAlarmId == DEFAULT_ALARM_ID) {
 
             mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
             // factory view model is used for sending parameters to the view model in our case
             // with alarm entry id to make sure we have one entity on our viewModel
-            DetailViewModelFactory factory = new DetailViewModelFactory(mDb,mAlarmId);
+            DetailViewModelFactory factory = new DetailViewModelFactory(mDb, mAlarmId);
             mViewModel =
                     ViewModelProviders.of(this, factory).get(DetailViewModel.class);
 
@@ -142,7 +142,7 @@ public class DetailActivity extends AppCompatActivity {
                         return;
                     }
                     mAlarmId = alarmEntry.getId();
-                    mMapAddress = new MapAddress(alarmEntry.getLatitude(),alarmEntry.getLongitude(),alarmEntry.getLocation(),alarmEntry.getRadius());
+                    mMapAddress = new MapAddress(alarmEntry.getLatitude(), alarmEntry.getLongitude(), alarmEntry.getLocation(), alarmEntry.getRadius());
                     // populate the UI
                     populateUI(alarmEntry);
                 }
@@ -150,13 +150,13 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    private void updateMapImage(boolean showSavedMap){
+    private void updateMapImage(boolean showSavedMap) {
         ImageView mapsImage = mDetailBinding.locationDetails.mapImage;
         String imgPath = (showSavedMap) ? getImagePath(mAlarmId) : getLocalMapDir() + "/" + TEMP_IMAGE_FILE;
         File imgFile = new File(imgPath);
-        if(!imgFile.exists()){
+        if (!imgFile.exists()) {
             mapsImage.setVisibility(View.GONE);
-        }else{
+        } else {
             mapsImage.setVisibility(View.VISIBLE);
 
             Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
@@ -194,7 +194,7 @@ public class DetailActivity extends AppCompatActivity {
 
         // Show error and abort save if one of the mandatory fields is empty
         if (radius == 0 || location == null) {
-            Toast.makeText(getApplicationContext(),R.string.error_mandatory,Toast.LENGTH_SHORT)
+            Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT)
                     .show();
             return;
         }
@@ -218,10 +218,10 @@ public class DetailActivity extends AppCompatActivity {
         // Save the added/updated alarm entity
         //TODO add alert
         final AlarmEntry alarm;
-        if(mAlarmId == DEFAULT_ALARM_ID) {
+        if (mAlarmId == DEFAULT_ALARM_ID) {
             alarm = new AlarmEntry(location, latitude, longitude, radius,
                     enabled, vibrate, message, null);
-        }else{
+        } else {
             alarm = new AlarmEntry(mAlarmId, location, latitude, longitude, radius,
                     enabled, vibrate, message, null);
         }
@@ -229,9 +229,9 @@ public class DetailActivity extends AppCompatActivity {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                if(mAlarmId == DEFAULT_ALARM_ID){
-                    mAlarmId = (int)mDb.alarmDao().insertAlarm(alarm);
-                }else{
+                if (mAlarmId == DEFAULT_ALARM_ID) {
+                    mAlarmId = (int) mDb.alarmDao().insertAlarm(alarm);
+                } else {
                     mDb.alarmDao().updateAlarm(alarm);
                 }
                 updateSnapshotToAlarm(mAlarmId);
@@ -239,15 +239,16 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
     }
+
     //TODO: Move it to utils
-    private void updateSnapshotToAlarm(int id){
+    private void updateSnapshotToAlarm(int id) {
         // Create imageDir
         File source = new File(getLocalMapDir() + "/" + TEMP_IMAGE_FILE);
 
         // File (or directory) with new name
         File dest = new File(getImagePath(id));
 
-        if(!source.exists())
+        if (!source.exists())
             return;
 
         if (dest.exists())
@@ -272,8 +273,8 @@ public class DetailActivity extends AppCompatActivity {
         // Create a new intent to start an map activity
         Intent mapIntent =
                 new Intent(DetailActivity.this, MapsActivity.class);
-        if (mMapAddress != null && mMapAddress.getLocation() != null && mMapAddress.getRadius() > 0){
-            MapAddress mapAddress = new MapAddress(mMapAddress.getLatitude(), mMapAddress.getLongitude(), mMapAddress.getLocation(),mMapAddress.getRadius());
+        if (mMapAddress != null && mMapAddress.getLocation() != null && mMapAddress.getRadius() > 0) {
+            MapAddress mapAddress = new MapAddress(mMapAddress.getLatitude(), mMapAddress.getLongitude(), mMapAddress.getLocation(), mMapAddress.getRadius());
             mapIntent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, mapAddress);
         }
         startActivityForResult(mapIntent, MAP_REQUEST_CODE);
@@ -282,11 +283,9 @@ public class DetailActivity extends AppCompatActivity {
 
     // Call Back method to get map details from map activity
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == MAP_REQUEST_CODE)
-        {
+        if (requestCode == MAP_REQUEST_CODE) {
             if (data != null && data.hasExtra(EXTRA_ALARM_ADDRESS)) {
                 // get coordinates (from intent)
                 mMapAddress = data.getParcelableExtra(EXTRA_ALARM_ADDRESS);
@@ -326,20 +325,20 @@ public class DetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private String getLocalMapDir(){
+    private String getLocalMapDir() {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
 
         File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
         return directory.getAbsolutePath();
     }
 
-    private String getImagePath(int id){
+    private String getImagePath(int id) {
         return getLocalMapDir() + "/" + id + ".png";
     }
 
-    private void deleteTempFile(){
+    private void deleteTempFile() {
         File source = new File(getLocalMapDir() + "/" + TEMP_IMAGE_FILE);
-        if(source.exists())
+        if (source.exists())
             source.delete();
     }
 }

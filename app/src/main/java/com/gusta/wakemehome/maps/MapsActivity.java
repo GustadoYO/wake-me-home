@@ -1,7 +1,6 @@
 package com.gusta.wakemehome.maps;
 
 import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,13 +9,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.gusta.wakemehome.DetailActivity;
 import com.gusta.wakemehome.R;
 
 import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_ADDRESS;
 
 
-public class MapsActivity extends AppCompatActivity{
+public class MapsActivity extends AppCompatActivity {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     public static final String INSTANCE_MAPS_ADDRESS_DATA = "instanceMapsAddressData";
@@ -41,8 +42,8 @@ public class MapsActivity extends AppCompatActivity{
         if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_MAPS_ADDRESS_DATA)) {
             MapAddress address = savedInstanceState.getParcelable(INSTANCE_MAPS_ADDRESS_DATA);
             mMapProvider.setMapAddress(address);
-            float radius  = address.getRadius();
-            mRadiusSlider.setProgress((int)radius);
+            float radius = address.getRadius();
+            mRadiusSlider.setProgress((int) radius);
             mRadiusText.setText(Float.toString(radius));
         }
         Intent intent = getIntent();
@@ -50,33 +51,35 @@ public class MapsActivity extends AppCompatActivity{
             MapAddress address = intent.getParcelableExtra(EXTRA_ALARM_ADDRESS);
             mMapProvider.setMapAddress(address);
 
-            float radius  = address.getRadius();
-            mRadiusSlider.setProgress((int)radius);
+            float radius = address.getRadius();
+            mRadiusSlider.setProgress((int) radius);
             mRadiusText.setText(Float.toString(radius));
         }
 
 
-        mRadiusSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
-        {
+        mRadiusSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 changeRadius(seekBar);
             }
 
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         mUpdateLocationButton = findViewById(R.id.updateLocation);
         mUpdateLocationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 MapAddress address = mMapProvider.getMapAddress();
-                if(address != null && address.isValidEntry()) {
+                if (address != null && address.isValidEntry()) {
                     Intent intent = new Intent(MapsActivity.this, DetailActivity.class);
                     intent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, address);
-                    setResult(1,intent );
+                    setResult(1, intent);
                     finish();
-                }else{
-                    Toast.makeText(getApplicationContext(),R.string.error_mandatory,Toast.LENGTH_SHORT)
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT)
                             .show();
                     return;
                 }
@@ -96,8 +99,9 @@ public class MapsActivity extends AppCompatActivity{
         finish();
         return isOptionSelected;
     }
-    private void changeRadius(SeekBar seekBar){
-        if(mMapProvider.getMapAddress() == null){
+
+    private void changeRadius(SeekBar seekBar) {
+        if (mMapProvider.getMapAddress() == null) {
             Toast.makeText(getApplicationContext(), R.string.selection_order, Toast.LENGTH_SHORT).show();
             seekBar.setProgress(0);
             return;

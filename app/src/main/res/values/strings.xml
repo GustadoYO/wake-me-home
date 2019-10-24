@@ -34,13 +34,13 @@
     <string name="error_latitude">Latitude must be between -90&#176; and +90&#176;</string>
     <string name="error_longitude">Longitude must be between -180&#176; and +180&#176;</string>
 
-    <string name="edit_alarm_latitude" >Latitude</string>
-    <string name="edit_alarm_longitude" >Longitude</string>
-    <string name="edit_alarm_radius" >Radius</string>
-    <string name="edit_alarm_enabled" >Enabled?</string>
-    <string name="edit_alarm_vibrate" >Vibrate?</string>
-    <string name="edit_alarm_message" >Enter a message..</string>
-    <string name="edit_alarm_ringtone" >Select ringtone</string>
+    <string name="edit_alarm_latitude">Latitude</string>
+    <string name="edit_alarm_longitude">Longitude</string>
+    <string name="edit_alarm_radius">Radius</string>
+    <string name="edit_alarm_enabled">Enabled?</string>
+    <string name="edit_alarm_vibrate">Vibrate?</string>
+    <string name="edit_alarm_message">Enter a message..</string>
+    <string name="edit_alarm_ringtone">Select ringtone</string>
 
     <string name="label_vibrate">Vibration</string>
 
@@ -72,9 +72,9 @@
     <string name="pref_units_imperial" translatable="false">imperial</string>
 
 
-    <!-- - - - - - - - - - - - - - - -->
-    <!-- Used by WakeMeHomeUnitsUtils-->
-    <!-- - - - - - - - - - - - - - - -->
+    <!-- - - - - - - - - - -->
+    <!-- Used by UnitsUtils-->
+    <!-- - - - - - - - - - -->
 
     <!-- Length format in Kilometres [CHAR LIMIT=5] -->
     <string name="format_length_metres">
@@ -117,7 +117,7 @@
         Click notification to return to app
     </string>
     <string name="geofence_not_available_title">
-        Location services are unavailable - alarms will not trigger!
+        Location services are unavailable - ALARMS WILL NOT TRIGGER!
     </string>
     <string name="geofence_not_available_text">
         Was location access turned off? Click notification to go to settings
@@ -128,9 +128,8 @@
         Location permission is needed for core functionality
     </string>
     <string name="permission_denied_explanation">
-        Permission was denied, but is needed for core functionality.
+        Location permission wad denied - ALARMS WILL NOT TRIGGER!
     </string>
     <string name="settings">Settings</string>
-
 
 </resources>

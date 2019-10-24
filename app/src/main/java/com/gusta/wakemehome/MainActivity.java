@@ -26,6 +26,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.geofencing.GeofenceManager;
+import com.gusta.wakemehome.utilities.PermissionUtils;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.MainViewModel;
 
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements
                         if (file.exists()) {
                             if (!file.delete()) {
                                 //TODO handle error
-                                Log.w(TAG,"image delete failed");
+                                Log.w(TAG, "image delete failed");
                             }
                         }
                     }
@@ -225,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements
                                            @NonNull int[] grantResults) {
         Log.i(TAG, "onRequestPermissionResult");
         if (requestCode == ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE) {
-            mGeofenceManager.onRequestPermissionsResult(grantResults);
+            PermissionUtils.handleResult(this, mGeofenceManager, grantResults);
         }
     }
 
@@ -275,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     //TODO: Move it to utils
-    private String getLocalMapDir(){
+    private String getLocalMapDir() {
         ContextWrapper cw = new ContextWrapper(getApplication().getApplicationContext());
 
         File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
@@ -283,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     //TODO: Move it to utils
-    private String getImagePath(AlarmEntry alarm){
+    private String getImagePath(AlarmEntry alarm) {
         return getLocalMapDir() + "/" + alarm.getId() + ".png";
     }
 

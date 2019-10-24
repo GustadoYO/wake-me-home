@@ -71,8 +71,9 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
             Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
 
             // Send notification and log the transition details.
-            NotificationUtils.sendNotification(this, geofenceTransitionDetails,
-                    getString(R.string.geofence_transition_notification_text), notificationIntent);
+            NotificationUtils.notifyUser(this, geofenceTransitionDetails,
+                    getString(R.string.geofence_transition_notification_text),
+                    getString(R.string.settings), notificationIntent);
             Log.i(TAG, geofenceTransitionDetails);
         } else {
             // Log the error.
@@ -95,10 +96,12 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
 
             // Geofence service is not available now. Typically this is because the user turned off
             // location access in settings > location access. Send error notification.
-            NotificationUtils.sendNotification(this,
+            NotificationUtils.notifyUser(this,
                     getString(R.string.geofence_not_available_title),
                     getString(R.string.geofence_not_available_text),
-                    new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    getString(R.string.settings),
+                    new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            );
         }
     }
 

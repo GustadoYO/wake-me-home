@@ -7,9 +7,9 @@ import com.gusta.wakemehome.R;
 /**
  * Contains useful utilities , such as conversion between Kilometres and Miles.
  */
-public final class WakeMeHomeUnitsUtils {
+public final class UnitsUtils {
 
-    private static final String LOG_TAG = WakeMeHomeUnitsUtils.class.getSimpleName();
+    private static final String LOG_TAG = UnitsUtils.class.getSimpleName();
 
     /**
      * This method will convert a length from Kilometres to Miles.
@@ -37,7 +37,7 @@ public final class WakeMeHomeUnitsUtils {
     public static String formatLength(Context context, double length) {
         int temperatureFormatResourceId = R.string.format_length_metres;
 
-        if (!WakeMeHomePreferences.isMetric(context)) {
+        if (!PreferencesUtils.isMetric(context)) {
             length = metresToFeet(length);
             temperatureFormatResourceId = R.string.format_length_feet;
         }

@@ -24,7 +24,7 @@ abstract class MapProvider {
     MapAddress mMapAddress;
     Geocoder mGeocoder;
 
-    MapProvider(MapsActivity mapsActivity){
+    MapProvider(MapsActivity mapsActivity) {
         mMapsActivity = mapsActivity;
         mGeocoder = new Geocoder(mMapsActivity, Locale.getDefault());
         isFirstUsage = true;
@@ -33,7 +33,7 @@ abstract class MapProvider {
     abstract void updateRadius(float radius);
 
     MapAddress getMapAddress() {
-        if(mMapAddress == null || !mMapAddress.isValidEntry()){
+        if (mMapAddress == null || !mMapAddress.isValidEntry()) {
             return null;
         }
         return mMapAddress;
@@ -44,7 +44,7 @@ abstract class MapProvider {
     }
 
     //TODO: Move it to utils
-    void saveToInternalStorage(Bitmap bitmapImage){
+    void saveToInternalStorage(Bitmap bitmapImage) {
         String dirPath = getLocalMapDir();
         // Create imageDir
         File path = new File(dirPath + "/" + com.gusta.wakemehome.DetailActivity.TEMP_IMAGE_FILE);
@@ -68,7 +68,7 @@ abstract class MapProvider {
     }
 
     //TODO: Move it to utils
-    private String getLocalMapDir(){
+    private String getLocalMapDir() {
         ContextWrapper cw = new ContextWrapper(mMapsActivity);
 
         File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
