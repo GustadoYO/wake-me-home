@@ -46,7 +46,7 @@
 
     <string name="button_open_map">Find On Map</string>
     <string name="button_select_location">Select Location</string>
-    <string name="label_radius_select">Select Radius:</string>
+    <string name="label_radius_select">radius:</string>
 
 
     <!-- - - - - - - - - - - -->
