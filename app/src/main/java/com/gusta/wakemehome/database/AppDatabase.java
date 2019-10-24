@@ -1,12 +1,13 @@
 package com.gusta.wakemehome.database;
 
-import androidx.room.Database;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
 import android.content.Context;
 import android.util.Log;
 
-@Database(entities = {AlarmEntry.class}, version = 1, exportSchema = false)
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+
+@Database(entities = {AlarmEntry.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static final String LOG_TAG = AppDatabase.class.getSimpleName();
@@ -28,5 +29,4 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     public abstract AlarmDao alarmDao();
-
 }

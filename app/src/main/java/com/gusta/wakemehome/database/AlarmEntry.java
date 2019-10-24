@@ -35,7 +35,6 @@ public class AlarmEntry implements GeofenceEntry {
         this.message = message;
         this.alert = alert;
     }
-
     public AlarmEntry(int id, String location, double latitude, double longitude, float radius,
                       boolean enabled, boolean vibrate, String message, String alert) {
         this.id = id;
@@ -120,4 +119,5 @@ public class AlarmEntry implements GeofenceEntry {
     public void setAlert(String alert) {
         this.alert = alert;
     }
+
 }
