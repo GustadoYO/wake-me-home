@@ -151,6 +151,9 @@ public class DetailActivity extends AppCompatActivity {
     private void updateMapImageVisibility() {
         ImageView mapsImage = mDetailBinding.locationDetails.mapImage;
         String tempImagePath = fileUtils.getTempPath() ;
+        //if there is temp it'll be selected
+        //temp image will delete on enter to existing alarm or on back without
+        //saving on map activity otherwise we will take the temp file to show up
         String imgPath = !isExistPath(tempImagePath) ? fileUtils.getMapImagePath(mAlarmId) : tempImagePath;
 
         if(!isExistPath(imgPath)){
