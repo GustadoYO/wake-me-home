@@ -109,7 +109,7 @@ public class DetailActivity extends AppCompatActivity {
             fileUtils.deleteTempImage();
             setAlarmData(intent);
         }
-        updateMapImageVisibility(true);
+        updateMapImageVisibility();
     }
 
     @Override
@@ -148,9 +148,10 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    private void updateMapImageVisibility(boolean showSavedMap) {
+    private void updateMapImageVisibility() {
         ImageView mapsImage = mDetailBinding.locationDetails.mapImage;
-        String imgPath = (showSavedMap) ? fileUtils.getMapImagePath(mAlarmId) : fileUtils.getTempPath();
+        String tempImagePath = fileUtils.getTempPath() ;
+        String imgPath = !isExistPath(tempImagePath) ? fileUtils.getMapImagePath(mAlarmId) : tempImagePath;
 
         if(!isExistPath(imgPath)){
             mapsImage.setVisibility(View.GONE);
@@ -173,7 +174,7 @@ public class DetailActivity extends AppCompatActivity {
     private void populateUI(AlarmEntry alarm) {
         mDetailBinding.clockDetails.vibrate.setChecked(alarm.isVibrate());
         mDetailBinding.clockDetails.message.setText(alarm.getMessage());
-        updateMapImageVisibility(true);
+        updateMapImageVisibility();
     }
 
     /**
@@ -273,7 +274,7 @@ public class DetailActivity extends AppCompatActivity {
                 mMapAddress = data.getParcelableExtra(EXTRA_ALARM_ADDRESS);
             }
         }
-        updateMapImageVisibility(false);
+        updateMapImageVisibility();
     }
 
     //TODO use select ringtone method
