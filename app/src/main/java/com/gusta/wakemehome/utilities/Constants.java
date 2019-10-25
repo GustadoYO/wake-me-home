@@ -17,5 +17,5 @@ public final class Constants {
 
     //temp png will be for unsaved snapshots on save it'll change to  map id.png
     public static final String MAPS_DIR = "mapsDir";
-    public static final String TEMP_IMAGE_FILE = "temp.png";
+    public static final String TEMP_IMAGE_FILE_NAME = "temp.png";
 }

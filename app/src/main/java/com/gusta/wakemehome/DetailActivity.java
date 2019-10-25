@@ -31,7 +31,7 @@ import com.gusta.wakemehome.viewmodel.DetailViewModelFactory;
 
 import java.util.Objects;
 
-import static com.gusta.wakemehome.utilities.fileUtils.isExistPath;
+import static com.gusta.wakemehome.utilities.fileUtils.isPathExists;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -105,11 +105,9 @@ public class DetailActivity extends AppCompatActivity {
         // If ALARM_ID was sent, it is update mode (list item clicked)
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
-            //delete older map to be able to update map for existing map
-            fileUtils.deleteTempImage();
             setAlarmData(intent);
         }
-        updateMapImageVisibility();
+        updateMapImage(true);
     }
 
     @Override
@@ -148,15 +146,20 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    private void updateMapImageVisibility() {
+    private void updateMapImage(boolean deleteTemp) {
+
         ImageView mapsImage = mDetailBinding.locationDetails.mapImage;
+        //delete older map to be able to update map for existing map
+        if(deleteTemp){
+            fileUtils.deleteTempImage();
+        }
         String tempImagePath = fileUtils.getTempPath() ;
         //if there is temp it'll be selected
         //temp image will delete on enter to existing alarm or on back without
         //saving on map activity otherwise we will take the temp file to show up
-        String imgPath = !isExistPath(tempImagePath) ? fileUtils.getMapImagePath(mAlarmId) : tempImagePath;
+        String imgPath = !isPathExists(tempImagePath) ? fileUtils.getMapImagePath(mAlarmId) : tempImagePath;
 
-        if(!isExistPath(imgPath)){
+        if(!isPathExists(imgPath)){
             mapsImage.setVisibility(View.GONE);
         } else {
 
@@ -177,7 +180,7 @@ public class DetailActivity extends AppCompatActivity {
     private void populateUI(AlarmEntry alarm) {
         mDetailBinding.clockDetails.vibrate.setChecked(alarm.isVibrate());
         mDetailBinding.clockDetails.message.setText(alarm.getMessage());
-        updateMapImageVisibility();
+        updateMapImage(true);
     }
 
     /**
@@ -277,7 +280,7 @@ public class DetailActivity extends AppCompatActivity {
                 mMapAddress = data.getParcelableExtra(EXTRA_ALARM_ADDRESS);
             }
         }
-        updateMapImageVisibility();
+        updateMapImage(false);
     }
 
     //TODO use select ringtone method

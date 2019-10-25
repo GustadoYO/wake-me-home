@@ -10,7 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static com.gusta.wakemehome.utilities.Constants.MAPS_DIR;
-import static com.gusta.wakemehome.utilities.Constants.TEMP_IMAGE_FILE;
+import static com.gusta.wakemehome.utilities.Constants.TEMP_IMAGE_FILE_NAME;
 
 public class fileUtils {
 
@@ -20,9 +20,14 @@ public class fileUtils {
     //locate to hold the maps images in our appData
     private static String mapImageFileDir;
 
-    /*
-        set the local map directory in app data for image saving
-        should call when app first loaded to set the dir path
+    /**
+     * Public methods
+     */
+
+
+    /**
+     * set the local map directory in app data for image saving
+     * should call when app first loaded to set the dir path
      */
     public static void setMapsDir(Context context){
 
@@ -32,52 +37,52 @@ public class fileUtils {
 
     }
 
-    /*
-        save map image - will change the temp file by id.png file
+    /**
+     * save map image - will change the temp file by id.png file
      */
     public static void saveMapImage(int id){
         changeFilePath(getTempPath(),getMapImagePath(id));
     }
 
-    /*
-        delete image which connected to specific alarm
+    /**
+     * delete image which connected to specific alarm
      */
     public static void deleteMapImage(int id){
         deleteFileFromPath(getMapImagePath(id));
     }
 
-    /*
-        delete temp file which saved for alarm that didn't save yet
+    /**
+     * delete temp file which saved for alarm that didn't save yet
      */
     public static void deleteTempImage(){
         deleteFileFromPath(getTempPath());
     }
 
-    /*
-        create temp file for alarm which didn't save yet
+    /**
+     * create temp file for alarm which didn't save yet
      */
     public static void createTempMapImage(Bitmap bitmap){
         saveImgToPath(bitmap,getTempPath());
     }
 
-    /*
-        get image path from directory
+    /**
+     * get image path from directory
      */
     public static String getMapImagePath(int id) {
         return mapImageFileDir + "/" + id + ".png";
     }
 
-    /*
-        get temp image path from directory
+    /**
+     * get temp image path from directory
     */
     public static String getTempPath() {
-        return mapImageFileDir + "/" + TEMP_IMAGE_FILE;
+        return mapImageFileDir + "/" + TEMP_IMAGE_FILE_NAME;
     }
 
-    /*
-        file exist in this path
+    /**
+     * file exist in this path
      */
-    public static boolean isExistPath(String path){
+    public static boolean isPathExists(String path){
         File source = new File(path);
         if (source.exists()) {
             return true;
@@ -85,8 +90,12 @@ public class fileUtils {
         return false;
     }
 
-    /*
-        save image to path
+    /**
+     * Private Section
+     */
+
+    /**
+     * save image to path
     */
     private static String saveImgToPath(Bitmap bitmapImage, String path){
 
@@ -113,8 +122,8 @@ public class fileUtils {
 
     }
 
-    /*
-        delete existing file
+    /**
+     * delete existing file
      */
     private static void deleteFileFromPath(String path){
         File file = new File(path);
@@ -127,8 +136,8 @@ public class fileUtils {
         }
     }
 
-    /*
-        change file path if exist
+    /**
+     * change file path if exist
      */
     private static void changeFilePath(String sourcePath, String destPath){
         File source = new File(sourcePath);
