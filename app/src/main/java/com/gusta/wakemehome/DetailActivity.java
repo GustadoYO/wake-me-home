@@ -1,7 +1,5 @@
 package com.gusta.wakemehome;
 
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,12 +24,14 @@ import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
 import com.gusta.wakemehome.maps.MapAddress;
 import com.gusta.wakemehome.maps.MapsActivity;
+import com.gusta.wakemehome.utilities.fileUtils;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.DetailViewModel;
 import com.gusta.wakemehome.viewmodel.DetailViewModelFactory;
 
-import java.io.File;
 import java.util.Objects;
+
+import static com.gusta.wakemehome.utilities.fileUtils.isPathExists;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -54,8 +54,6 @@ public class DetailActivity extends AppCompatActivity {
     // save alarm address to be received after rotation
     public static final String INSTANCE_ALARM_ADDRESS_DATA = "instanceAlarmAddressData";
 
-    //temp png will be for unsaved snapshots on save it'll change to  map id.png
-    public static final String TEMP_IMAGE_FILE = "temp.png";
     // map intent request code
     private static final int MAP_REQUEST_CODE = 1;
 
@@ -107,8 +105,6 @@ public class DetailActivity extends AppCompatActivity {
         // If ALARM_ID was sent, it is update mode (list item clicked)
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
-            //delete older map to be able to update map for existing map
-            deleteTempFile();
             setAlarmData(intent);
         }
         updateMapImage(true);
@@ -150,16 +146,26 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    private void updateMapImage(boolean showSavedMap) {
+    private void updateMapImage(boolean deleteTemp) {
+
         ImageView mapsImage = mDetailBinding.locationDetails.mapImage;
-        String imgPath = (showSavedMap) ? getImagePath(mAlarmId) : getLocalMapDir() + "/" + TEMP_IMAGE_FILE;
-        File imgFile = new File(imgPath);
-        if (!imgFile.exists()) {
+        //delete older map to be able to update map for existing map
+        if(deleteTemp){
+            fileUtils.deleteTempImage();
+        }
+        String tempImagePath = fileUtils.getTempPath() ;
+        //if there is temp it'll be selected
+        //temp image will delete on enter to existing alarm or on back without
+        //saving on map activity otherwise we will take the temp file to show up
+        String imgPath = !isPathExists(tempImagePath) ? fileUtils.getMapImagePath(mAlarmId) : tempImagePath;
+
+        if(!isPathExists(imgPath)){
             mapsImage.setVisibility(View.GONE);
         } else {
+
             mapsImage.setVisibility(View.VISIBLE);
 
-            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            Bitmap myBitmap = BitmapFactory.decodeFile(imgPath);
 
             mapsImage.setImageBitmap(myBitmap);
 
@@ -245,29 +251,12 @@ public class DetailActivity extends AppCompatActivity {
                 } else {
                     mDb.alarmDao().updateAlarm(alarm);
                 }
-                updateSnapshotToAlarm(mAlarmId);
+                fileUtils.saveMapImage(mAlarmId);
                 finish();
             }
         });
     }
 
-    //TODO: Move it to utils
-    private void updateSnapshotToAlarm(int id) {
-        // Create imageDir
-        File source = new File(getLocalMapDir() + "/" + TEMP_IMAGE_FILE);
-
-        // File (or directory) with new name
-        File dest = new File(getImagePath(id));
-
-        if (!source.exists())
-            return;
-
-        if (dest.exists())
-            dest.delete();
-
-        // Rename file (or directory)
-        source.renameTo(dest);
-    }
     /**
      * This method uses the URI scheme for showing the alarm on a
      * map. This super-handy intent is detailed in the "Common Intents"
@@ -336,20 +325,4 @@ public class DetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private String getLocalMapDir() {
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-
-        File directory = cw.getDir("mapsDir", Context.MODE_PRIVATE);
-        return directory.getAbsolutePath();
-    }
-
-    private String getImagePath(int id) {
-        return getLocalMapDir() + "/" + id + ".png";
-    }
-
-    private void deleteTempFile() {
-        File source = new File(getLocalMapDir() + "/" + TEMP_IMAGE_FILE);
-        if (source.exists())
-            source.delete();
-    }
 }

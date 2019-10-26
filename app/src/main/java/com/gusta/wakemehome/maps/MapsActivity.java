@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.gusta.wakemehome.DetailActivity;
 import com.gusta.wakemehome.R;
 import com.gusta.wakemehome.utilities.UnitsUtils;
+import com.gusta.wakemehome.utilities.fileUtils;
 
 import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_ADDRESS;
 
@@ -99,6 +100,7 @@ public class MapsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean isOptionSelected = super.onOptionsItemSelected(item);
+        fileUtils.deleteTempImage();
         finish();
         return isOptionSelected;
     }
