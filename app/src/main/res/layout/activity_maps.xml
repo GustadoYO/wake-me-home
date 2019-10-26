@@ -20,11 +20,14 @@
             android:orientation="horizontal"
             android:paddingTop="@dimen/maps_activity_radius_container_padding"
             android:paddingLeft="@dimen/maps_activity_radius_container_padding"
-            android:paddingRight="@dimen/maps_activity_radius_container_padding">
+            android:paddingRight="@dimen/maps_activity_radius_container_padding"
+            android:paddingBottom="@dimen/maps_activity_radius_container_padding"
+            >
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="0"
                 android:text="@string/label_radius_select"
                 android:textSize="@dimen/maps_activity_radius_text_size"
                 android:textStyle="bold" />
@@ -34,18 +37,18 @@
                 style="@style/TextAppearance.AppCompat.Large"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:max="2000" />
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/seekBarInfoTextView"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:textSize="@dimen/maps_activity_radius_text_size"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/seekBarInfoTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="@dimen/maps_activity_radius_text_size"
-            android:paddingBottom="@dimen/maps_activity_radius_container_padding"
-            android:textStyle="bold" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/updateLocation"

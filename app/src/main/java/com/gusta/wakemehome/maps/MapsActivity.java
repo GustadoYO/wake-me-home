@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.gusta.wakemehome.DetailActivity;
 import com.gusta.wakemehome.R;
+import com.gusta.wakemehome.utilities.UnitsUtils;
 
 import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_ADDRESS;
 
@@ -26,6 +27,7 @@ public class MapsActivity extends AppCompatActivity {
     private MapProvider mMapProvider;
     private TextView mRadiusText;
     private SeekBar mRadiusSlider;
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,7 @@ public class MapsActivity extends AppCompatActivity {
             mMapProvider.setMapAddress(address);
             float radius = address.getRadius();
             mRadiusSlider.setProgress((int) radius);
-            mRadiusText.setText(Float.toString(radius));
+            mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         }
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ADDRESS)) {
@@ -53,7 +55,7 @@ public class MapsActivity extends AppCompatActivity {
 
             float radius = address.getRadius();
             mRadiusSlider.setProgress((int) radius);
-            mRadiusText.setText(Float.toString(radius));
+            mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         }
 
 
@@ -79,9 +81,10 @@ public class MapsActivity extends AppCompatActivity {
                     setResult(1, intent);
                     finish();
                 } else {
-                    Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT)
-                            .show();
-                    return;
+                    if(toast != null)
+                        toast.cancel();
+                    toast = Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             }
         });
@@ -101,13 +104,21 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void changeRadius(SeekBar seekBar) {
+        //if address doesn't exist
         if (mMapProvider.getMapAddress() == null) {
-            Toast.makeText(getApplicationContext(), R.string.selection_order, Toast.LENGTH_SHORT).show();
+            //keep toast to avoid multiple toasts on the screen
+            if(toast != null)
+                toast.cancel();
+            //create toast for radius without selection on map
+            toast = Toast.makeText(getApplicationContext(), R.string.selection_order, Toast.LENGTH_SHORT);
+            toast.show();
             seekBar.setProgress(0);
             return;
         }
+        toast = null;
         float radius = seekBar.getProgress();
-        mRadiusText.setText(Float.toString(radius));
+        mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         mMapProvider.updateRadius(radius);
     }
+
 }
