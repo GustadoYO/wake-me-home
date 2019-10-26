@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
@@ -25,8 +24,13 @@ public final class NotificationUtils {
     // PUBLIC METHODS //
     //================//
 
+    // TODO: Improve class API
+
     /**
      * Show a text message to the user.
+     *
+     * Easy interface for text only (without action) that can be displayed ether on SnackBar or
+     * Notification.
      *
      * @param context The context asking to show the message.
      * @param text    The message text.
@@ -37,6 +41,8 @@ public final class NotificationUtils {
 
     /**
      * Show a text message to the user.
+     *
+     * Easy interface for activity to launch SnackBar.
      *
      * @param activity           The activity to show the message on.
      * @param mainTextStringId   The id for the string resource for the message's main text.
@@ -52,18 +58,20 @@ public final class NotificationUtils {
     /**
      * Show a text message to the user.
      *
+     * Easy interface for service to send a Notification.
+     *
      * @param service       The service asking to show the message.
      * @param mainText      The message's main text.
      * @param secondaryText The message's secondary text.
-     * @param intent        Intent to be called when message is pressed.
      */
-    public static void notifyUser(Service service, String mainText, String secondaryText,
-                                  Intent intent) {
-        notifyUser(service, mainText, secondaryText, null, null, intent);
+    public static void notifyUser(Service service, String mainText, String secondaryText) {
+        notifyUser(service, mainText, secondaryText, null, null, null);
     }
 
     /**
      * Show a text message to the user.
+     *
+     * Full interface using string IDs.
      *
      * @param context               The context asking to show the message.
      * @param mainTextStringId      The id for the string resource for the message's main text.
@@ -82,6 +90,8 @@ public final class NotificationUtils {
     /**
      * Show a text message to the user.
      *
+     * Full interface using strings.
+     *
      * @param context       The context asking to show the message.
      * @param mainText      The message's main text.
      * @param secondaryText The message's secondary text.
@@ -98,7 +108,7 @@ public final class NotificationUtils {
     //=================//
 
     /**
-     * Show a text message to the user.
+     * Show a text message to the user. - IMPLEMENTATION
      *
      * @param context       The context asking to show the message.
      * @param mainText      The message's main text.
@@ -122,7 +132,7 @@ public final class NotificationUtils {
             showSnackbar((Activity) context, mainText, actionText, listener);
         }
         // If the context is not an activity, we have to use a notification so notify the user
-        else sendNotification(context, mainText, secondaryText, intent);
+        else sendNotification(context, mainText, secondaryText, actionText, intent);
     }
 
     /**
@@ -130,10 +140,11 @@ public final class NotificationUtils {
      * @param context       Context used to use various Utility methods
      * @param contentTitle  Notification's title
      * @param contentText   Notification's text
+     * @param actionText    The text of the action item.
      * @param intent        Intent to be called when notification is pressed
      */
     private static void sendNotification(Context context, String contentTitle, String contentText,
-                                         Intent intent) {
+                                         String actionText, Intent intent) {
         // Get an instance of the Notification manager
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -156,8 +167,9 @@ public final class NotificationUtils {
         // Add the main Activity to the task stack as the parent.
         stackBuilder.addParentStack(MainActivity.class);
 
-        // Push the content Intent onto the stack.
-        stackBuilder.addNextIntent(intent);
+        // Every notification should respond to a tap,
+        // usually to open an activity in your app that corresponds to the notification.
+        stackBuilder.addNextIntent(new Intent(context.getApplicationContext(), MainActivity.class));
 
         // Get a PendingIntent containing the entire back stack.
         PendingIntent notificationPendingIntent =
@@ -169,10 +181,6 @@ public final class NotificationUtils {
 
         // Define the notification settings.
         builder.setSmallIcon(R.mipmap.ic_launcher)
-                // In a real app, you may want to use a library like Volley
-                // to decode the Bitmap.
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),
-                        R.mipmap.ic_launcher))
                 .setColor(Color.RED)
                 .setContentTitle(contentTitle)
                 .setContentText(contentText)
@@ -183,8 +191,18 @@ public final class NotificationUtils {
             builder.setChannelId(Constants.CHANNEL_ID); // Channel ID
         }
 
-        // Dismiss notification once the user touches it.
-        builder.setAutoCancel(true);
+        // If an action was sent - add it to the notification
+        if (actionText != null && intent != null) {
+            PendingIntent actionPendingIntent =
+                    PendingIntent.getBroadcast(context, 0, intent, 0);
+            NotificationCompat.Action action = new NotificationCompat.Action.Builder(0,
+                    actionText, actionPendingIntent).build();
+            builder.addAction(action);
+        } else {
+
+            // Dismiss notification once the user touches it.
+            builder.setAutoCancel(true);
+        }
 
         // Issue the notification
         mNotificationManager.notify(0, builder.build());

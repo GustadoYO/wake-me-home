@@ -72,6 +72,11 @@
             android:name=".services.ReRegisterGeofencesJobIntentService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".services.NotificationActionsJobIntentService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service android:name=".services.RingtonePlayingService" />
 
     </application>
 

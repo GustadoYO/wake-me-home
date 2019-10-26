@@ -131,6 +131,8 @@
     <string name="permission_denied_explanation">
         Location permission wad denied - ALARMS WILL NOT TRIGGER!
     </string>
+
     <string name="settings">Settings</string>
+    <string name="dismiss">dismiss</string>
 
 </resources>

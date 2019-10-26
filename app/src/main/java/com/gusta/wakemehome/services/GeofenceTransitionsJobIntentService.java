@@ -3,9 +3,6 @@ package com.gusta.wakemehome.services;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -16,10 +13,11 @@ import androidx.lifecycle.Observer;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
-import com.gusta.wakemehome.MainActivity;
 import com.gusta.wakemehome.R;
 import com.gusta.wakemehome.database.AlarmEntry;
+import com.gusta.wakemehome.geofencing.GeofenceBroadcastReceiver;
 import com.gusta.wakemehome.geofencing.GeofenceErrorMessages;
+import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.NotificationUtils;
 
 import java.util.List;
@@ -171,27 +169,22 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
 
         Log.i(TAG, "Launching alarm: " + alarm.getId());
 
-        //this will sound the alarm tone
-        //this will sound the alarm once, if you wish to
-        //raise alarm in loop continuously then use MediaPlayer and setLooping(true)
-//        Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-//            if (alarmUri == null) {
-//                alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//            }
-        Uri alarmUri = Uri.parse(alarm.getAlert());
-        Ringtone ringtone = RingtoneManager.getRingtone(this, alarmUri);
-        ringtone.play();
+        // Play the selected ringtone. We use a Service in order to allow dismissing the alarm
+        Intent startIntent = new Intent(this, RingtonePlayingService.class);
+        startIntent.putExtra(RingtonePlayingService.EXTRA_RINGTONE_URI, alarm.getAlert());
+        this.startService(startIntent);
 
-        // Get the transition details as a string
+        // Get the transition details as a string and add alarm's location to form title
         String geofenceTransitionString = getTransitionString(Geofence.GEOFENCE_TRANSITION_ENTER);
+        String NotificationTitle = geofenceTransitionString + " " + alarm.getLocation();
 
-        // Create an explicit content Intent that starts the main Activity.
-        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+        // Create the dismiss button intent
+        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+        intent.setAction(Constants.ACTION_DISMISS_ALARM);
 
         // Send notification and log the transition details.
-        String NotificationTitle = geofenceTransitionString + " " + alarm.getLocation();
         NotificationUtils.notifyUser(this, NotificationTitle, alarm.getMessage(),
-                notificationIntent);
+                getString(R.string.dismiss), intent);
     }
 
     @Override
