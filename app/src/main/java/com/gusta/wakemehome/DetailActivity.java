@@ -306,6 +306,10 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * pick ringtone from default android ringtone selector
+     * Note: this intent doesn't exist on the emulator
+     */
     public void pickRingtone() {
         final Uri currentTone = getCurrentRingtone();
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
@@ -317,12 +321,25 @@ public class DetailActivity extends AppCompatActivity {
         startActivityForResult(intent, RINGTONE_PICKER_REQUEST_CODE);
     }
 
+    /**
+     * default ringtone value of android
+     * @return
+     */
     private Uri getDefaultRingtone(){
         return RingtoneManager.getActualDefaultRingtoneUri(DetailActivity.this, RingtoneManager.TYPE_ALARM);
     }
+
+    /**
+     * current could be the saved value when exist or android default
+     * @return
+     */
     private Uri getCurrentRingtone(){
         return mAlarmRingtone != null ? mAlarmRingtone : getDefaultRingtone();
     }
+
+    /**
+     * set the ringtone name from relevant uri -> saved value or default ringtone value
+     */
     private void setRingtoneName(){
         //select default ringtone when there isn't ringtone which chose
         Uri ringtoneUri = getCurrentRingtone();
@@ -330,7 +347,12 @@ public class DetailActivity extends AppCompatActivity {
         mDetailBinding.clockDetails.ringtone.setText(ringtone.getTitle(this));
     }
 
-    // Call Back method to get map details from map activity
+    /**
+     * return results from activities
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
