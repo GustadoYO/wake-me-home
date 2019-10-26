@@ -1,8 +1,12 @@
 package com.gusta.wakemehome;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -50,12 +55,15 @@ public class DetailActivity extends AppCompatActivity {
     // save alarm ID to be received after rotation
     public static final String INSTANCE_ALARM_ID = "instanceAlarmId";
     // save alarm alert to be received after rotation
-    public static final String INSTANCE_ALARM_ALERT = "instanceAlarmAlert";
+    public static final String INSTANCE_ALARM_RINGTONE = "instanceAlarmAlert";
     // save alarm address to be received after rotation
     public static final String INSTANCE_ALARM_ADDRESS_DATA = "instanceAlarmAddressData";
 
     // map intent request code
     private static final int MAP_REQUEST_CODE = 1;
+
+    // ringtone picker request code
+    private static final int RINGTONE_PICKER_REQUEST_CODE = 2;
 
     //=========//
     // MEMBERS //
@@ -63,8 +71,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private MapAddress mMapAddress;                 // The current alarm address
     private int mAlarmId;                           // The current alarm id
-    //TODO add alert
-    private String mAlarmAlert;                     // The current alarm alert
+    private Uri mAlarmRingtone;                     // The current alarm ringtone
     private DetailViewModel mViewModel;             // The current alarm view model
     private ActivityDetailBinding mDetailBinding;   // The data binding object
     private AppDatabase mDb;                        // db instance
@@ -93,12 +100,24 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+        LinearLayout ringtone = mDetailBinding.clockDetails.alert;
+        ringtone.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View view) {
+                pickRingtone();
+            }
+
+        });
+
         // Check for saved state (like after phone orientation change) - and load it
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(INSTANCE_ALARM_ID))
                 mAlarmId = savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID);
             if (savedInstanceState.containsKey(INSTANCE_ALARM_ADDRESS_DATA)) {
                 mMapAddress = savedInstanceState.getParcelable(INSTANCE_ALARM_ADDRESS_DATA);
+            }
+            if (savedInstanceState.containsKey(INSTANCE_ALARM_RINGTONE)) {
+                mAlarmRingtone = Uri.parse(savedInstanceState.getString(INSTANCE_ALARM_RINGTONE));
             }
         }
 
@@ -108,6 +127,7 @@ public class DetailActivity extends AppCompatActivity {
             setAlarmData(intent);
         }
         updateMapImage(true);
+        setRingtoneName();
     }
 
     @Override
@@ -115,6 +135,8 @@ public class DetailActivity extends AppCompatActivity {
         // Save alarm ID to state (to keep it in case of phone orientation change for example)
         outState.putParcelable(INSTANCE_ALARM_ADDRESS_DATA, mMapAddress);
         outState.putInt(INSTANCE_ALARM_ID, mAlarmId);
+        if(mAlarmRingtone != null)
+            outState.putString(INSTANCE_ALARM_RINGTONE, mAlarmRingtone.toString());
         super.onSaveInstanceState(outState);
     }
 
@@ -139,6 +161,7 @@ public class DetailActivity extends AppCompatActivity {
                     }
                     mAlarmId = alarmEntry.getId();
                     mMapAddress = new MapAddress(alarmEntry.getLatitude(), alarmEntry.getLongitude(), alarmEntry.getLocation(), alarmEntry.getRadius());
+                    mAlarmRingtone = alarmEntry.getAlert() != null ? Uri.parse(alarmEntry.getAlert()) : null;
                     // populate the UI
                     populateUI(alarmEntry);
                 }
@@ -180,6 +203,7 @@ public class DetailActivity extends AppCompatActivity {
     private void populateUI(AlarmEntry alarm) {
         mDetailBinding.clockDetails.vibrate.setChecked(alarm.isVibrate());
         mDetailBinding.clockDetails.message.setText(alarm.getMessage());
+        setRingtoneName();
         updateMapImage(true);
     }
 
@@ -202,6 +226,8 @@ public class DetailActivity extends AppCompatActivity {
         float radius = mMapAddress.getRadius();
         double latitude = mMapAddress.getLatitude();
         double longitude = mMapAddress.getLongitude();
+        String ringtone = mAlarmRingtone == null ? getDefaultRingtone().toString() : mAlarmRingtone.toString();
+
         boolean vibrate = mDetailBinding.clockDetails.vibrate.isChecked();
         String message = mDetailBinding.clockDetails.message.getText().toString();
 
@@ -237,10 +263,10 @@ public class DetailActivity extends AppCompatActivity {
         final AlarmEntry alarm;
         if (mAlarmId == DEFAULT_ALARM_ID) {
             alarm = new AlarmEntry(location, latitude, longitude, radius,
-                    enabled, vibrate, message, null);
+                    enabled, vibrate, message, ringtone);
         } else {
             alarm = new AlarmEntry(mAlarmId, location, latitude, longitude, radius,
-                    enabled, vibrate, message, null);
+                    enabled, vibrate, message, ringtone);
         }
         // Save the added/updated alarm entity
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
@@ -269,7 +295,6 @@ public class DetailActivity extends AppCompatActivity {
      */
     private void onOpenMapButtonClicked() {
 
-
         // Create a new intent to start an map activity
         Intent mapIntent =
                 new Intent(DetailActivity.this, MapsActivity.class);
@@ -281,10 +306,60 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
-    // Call Back method to get map details from map activity
+    /**
+     * pick ringtone from default android ringtone selector
+     * Note: this intent doesn't exist on the emulator
+     */
+    public void pickRingtone() {
+        final Uri currentTone = getCurrentRingtone();
+        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, R.string.label_ringtone);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, currentTone);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
+        startActivityForResult(intent, RINGTONE_PICKER_REQUEST_CODE);
+    }
+
+    /**
+     * default ringtone value of android
+     * @return
+     */
+    private Uri getDefaultRingtone(){
+        return RingtoneManager.getActualDefaultRingtoneUri(DetailActivity.this, RingtoneManager.TYPE_ALARM);
+    }
+
+    /**
+     * current could be the saved value when exist or android default
+     * @return
+     */
+    private Uri getCurrentRingtone(){
+        return mAlarmRingtone != null ? mAlarmRingtone : getDefaultRingtone();
+    }
+
+    /**
+     * set the ringtone name from relevant uri -> saved value or default ringtone value
+     */
+    private void setRingtoneName(){
+        //select default ringtone when there isn't ringtone which chose
+        Uri ringtoneUri = getCurrentRingtone();
+        Ringtone ringtone = RingtoneManager.getRingtone(this, ringtoneUri);
+        mDetailBinding.clockDetails.ringtone.setText(ringtone.getTitle(this));
+    }
+
+    /**
+     * return results from activities
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RINGTONE_PICKER_REQUEST_CODE && resultCode == Activity.RESULT_OK ){
+                mAlarmRingtone = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                setRingtoneName();
+        }
         if (requestCode == MAP_REQUEST_CODE) {
             if (data != null && data.hasExtra(EXTRA_ALARM_ADDRESS)) {
                 // get coordinates (from intent)
@@ -292,14 +367,6 @@ public class DetailActivity extends AppCompatActivity {
             }
         }
         updateMapImage(false);
-    }
-
-    //TODO use select ringtone method
-    private void onRingtoneSelect() {
-        Intent intent_upload = new Intent();
-        intent_upload.setType("audio/*");
-        intent_upload.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent_upload, 1);
     }
 
     //=====================//

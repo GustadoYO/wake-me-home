@@ -6,7 +6,6 @@
         android:id="@+id/clock_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/detail_vertical_padding"
         android:paddingLeft="@dimen/detail_horizontal_padding"
         android:paddingRight="@dimen/detail_horizontal_padding"
         android:paddingTop="@dimen/detail_vertical_padding">
@@ -19,15 +18,32 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.4" />
 
-
-        <!-- Alert edit -->
-        <Button
+        <LinearLayout
             android:id="@+id/alert"
             style="@style/DetailEdit"
-            android:hint="@string/edit_alarm_ringtone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:importantForAutofill="no" />
+            app:layout_constraintLeft_toLeftOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_ringtone"
+                android:textStyle="bold"
+                android:textSize="@dimen/detail_activity_font_size"
+                />
+
+            <TextView
+                android:id="@+id/ringtone"
+                android:hint="@string/edit_alarm_ringtone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/detail_activity_font_size"
+                />
+
+        </LinearLayout>
 
         <!-- Message edit -->
         <EditText
