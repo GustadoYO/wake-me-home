@@ -189,7 +189,14 @@ public class DetailActivity extends AppCompatActivity {
      */
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void onSaveButtonClicked() {
-        // Get user inputs
+
+        //check for getting address data from map at all
+        if(mMapAddress == null){
+            Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
         // Parse numeric fields to their appropriate types
         String location = mMapAddress.getLocation();
         float radius = mMapAddress.getRadius();
@@ -197,6 +204,10 @@ public class DetailActivity extends AppCompatActivity {
         double longitude = mMapAddress.getLongitude();
         boolean vibrate = mDetailBinding.clockDetails.vibrate.isChecked();
         String message = mDetailBinding.clockDetails.message.getText().toString();
+
+        /*
+        Validation check
+         */
 
         // Show error and abort save if one of the mandatory fields is empty
         if (radius == 0 || location == null) {
