@@ -4,12 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 
-import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.geofencing.GeofenceManager;
-
-import java.util.List;
 
 /**
  * Listener for events that the system cannot recover the geofences in.
@@ -58,12 +54,7 @@ public class ReRegisterGeofencesJobIntentService extends GeofencingJobIntentServ
 
         // Init the geofence manager if needed
         if (mGeofenceManager == null) {
-
-            // Get all alarms from database
-            LiveData<List<AlarmEntry>> alarms = getAlarmsFromDb();
-            assert alarms != null;
-
-            mGeofenceManager = new GeofenceManager(this, alarms);
+            mGeofenceManager = new GeofenceManager(this, mAlarms);
         }
 
         mGeofenceManager.addGeofences();

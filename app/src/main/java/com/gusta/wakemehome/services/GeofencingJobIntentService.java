@@ -7,10 +7,16 @@ import androidx.lifecycle.LiveData;
 
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
+import com.gusta.wakemehome.viewmodel.MainViewModel;
 
 import java.util.List;
 
 abstract class GeofencingJobIntentService extends JobIntentService {
+
+    // Constant for logging
+    private static final String TAG = MainViewModel.class.getSimpleName();
+
+    protected LiveData<List<AlarmEntry>> mAlarms;
 
     /**
      * Override getter to get specific class tag.
@@ -20,14 +26,12 @@ abstract class GeofencingJobIntentService extends JobIntentService {
     abstract protected String getTag();
 
     /**
-     * Get all alarms from the databse.
-     *
-     * @return Alarms list inside a LiveData object.
+     * Initialize alarms list.
      */
-    protected LiveData<List<AlarmEntry>> getAlarmsFromDb() {
-        // Retrieve the alarms list from the db
-        AppDatabase database = AppDatabase.getInstance(getApplication());
-        Log.d(getTag(), "Actively retrieving the alarms from the DataBase");
-        return database.alarmDao().loadAllAlarms();
+    public GeofencingJobIntentService() {
+        // Retrieve the alarms list from the db into a LiveData object
+        AppDatabase database = AppDatabase.getInstance(this.getApplication());
+        Log.d(TAG, "Actively retrieving the alarms from the DataBase");
+        mAlarms = database.alarmDao().loadAllAlarms();
     }
 }

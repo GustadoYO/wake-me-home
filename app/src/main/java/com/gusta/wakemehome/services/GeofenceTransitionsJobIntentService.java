@@ -6,9 +6,12 @@ import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Observer;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
@@ -41,6 +44,8 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
         return TAG;
     }
 
+    private Observer<List<AlarmEntry>> mObserver;
+
     /**
      * Convenience method for enqueuing work in to this service.
      */
@@ -70,33 +75,8 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
             // Get the geofences that were triggered. A single event can trigger multiple geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
 
-            // Get the closest alarm that triggered
-            AlarmEntry alarm = getRelevantAlarm(geofenceTransition, triggeringGeofences);
-
-
-            //this will sound the alarm tone
-            //this will sound the alarm once, if you wish to
-            //raise alarm in loop continuously then use MediaPlayer and setLooping(true)
-            Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-            if (alarmUri == null) {
-                alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            }
-            Ringtone ringtone = RingtoneManager.getRingtone(this, alarmUri);
-            ringtone.play();
-
-
-
-            // Get the transition details as a string
-            String geofenceTransitionString = getTransitionString(geofenceTransition);
-
-            // Create an explicit content Intent that starts the main Activity.
-            Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
-
-            // Send notification and log the transition details.
-            String NotificationTitle = geofenceTransitionString + " " + alarm.getLocation();
-            NotificationUtils.notifyUser(this, NotificationTitle, alarm.getMessage(),
-                    notificationIntent);
-            Log.i(TAG, NotificationTitle);
+            // Launch the closest alarm that triggered
+            launchRelevantAlarm(triggeringGeofences);
 
         } else {
             // Log the error.
@@ -148,30 +128,75 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
     /**
      * Get the closest alarm that triggered.
      *
-     * @param geofenceTransition  The geofencing transition that occurred
      * @param triggeringGeofences The list of geofences that triggered
      */
-    private AlarmEntry getRelevantAlarm(int geofenceTransition, List<Geofence> triggeringGeofences) {
+    private void launchRelevantAlarm(final List<Geofence> triggeringGeofences) {
 
-        // Get all alarms from database
-        List<AlarmEntry> alarms = getAlarmsFromDb().getValue();
-        assert alarms != null;
+        // Alarms are in LiveData, so observer is needed in order to use them
+        mObserver = new Observer<List<AlarmEntry>>() {
+            @Override
+            public void onChanged(List<AlarmEntry> alarmEntries) {
+                mAlarms.removeObserver(this);
 
-        // Find the closest alarm that triggered
-        AlarmEntry relevantAlarm = null;
-        for (Geofence geofence : triggeringGeofences) {
+                // Find the closest alarm that triggered
+                AlarmEntry relevantAlarm = null;
+                for (Geofence geofence : triggeringGeofences) {
 
-            // The geofence id is the same as the matching alarm id - get the matching alarm
-            AlarmEntry currAlarm =
-                    alarms.get(alarms.indexOf(new AlarmEntry(
-                            Integer.parseInt(geofence.getRequestId()))));
+                    // The geofence id is the same as the matching alarm id - get the matching alarm
+                    AlarmEntry currAlarm =
+                            alarmEntries.get(alarmEntries.indexOf(new AlarmEntry(
+                                    Integer.parseInt(geofence.getRequestId()))));
 
-            // Choose alarm based on radius
-            if (relevantAlarm == null || relevantAlarm.getRadius() > currAlarm.getRadius()) {
-                relevantAlarm = currAlarm;
+                    // Choose alarm based on radius
+                    if (relevantAlarm == null || relevantAlarm.getRadius() > currAlarm.getRadius()) {
+                        relevantAlarm = currAlarm;
+                    }
+                }
+
+                assert relevantAlarm != null;
+                launchAlarm(relevantAlarm);
             }
-        }
+        };
 
-        return relevantAlarm;
+        // 'observeForever(..)' must be called from the main thread
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                mAlarms.observeForever(mObserver);
+            }
+        });
+    }
+
+    private void launchAlarm(AlarmEntry alarm) {
+
+        Log.i(TAG, "Launching alarm: " + alarm.getId());
+
+        //this will sound the alarm tone
+        //this will sound the alarm once, if you wish to
+        //raise alarm in loop continuously then use MediaPlayer and setLooping(true)
+//        Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+//            if (alarmUri == null) {
+//                alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//            }
+        Uri alarmUri = Uri.parse(alarm.getAlert());
+        Ringtone ringtone = RingtoneManager.getRingtone(this, alarmUri);
+        ringtone.play();
+
+        // Get the transition details as a string
+        String geofenceTransitionString = getTransitionString(Geofence.GEOFENCE_TRANSITION_ENTER);
+
+        // Create an explicit content Intent that starts the main Activity.
+        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+
+        // Send notification and log the transition details.
+        String NotificationTitle = geofenceTransitionString + " " + alarm.getLocation();
+        NotificationUtils.notifyUser(this, NotificationTitle, alarm.getMessage(),
+                notificationIntent);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAlarms.removeObserver(mObserver);
     }
 }
