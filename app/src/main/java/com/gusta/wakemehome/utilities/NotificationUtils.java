@@ -20,6 +20,8 @@ import com.gusta.wakemehome.R;
 
 public final class NotificationUtils {
 
+    private static int NOTIFICATION_ID = 0;
+
     //================//
     // PUBLIC METHODS //
     //================//
@@ -103,6 +105,18 @@ public final class NotificationUtils {
         notifyUser(context, mainText, secondaryText, actionText, null, intent);
     }
 
+    /**
+     * Cancels a notification
+     */
+    public static void cancelNotification(Context context) {
+        // Get an instance of the Notification manager
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Cancel notification
+        notificationManager.cancel(NOTIFICATION_ID);
+    }
+
     //=================//
     // PRIVATE METHODS //
     //=================//
@@ -146,7 +160,7 @@ public final class NotificationUtils {
     private static void sendNotification(Context context, String contentTitle, String contentText,
                                          String actionText, Intent intent) {
         // Get an instance of the Notification manager
-        NotificationManager mNotificationManager =
+        NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Android O requires a Notification Channel.
@@ -158,7 +172,7 @@ public final class NotificationUtils {
                             NotificationManager.IMPORTANCE_DEFAULT);
 
             // Set the Notification Channel for the Notification Manager.
-            mNotificationManager.createNotificationChannel(mChannel);
+            notificationManager.createNotificationChannel(mChannel);
         }
 
         // Construct a task stack.
@@ -197,7 +211,7 @@ public final class NotificationUtils {
                     PendingIntent.getBroadcast(context, 0, intent, 0);
             NotificationCompat.Action action = new NotificationCompat.Action.Builder(0,
                     actionText, actionPendingIntent).build();
-            builder.addAction(action);
+            builder.addAction(action).setOngoing(true);
         } else {
 
             // Dismiss notification once the user touches it.
@@ -205,7 +219,7 @@ public final class NotificationUtils {
         }
 
         // Issue the notification
-        mNotificationManager.notify(0, builder.build());
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     /**

@@ -6,6 +6,8 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 
+import com.gusta.wakemehome.utilities.NotificationUtils;
+
 public class NotificationActionsJobIntentService extends JobIntentService {
 
     // Constant for logging
@@ -31,6 +33,7 @@ public class NotificationActionsJobIntentService extends JobIntentService {
     protected void onHandleWork(@NonNull Intent intent) {
         Intent stopIntent = new Intent(this, RingtonePlayingService.class);
         this.stopService(stopIntent);
+        NotificationUtils.cancelNotification(this);
     }
 
 }
