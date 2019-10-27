@@ -30,7 +30,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".maps.MapsActivity"></activity>
+        <activity android:name=".maps.MapsActivity" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -55,7 +55,7 @@
         <!--The manifest entry for our SettingsActivity. Each Activity requires a manifest entry-->
         <activity android:name=".SettingsActivity" />
 
-        <!--The manifest entries for our geofencing receiver and services-->
+        <!--The manifest entry for our geofencing broadcast receiver-->
         <receiver
             android:name=".geofencing.GeofenceBroadcastReceiver"
             android:exported="true"
@@ -66,18 +66,25 @@
             </intent-filter>
         </receiver>
 
+        <!--JobIntentService class to handle geofence transition events-->
         <service
             android:name=".services.GeofenceTransitionsJobIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="true"/>
+
+        <!--JobIntentService class to re-register all geofences from database-->
         <service
             android:name=".services.ReRegisterGeofencesJobIntentService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!--JobIntentService class to handle notification action buttons clicks-->
         <service
             android:name=".services.NotificationActionsJobIntentService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!--Ringtone playing controller service-->
         <service android:name=".services.RingtonePlayingService" />
 
     </application>

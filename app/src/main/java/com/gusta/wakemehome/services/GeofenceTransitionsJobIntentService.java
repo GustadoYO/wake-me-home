@@ -3,12 +3,9 @@ package com.gusta.wakemehome.services;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
@@ -37,12 +34,12 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
     // TODO: Refactor use of constants
     private static final int JOB_ID = 573;
 
+    private List<Geofence> mTriggeringGeofences;
+
     @Override
     protected String getTag() {
         return TAG;
     }
-
-    private Observer<List<AlarmEntry>> mObserver;
 
     /**
      * Convenience method for enqueuing work in to this service.
@@ -71,15 +68,43 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
 
             // Get the geofences that were triggered. A single event can trigger multiple geofences.
-            List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
+            mTriggeringGeofences = geofencingEvent.getTriggeringGeofences();
 
-            // Launch the closest alarm that triggered
-            launchRelevantAlarm(triggeringGeofences);
+            // Load all alarms. When loading will finish, the relevant alarm will be triggered
+            loadAlarms();
 
         } else {
             // Log the error.
             Log.e(TAG, getString(R.string.geofence_transition_invalid_type, geofenceTransition));
         }
+    }
+
+    /**
+     * Get the closest alarm that triggered - and trigger it.
+     */
+    protected void onAlarmsLoaded() {
+        super.onAlarmsLoaded();
+
+        List<AlarmEntry> alarmEntries = mAlarms.getValue();
+        assert alarmEntries != null;
+
+        // Find the closest alarm that triggered
+        AlarmEntry relevantAlarm = null;
+        for (Geofence geofence : mTriggeringGeofences) {
+
+            // The geofence id is the same as the matching alarm id - get the matching alarm
+            AlarmEntry currAlarm =
+                    alarmEntries.get(alarmEntries.indexOf(new AlarmEntry(
+                            Integer.parseInt(geofence.getRequestId()))));
+
+            // Choose alarm based on radius
+            if (relevantAlarm == null || relevantAlarm.getRadius() > currAlarm.getRadius()) {
+                relevantAlarm = currAlarm;
+            }
+        }
+
+        assert relevantAlarm != null;
+        launchAlarm(relevantAlarm);
     }
 
     /**
@@ -124,47 +149,9 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
     }
 
     /**
-     * Get the closest alarm that triggered.
-     *
-     * @param triggeringGeofences The list of geofences that triggered
+     * Launch the given alarm.
+     * @param alarm The alarm to launch.
      */
-    private void launchRelevantAlarm(final List<Geofence> triggeringGeofences) {
-
-        // Alarms are in LiveData, so observer is needed in order to use them
-        mObserver = new Observer<List<AlarmEntry>>() {
-            @Override
-            public void onChanged(List<AlarmEntry> alarmEntries) {
-                mAlarms.removeObserver(this);
-
-                // Find the closest alarm that triggered
-                AlarmEntry relevantAlarm = null;
-                for (Geofence geofence : triggeringGeofences) {
-
-                    // The geofence id is the same as the matching alarm id - get the matching alarm
-                    AlarmEntry currAlarm =
-                            alarmEntries.get(alarmEntries.indexOf(new AlarmEntry(
-                                    Integer.parseInt(geofence.getRequestId()))));
-
-                    // Choose alarm based on radius
-                    if (relevantAlarm == null || relevantAlarm.getRadius() > currAlarm.getRadius()) {
-                        relevantAlarm = currAlarm;
-                    }
-                }
-
-                assert relevantAlarm != null;
-                launchAlarm(relevantAlarm);
-            }
-        };
-
-        // 'observeForever(..)' must be called from the main thread
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                mAlarms.observeForever(mObserver);
-            }
-        });
-    }
-
     private void launchAlarm(AlarmEntry alarm) {
 
         Log.i(TAG, "Launching alarm: " + alarm.getId());
@@ -188,9 +175,4 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
                 getString(R.string.dismiss), intent, true);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mAlarms.removeObserver(mObserver);
-    }
 }
