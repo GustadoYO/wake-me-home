@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
 
@@ -195,7 +194,7 @@ public final class NotificationUtils {
 
         // Define the notification settings.
         builder.setSmallIcon(R.mipmap.ic_launcher)
-                .setColor(Color.RED)
+                .setColor(context.getResources().getColor(R.color.colorPrimary))
                 .setContentTitle(contentTitle)
                 .setContentText(contentText)
                 .setContentIntent(notificationPendingIntent);

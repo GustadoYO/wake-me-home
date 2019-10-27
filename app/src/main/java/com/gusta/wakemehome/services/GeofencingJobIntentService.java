@@ -7,14 +7,13 @@ import androidx.lifecycle.LiveData;
 
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
-import com.gusta.wakemehome.viewmodel.MainViewModel;
 
 import java.util.List;
 
 abstract class GeofencingJobIntentService extends JobIntentService {
 
     // Constant for logging
-    private static final String TAG = MainViewModel.class.getSimpleName();
+    private static final String TAG = GeofencingJobIntentService.class.getSimpleName();
 
     protected LiveData<List<AlarmEntry>> mAlarms;
 

@@ -57,6 +57,7 @@ public class ReRegisterGeofencesJobIntentService extends GeofencingJobIntentServ
             mGeofenceManager = new GeofenceManager(this, mAlarms);
         }
 
+        // TODO: Observe LiveData object to add geofences
         mGeofenceManager.addGeofences();
     }
 }

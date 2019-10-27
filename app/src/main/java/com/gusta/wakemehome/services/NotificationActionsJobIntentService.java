@@ -8,6 +8,9 @@ import androidx.core.app.JobIntentService;
 
 import com.gusta.wakemehome.utilities.NotificationUtils;
 
+/**
+ * JobIntentService class to handle notification action buttons clicks.
+ */
 public class NotificationActionsJobIntentService extends JobIntentService {
 
     // Constant for logging
