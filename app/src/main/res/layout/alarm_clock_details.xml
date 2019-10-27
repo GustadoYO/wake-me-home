@@ -45,6 +45,7 @@
 
         </LinearLayout>
 
+        <!-- TODO handle unlimited length-->
         <!-- Message edit -->
         <EditText
             android:id="@+id/message"
