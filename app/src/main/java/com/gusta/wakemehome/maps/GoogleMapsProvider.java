@@ -253,14 +253,15 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
 
     void updateRadius(float radius) {
 
+        if (radius <= 0) {
+            return;
+        }
+
         //remove the old circle
         if (mMapRadiusCircle != null) {
             mMapRadiusCircle.remove();
         }
-
-        if (radius > 0) {
-            mMapAddress.setRadius(radius);
-        }
+        mMapAddress.setRadius(radius);
 
         LatLng coordinate = mMapAddress.getCoordinates();
 
@@ -314,7 +315,6 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
                 fileUtils.createTempMapImage(snapshot);
             }
         };
-
         mMap.snapshot(callback);
     }
 

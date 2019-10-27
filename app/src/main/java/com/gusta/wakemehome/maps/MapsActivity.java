@@ -2,6 +2,7 @@ package com.gusta.wakemehome.maps;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -76,7 +77,7 @@ public class MapsActivity extends AppCompatActivity {
         mUpdateLocationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 MapAddress address = mMapProvider.getMapAddress();
-                if (address != null && address.isValidEntry()) {
+                if (address != null && address.getRadius() > 0) {
                     Intent intent = new Intent(MapsActivity.this, DetailActivity.class);
                     intent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, address);
                     setResult(1, intent);

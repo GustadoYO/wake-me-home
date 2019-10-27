@@ -236,7 +236,7 @@ public class DetailActivity extends AppCompatActivity {
          */
 
         // Show error and abort save if one of the mandatory fields is empty
-        if (radius == 0 || location == null) {
+        if (radius <= 0 || location == null) {
             Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT)
                     .show();
             return;
@@ -298,7 +298,7 @@ public class DetailActivity extends AppCompatActivity {
         // Create a new intent to start an map activity
         Intent mapIntent =
                 new Intent(DetailActivity.this, MapsActivity.class);
-        if (mMapAddress != null && mMapAddress.getLocation() != null && mMapAddress.getRadius() > 0) {
+        if (mMapAddress != null && mMapAddress.getLocation() != null && mMapAddress.getRadius() >= 0) {
             MapAddress mapAddress = new MapAddress(mMapAddress.getLatitude(), mMapAddress.getLongitude(), mMapAddress.getLocation(), mMapAddress.getRadius());
             mapIntent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, mapAddress);
         }
