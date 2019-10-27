@@ -12,18 +12,17 @@ import java.io.IOException;
 import static com.gusta.wakemehome.utilities.Constants.MAPS_DIR;
 import static com.gusta.wakemehome.utilities.Constants.TEMP_IMAGE_FILE_NAME;
 
-public class fileUtils {
+public final class FileUtils {
 
     // Constant for logging
-    private static final String TAG = fileUtils.class.getSimpleName();
+    private static final String TAG = FileUtils.class.getSimpleName();
 
     //locate to hold the maps images in our appData
     private static String mapImageFileDir;
 
-    /**
-     * Public methods
-     */
-
+    //================//
+    // PUBLIC METHODS //
+    //================//
 
     /**
      * set the local map directory in app data for image saving
@@ -84,15 +83,12 @@ public class fileUtils {
      */
     public static boolean isPathExists(String path){
         File source = new File(path);
-        if (source.exists()) {
-            return true;
-        }
-        return false;
+        return source.exists();
     }
 
-    /**
-     * Private Section
-     */
+    //=================//
+    // PRIVATE METHODS //
+    //=================//
 
     /**
      * save image to path
