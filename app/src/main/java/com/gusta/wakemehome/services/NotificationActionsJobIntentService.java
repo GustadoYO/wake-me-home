@@ -2,10 +2,12 @@ package com.gusta.wakemehome.services;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 
+import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.NotificationUtils;
 
 /**
@@ -34,9 +36,19 @@ public class NotificationActionsJobIntentService extends JobIntentService {
      */
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
-        Intent stopIntent = new Intent(this, RingtonePlayingService.class);
-        this.stopService(stopIntent);
+        String action = intent.getAction();
+        Log.d(TAG, "action is: " + action);
+        assert action != null;
+
+        if (action.equals(Constants.ACTION_DISMISS_ALARM)) {
+            Intent stopIntent = new Intent(this, RingtonePlayingService.class);
+            this.stopService(stopIntent);
+        } else if (action.equals(Constants.ACTION_OPEN_SETTINGS)) {
+            Intent settingsIntent =
+                    new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(settingsIntent);
+        }
+
         NotificationUtils.cancelNotification(this);
     }
-
 }

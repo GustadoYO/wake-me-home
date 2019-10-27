@@ -197,7 +197,7 @@ public final class NotificationUtils {
 
         // Define the notification settings.
         builder.setSmallIcon(R.mipmap.ic_launcher)
-                .setColor(context.getResources().getColor(R.color.colorPrimary))
+                .setColor(context.getResources().getColor(R.color.colorAccent))
                 .setContentTitle(contentTitle)
                 .setContentText(contentText)
                 .setContentIntent(notificationPendingIntent)
