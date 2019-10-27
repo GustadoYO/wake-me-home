@@ -38,7 +38,8 @@ public final class NotificationUtils {
      * @param text    The message text.
      */
     public static void notifyUser(Context context, String text) {
-        notifyUser(context, text, null, null, null, null);
+        notifyUser(context, text, null, null, null, null,
+                false);
     }
 
     /**
@@ -54,7 +55,7 @@ public final class NotificationUtils {
     public static void notifyUser(Activity activity, int mainTextStringId, int actionTextStringId,
                                   View.OnClickListener listener) {
         notifyUser(activity, activity.getString(mainTextStringId), null,
-                activity.getString(actionTextStringId), listener, null);
+                activity.getString(actionTextStringId), listener, null, false);
     }
 
     /**
@@ -67,7 +68,8 @@ public final class NotificationUtils {
      * @param secondaryText The message's secondary text.
      */
     public static void notifyUser(Service service, String mainText, String secondaryText) {
-        notifyUser(service, mainText, secondaryText, null, null, null);
+        notifyUser(service, mainText, secondaryText, null, null, null,
+                false);
     }
 
     /**
@@ -83,10 +85,10 @@ public final class NotificationUtils {
      */
     public static void notifyUser(final Context context, int mainTextStringId,
                                   int secondaryTextStringId, int actionTextStringId,
-                                  final Intent intent) {
+                                  final Intent intent, boolean setOngoing) {
         notifyUser(context, context.getString(mainTextStringId),
                 context.getString(secondaryTextStringId), context.getString(actionTextStringId),
-                null, intent);
+                null, intent, setOngoing);
     }
 
     /**
@@ -101,8 +103,8 @@ public final class NotificationUtils {
      * @param intent        Intent to be called when message is pressed.
      */
     public static void notifyUser(final Context context, String mainText, String secondaryText,
-                                  String actionText, final Intent intent) {
-        notifyUser(context, mainText, secondaryText, actionText, null, intent);
+                                  String actionText, final Intent intent, boolean setOngoing) {
+        notifyUser(context, mainText, secondaryText, actionText, null, intent, setOngoing);
     }
 
     /**
@@ -133,7 +135,7 @@ public final class NotificationUtils {
      */
     private static void notifyUser(final Context context, String mainText, String secondaryText,
                                    String actionText, View.OnClickListener listener,
-                                   final Intent intent) {
+                                   final Intent intent, boolean setOngoing) {
 
         // If the context is an activity, the message can be shown on the screen (with a snackbar)
         if (context instanceof Activity) {
@@ -146,7 +148,7 @@ public final class NotificationUtils {
             showSnackbar((Activity) context, mainText, actionText, listener);
         }
         // If the context is not an activity, we have to use a notification so notify the user
-        else sendNotification(context, mainText, secondaryText, actionText, intent);
+        else sendNotification(context, mainText, secondaryText, actionText, intent, setOngoing);
     }
 
     /**
@@ -156,9 +158,10 @@ public final class NotificationUtils {
      * @param contentText   Notification's text
      * @param actionText    The text of the action item.
      * @param intent        Intent to be called when notification is pressed
+     * @param setOngoing    Should the notification persist when swiped?
      */
     private static void sendNotification(Context context, String contentTitle, String contentText,
-                                         String actionText, Intent intent) {
+                                         String actionText, Intent intent, boolean setOngoing) {
         // Get an instance of the Notification manager
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -198,7 +201,8 @@ public final class NotificationUtils {
                 .setColor(Color.RED)
                 .setContentTitle(contentTitle)
                 .setContentText(contentText)
-                .setContentIntent(notificationPendingIntent);
+                .setContentIntent(notificationPendingIntent)
+                .setAutoCancel(!setOngoing).setOngoing(setOngoing);
 
         // Set the Channel ID for Android O.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -211,11 +215,7 @@ public final class NotificationUtils {
                     PendingIntent.getBroadcast(context, 0, intent, 0);
             NotificationCompat.Action action = new NotificationCompat.Action.Builder(0,
                     actionText, actionPendingIntent).build();
-            builder.addAction(action).setOngoing(true);
-        } else {
-
-            // Dismiss notification once the user touches it.
-            builder.setAutoCancel(true);
+            builder.addAction(action);
         }
 
         // Issue the notification

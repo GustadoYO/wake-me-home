@@ -101,8 +101,8 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
                     getString(R.string.geofence_not_available_title),
                     getString(R.string.geofence_not_available_text),
                     getString(R.string.settings),
-                    new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-            );
+                    new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS),
+                    false);
         }
     }
 
@@ -185,7 +185,7 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
 
         // Send notification and log the transition details.
         NotificationUtils.notifyUser(this, NotificationTitle, alarm.getMessage(),
-                getString(R.string.dismiss), intent);
+                getString(R.string.dismiss), intent, true);
     }
 
     @Override
