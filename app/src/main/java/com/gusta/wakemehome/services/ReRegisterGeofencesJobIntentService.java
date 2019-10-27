@@ -57,7 +57,19 @@ public class ReRegisterGeofencesJobIntentService extends GeofencingJobIntentServ
             mGeofenceManager = new GeofenceManager(this, mAlarms);
         }
 
-        // TODO: Observe LiveData object to add geofences
+        // Load all alarms. When loading will finish, the relevant geofences will be added
+        loadAlarms();
+
+    }
+
+    /**
+     * Re-register all geofences.
+     */
+    @Override
+    protected void onAlarmsLoaded() {
+        super.onAlarmsLoaded();
+
+        // Re-register all geofences.
         mGeofenceManager.addGeofences();
     }
 }
