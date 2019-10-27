@@ -1,5 +1,6 @@
 package com.gusta.wakemehome.database;
 
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -24,6 +25,11 @@ public class AlarmEntry implements GeofenceEntry {
     private String alert;       // Audio alert to play when alarm triggers
 
     @Ignore
+    public AlarmEntry(int id) {
+        this.id = id;
+    }
+
+    @Ignore
     public AlarmEntry(String location, double latitude, double longitude, float radius,
                       boolean enabled, boolean vibrate, String message, String alert) {
         this.location = location;
@@ -35,6 +41,7 @@ public class AlarmEntry implements GeofenceEntry {
         this.message = message;
         this.alert = alert;
     }
+
     public AlarmEntry(int id, String location, double latitude, double longitude, float radius,
                       boolean enabled, boolean vibrate, String message, String alert) {
         this.id = id;
@@ -120,4 +127,16 @@ public class AlarmEntry implements GeofenceEntry {
         this.alert = alert;
     }
 
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        AlarmEntry alarm = (AlarmEntry) obj;
+        return id == alarm.id;
+    }
 }

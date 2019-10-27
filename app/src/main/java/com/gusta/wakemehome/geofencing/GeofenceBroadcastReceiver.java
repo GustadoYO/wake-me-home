@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.util.Log;
 
-import com.gusta.wakemehome.ReRegisterGeofencesJobIntentService;
+import com.gusta.wakemehome.services.GeofenceTransitionsJobIntentService;
+import com.gusta.wakemehome.services.NotificationActionsJobIntentService;
+import com.gusta.wakemehome.services.ReRegisterGeofencesJobIntentService;
 import com.gusta.wakemehome.utilities.Constants;
 
 /**
@@ -41,6 +43,9 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         if (action.equals(Intent.ACTION_BOOT_COMPLETED) ||
                 action.equals(LocationManager.PROVIDERS_CHANGED_ACTION)) {
             ReRegisterGeofencesJobIntentService.enqueueWork(context, intent);
+        }
+        if (action.equals(Constants.ACTION_DISMISS_ALARM)) {
+            NotificationActionsJobIntentService.enqueueWork(context, intent);
         }
     }
 }

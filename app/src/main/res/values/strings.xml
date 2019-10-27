@@ -109,7 +109,7 @@
     </string>
 
     <!-- Transition type strings -->
-    <string name="geofence_transition_entered">Entered</string>
+    <string name="geofence_transition_entered">You are approaching</string>
     <string name="geofence_transition_exited">Exited</string>
     <string name="unknown_geofence_transition">Unknown Transition</string>
 
@@ -131,6 +131,8 @@
     <string name="permission_denied_explanation">
         Location permission wad denied - ALARMS WILL NOT TRIGGER!
     </string>
+
     <string name="settings">Settings</string>
+    <string name="dismiss">dismiss</string>
 
 </resources>

@@ -10,6 +10,7 @@ public final class Constants {
     // TODO: Refactor use of constants
     public static final String ACTION_GEOFENCE_TRANSITION_OCCURRED =
             PACKAGE_NAME + ".ACTION_GEOFENCE_TRANSITION_OCCURRED";
+    public static final String ACTION_DISMISS_ALARM = PACKAGE_NAME + ".ACTION_DISMISS_ALARM";
 
     public static final String CHANNEL_ID = "channel_01";
 
