@@ -74,7 +74,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
             @Override
             public void onPlaceSelected(Place place) {
 
-                LatLng cord = MapAddress.getCoordinatesAddress(mGeocoder, place.getName());
+                LatLng cord = MapDestination.getCoordinatesAddress(mGeocoder, place.getName());
                 setMarker(cord);
                 Log.d(TAG, "Place: " + place.getName() + ", " + place.getId());
             }
@@ -110,13 +110,13 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
             public void onMapClick(LatLng coordinates) {
 
                 setMarker(coordinates);
-                updateRadius(mMapAddress.getRadius());
+                updateRadius(mMapDestination.getRadius());
 
             }
         });
 
         // Check for first time and it's not came from detail activity
-        if (isFirstUsage && mMapAddress == null) {
+        if (isFirstUsage && mMapDestination == null) {
 
             // Set is not first time for next usage
             isFirstUsage = false;
@@ -132,8 +132,8 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
 
         } else {
 
-            setMarker(mMapAddress.getCoordinates());
-            updateRadius(mMapAddress.getRadius());
+            setMarker(mMapDestination.getCoordinates());
+            updateRadius(mMapDestination.getRadius());
 
         }
 
@@ -146,14 +146,14 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         // Setting the position for the marker
         markerOptions.position(coordinate);
 
-        if (mMapAddress == null) {
-            mMapAddress = new MapAddress(coordinate, 0, mGeocoder);
+        if (mMapDestination == null) {
+            mMapDestination = new MapDestination(coordinate, 0, mGeocoder);
         } else {
-            mMapAddress.setCoordinates(coordinate, mGeocoder);
+            mMapDestination.setCoordinates(coordinate, mGeocoder);
         }
         // Setting the title for the marker.
         // This will be displayed on taping the marker
-        markerOptions.title(mMapAddress.getLocation());
+        markerOptions.title(mMapDestination.getLocation());
 
         // Clears the previously touched position
         mMap.clear();
@@ -261,9 +261,9 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         if (mMapRadiusCircle != null) {
             mMapRadiusCircle.remove();
         }
-        mMapAddress.setRadius(radius);
+        mMapDestination.setRadius(radius);
 
-        LatLng coordinate = mMapAddress.getCoordinates();
+        LatLng coordinate = mMapDestination.getCoordinates();
 
         // Instantiating CircleOptions to draw a circle around the marker
         CircleOptions circleOptions = new CircleOptions();

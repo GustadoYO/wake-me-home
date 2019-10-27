@@ -27,7 +27,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
-import com.gusta.wakemehome.maps.MapAddress;
+import com.gusta.wakemehome.maps.MapDestination;
 import com.gusta.wakemehome.maps.MapsActivity;
 import com.gusta.wakemehome.utilities.fileUtils;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
@@ -69,7 +69,7 @@ public class DetailActivity extends AppCompatActivity {
     // MEMBERS //
     //=========//
 
-    private MapAddress mMapAddress;                 // The current alarm address
+    private MapDestination mMapDestination;                 // The current alarm address
     private int mAlarmId;                           // The current alarm id
     private Uri mAlarmRingtone;                     // The current alarm ringtone
     private DetailViewModel mViewModel;             // The current alarm view model
@@ -114,7 +114,7 @@ public class DetailActivity extends AppCompatActivity {
             if (savedInstanceState.containsKey(INSTANCE_ALARM_ID))
                 mAlarmId = savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID);
             if (savedInstanceState.containsKey(INSTANCE_ALARM_ADDRESS_DATA)) {
-                mMapAddress = savedInstanceState.getParcelable(INSTANCE_ALARM_ADDRESS_DATA);
+                mMapDestination = savedInstanceState.getParcelable(INSTANCE_ALARM_ADDRESS_DATA);
             }
             if (savedInstanceState.containsKey(INSTANCE_ALARM_RINGTONE)) {
                 mAlarmRingtone = Uri.parse(savedInstanceState.getString(INSTANCE_ALARM_RINGTONE));
@@ -133,7 +133,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // Save alarm ID to state (to keep it in case of phone orientation change for example)
-        outState.putParcelable(INSTANCE_ALARM_ADDRESS_DATA, mMapAddress);
+        outState.putParcelable(INSTANCE_ALARM_ADDRESS_DATA, mMapDestination);
         outState.putInt(INSTANCE_ALARM_ID, mAlarmId);
         if(mAlarmRingtone != null)
             outState.putString(INSTANCE_ALARM_RINGTONE, mAlarmRingtone.toString());
@@ -160,7 +160,7 @@ public class DetailActivity extends AppCompatActivity {
                         return;
                     }
                     mAlarmId = alarmEntry.getId();
-                    mMapAddress = new MapAddress(alarmEntry.getLatitude(), alarmEntry.getLongitude(), alarmEntry.getLocation(), alarmEntry.getRadius());
+                    mMapDestination = new MapDestination(alarmEntry.getLatitude(), alarmEntry.getLongitude(), alarmEntry.getLocation(), alarmEntry.getRadius());
                     mAlarmRingtone = alarmEntry.getAlert() != null ? Uri.parse(alarmEntry.getAlert()) : null;
                     // populate the UI
                     populateUI(alarmEntry);
@@ -215,17 +215,17 @@ public class DetailActivity extends AppCompatActivity {
     public void onSaveButtonClicked() {
 
         //check for getting address data from map at all
-        if(mMapAddress == null){
+        if(mMapDestination == null){
             Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT)
                     .show();
             return;
         }
 
         // Parse numeric fields to their appropriate types
-        String location = mMapAddress.getLocation();
-        float radius = mMapAddress.getRadius();
-        double latitude = mMapAddress.getLatitude();
-        double longitude = mMapAddress.getLongitude();
+        String location = mMapDestination.getLocation();
+        float radius = mMapDestination.getRadius();
+        double latitude = mMapDestination.getLatitude();
+        double longitude = mMapDestination.getLongitude();
         String ringtone = mAlarmRingtone == null ? getDefaultRingtone().toString() : mAlarmRingtone.toString();
 
         boolean vibrate = mDetailBinding.clockDetails.vibrate.isChecked();
@@ -298,9 +298,9 @@ public class DetailActivity extends AppCompatActivity {
         // Create a new intent to start an map activity
         Intent mapIntent =
                 new Intent(DetailActivity.this, MapsActivity.class);
-        if (mMapAddress != null && mMapAddress.getLocation() != null && mMapAddress.getRadius() >= 0) {
-            MapAddress mapAddress = new MapAddress(mMapAddress.getLatitude(), mMapAddress.getLongitude(), mMapAddress.getLocation(), mMapAddress.getRadius());
-            mapIntent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, mapAddress);
+        if (mMapDestination != null && mMapDestination.getLocation() != null && mMapDestination.getRadius() >= 0) {
+            MapDestination mapDestination = new MapDestination(mMapDestination.getLatitude(), mMapDestination.getLongitude(), mMapDestination.getLocation(), mMapDestination.getRadius());
+            mapIntent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, mapDestination);
         }
         startActivityForResult(mapIntent, MAP_REQUEST_CODE);
 
@@ -363,7 +363,7 @@ public class DetailActivity extends AppCompatActivity {
         if (requestCode == MAP_REQUEST_CODE) {
             if (data != null && data.hasExtra(EXTRA_ALARM_ADDRESS)) {
                 // get coordinates (from intent)
-                mMapAddress = data.getParcelableExtra(EXTRA_ALARM_ADDRESS);
+                mMapDestination = data.getParcelableExtra(EXTRA_ALARM_ADDRESS);
             }
         }
         updateMapImage(false);
