@@ -23,10 +23,8 @@ public class MapsActivity extends AppCompatActivity {
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final String INSTANCE_MAPS_ADDRESS_DATA = "instanceMapsAddressData";
 
-    private Button mUpdateLocationButton;
     private MapProvider mMapProvider;
     private TextView mRadiusText;
-    private SeekBar mRadiusSlider;
     private Toast toast;
 
     @Override
@@ -38,7 +36,7 @@ public class MapsActivity extends AppCompatActivity {
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mRadiusSlider = findViewById(R.id.radius_slider);
+        SeekBar radiusSlider = findViewById(R.id.radius_slider);
         mRadiusText = findViewById(R.id.seekBarInfoTextView);
         mMapProvider = new GoogleMapsProvider(this);
 
@@ -49,7 +47,7 @@ public class MapsActivity extends AppCompatActivity {
             assert address != null;
             mMapProvider.setMapDestination(address);
             float radius = address.getRadius();
-            mRadiusSlider.setProgress((int) radius);
+            radiusSlider.setProgress((int) radius);
             mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         }
         Intent intent = getIntent();
@@ -58,12 +56,12 @@ public class MapsActivity extends AppCompatActivity {
             mMapProvider.setMapDestination(address);
 
             float radius = address.getRadius();
-            mRadiusSlider.setProgress((int) radius);
+            radiusSlider.setProgress((int) radius);
             mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         }
 
 
-        mRadiusSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        radiusSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 changeRadius(seekBar);
             }
@@ -75,12 +73,11 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
-        mUpdateLocationButton = findViewById(R.id.updateLocation);
-        mUpdateLocationButton.setOnClickListener(new View.OnClickListener() {
+        Button updateLocationButton = findViewById(R.id.updateLocation);
+        updateLocationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 MapDestination address = mMapProvider.getMapDestination();
                 if (address != null && address.getRadius() > 0) {
-                    // TODO: Class should not use DetailActivity class explicitly
                     Intent intent = new Intent();
                     intent.putExtra(Constants.EXTRA_ALARM_DESTINATION, address);
                     setResult(1, intent);
