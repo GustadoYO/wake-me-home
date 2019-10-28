@@ -87,6 +87,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         holder.locationElement.setText(location);
         holder.messageElement.setText(message);
         holder.enabledElement.setText(radius);
+
+        //remove checked handler for re register change listener
+        holder.enabledElement.setOnCheckedChangeListener(null);
         holder.enabledElement.setChecked(enabled);
         holder.enabledElement.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

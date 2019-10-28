@@ -18,6 +18,8 @@
     <dimen name="detail_activity_margin">14dp</dimen>
     <dimen name="detail_activity_padding">10dp</dimen>
 
+    <dimen name="main_activity_recycle_last_element_padding">60dp</dimen>
+
     <!--TODO remove progress bar-->
     <!-- Loading indicator dimens -->
     <dimen name="loading_indicator_size">42dp</dimen>

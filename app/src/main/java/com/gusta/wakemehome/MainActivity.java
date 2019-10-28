@@ -82,6 +82,15 @@ public class MainActivity extends AppCompatActivity implements
          */
         mRecyclerView.setHasFixedSize(true);
 
+
+        /*
+         * floating action button hide the last item so adding padding
+         * enable last element to be able to display .
+         */
+        mRecyclerView.setClipToPadding(false);
+        mRecyclerView.setPadding(0,0,0,
+                getResources().getDimensionPixelOffset(R.dimen.main_activity_recycle_last_element_padding));
+
         // Initialize the adapter and attach it to the RecyclerView
         mAdapter = new AlarmAdapter(this, this);
         mRecyclerView.setAdapter(mAdapter);
