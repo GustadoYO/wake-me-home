@@ -169,6 +169,7 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
 
         // Create the dismiss button intent
         Intent intent = new Intent(this, AppBroadcastReceiver.class);
+        intent.putExtra(Constants.EXTRA_ALARM_ID, alarm.getId());
         intent.setAction(Constants.ACTION_DISMISS_ALARM);
 
         // Send notification and log the transition details.

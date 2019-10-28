@@ -47,8 +47,7 @@ public class DetailActivity extends AppCompatActivity {
 
     // Constant for logging
     private static final String TAG = DetailActivity.class.getSimpleName();
-    //default value for alarm id
-    private static final int DEFAULT_ALARM_ID = -1;
+
     // save alarm ID to be received after rotation
     private static final String INSTANCE_ALARM_ID = "instanceAlarmId";
     // save alarm alert to be received after rotation
@@ -81,7 +80,7 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAlarmId = DEFAULT_ALARM_ID;
+        mAlarmId = Constants.DEFAULT_ALARM_ID;
 
         mDb = AppDatabase.getInstance(this);
 
@@ -109,7 +108,7 @@ public class DetailActivity extends AppCompatActivity {
         // Check for saved state (like after phone orientation change) - and load it
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(INSTANCE_ALARM_ID))
-                mAlarmId = savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID);
+                mAlarmId = savedInstanceState.getInt(INSTANCE_ALARM_ID, Constants.DEFAULT_ALARM_ID);
             if (savedInstanceState.containsKey(INSTANCE_ALARM_ADDRESS_DATA)) {
                 mMapDestination = savedInstanceState.getParcelable(INSTANCE_ALARM_ADDRESS_DATA);
             }
@@ -139,9 +138,9 @@ public class DetailActivity extends AppCompatActivity {
 
     private void setAlarmData(Intent intent) {
         // If member alarm is new and there is ID from intent it should load from db
-        if (mAlarmId == DEFAULT_ALARM_ID) {
+        if (mAlarmId == Constants.DEFAULT_ALARM_ID) {
 
-            mAlarmId = intent.getIntExtra(Constants.EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
+            mAlarmId = intent.getIntExtra(Constants.EXTRA_ALARM_ID, Constants.DEFAULT_ALARM_ID);
             // factory view model is used for sending parameters to the view model in our case
             // with alarm entry id to make sure we have one entity on our viewModel
             DetailViewModelFactory factory = new DetailViewModelFactory(mDb, mAlarmId);
@@ -157,11 +156,11 @@ public class DetailActivity extends AppCompatActivity {
                         return;
                     }
                     mAlarmId = alarmEntry.getId();
-                    mMapDestination = 
-                      new MapDestination(alarmEntry.getLatitude(), alarmEntry.getLongitude(), 
+                    mMapDestination =
+                            new MapDestination(alarmEntry.getLatitude(), alarmEntry.getLongitude(),
                                          alarmEntry.getLocation(), alarmEntry.getRadius());
                     mAlarmRingtone = alarmEntry.getAlert() != null ? Uri.parse(alarmEntry.getAlert()) : null;
-                  
+
                     // populate the UI
                     populateUI(alarmEntry);
                 }
@@ -217,7 +216,8 @@ public class DetailActivity extends AppCompatActivity {
 
         //check for getting address data from map at all
         if(mMapDestination == null){
-            Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT)
+            Toast.makeText(getApplicationContext(),
+                    R.string.error_mandatory, Toast.LENGTH_SHORT)
                     .show();
             return;
         }
@@ -227,7 +227,7 @@ public class DetailActivity extends AppCompatActivity {
         float radius = mMapDestination.getRadius();
         double latitude = mMapDestination.getLatitude();
         double longitude = mMapDestination.getLongitude();
-        String ringtone = 
+        String ringtone =
           mAlarmRingtone == null ? getDefaultRingtone().toString() : mAlarmRingtone.toString();
 
         boolean vibrate = mDetailBinding.clockDetails.vibrate.isChecked();
@@ -239,8 +239,9 @@ public class DetailActivity extends AppCompatActivity {
 
         // Show error and abort save if one of the mandatory fields is empty
         if (radius <= 0 || location == null) {
-            Toast.makeText(getApplicationContext(), 
-                           R.string.error_mandatory, Toast.LENGTH_SHORT)
+            Toast.makeText(getApplicationContext(),
+                    R.string.error_mandatory,
+                    Toast.LENGTH_SHORT)
                     .show();
             return;
         }
@@ -264,7 +265,7 @@ public class DetailActivity extends AppCompatActivity {
         // Save the added/updated alarm entity
         //TODO add alert
         final AlarmEntry alarm;
-        if (mAlarmId == DEFAULT_ALARM_ID) {
+        if (mAlarmId == Constants.DEFAULT_ALARM_ID) {
             alarm = new AlarmEntry(location, latitude, longitude, radius,
                     enabled, vibrate, message, ringtone);
         } else {
@@ -275,7 +276,7 @@ public class DetailActivity extends AppCompatActivity {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                if (mAlarmId == DEFAULT_ALARM_ID) {
+                if (mAlarmId == Constants.DEFAULT_ALARM_ID) {
                     mAlarmId = (int) mDb.alarmDao().insertAlarm(alarm);
                 } else {
                     mDb.alarmDao().updateAlarm(alarm);
@@ -301,11 +302,12 @@ public class DetailActivity extends AppCompatActivity {
         // Create a new intent to start an map activity
         Intent mapIntent =
                 new Intent(DetailActivity.this, MapsActivity.class);
-        if (mMapDestination != null && mMapDestination.getLocation() != null && 
+        if (mMapDestination != null && mMapDestination.getLocation() != null &&
             mMapDestination.getRadius() >= 0) {
-            MapDestination mapDestination = 
-              new MapDestination(mMapDestination.getLatitude(), mMapDestination.getLongitude(), 
-                                 mMapDestination.getLocation(), mMapDestination.getRadius());
+            MapDestination mapDestination =
+                    new MapDestination(mMapDestination.getLatitude(),
+                            mMapDestination.getLongitude(), mMapDestination.getLocation(),
+                            mMapDestination.getRadius());
             mapIntent.putExtra(Constants.EXTRA_ALARM_DESTINATION, mapDestination);
         }
         startActivityForResult(mapIntent, MAP_REQUEST_CODE);

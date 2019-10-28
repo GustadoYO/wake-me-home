@@ -19,6 +19,9 @@ public final class Constants {
     public static final String EXTRA_RINGTONE_URI = "extraRingtoneUri"; // GeofenceTransitionsJobIntentService to RingtonePlayingService
     public static final String EXTRA_SHOULD_VIBRATE = "extraShouldVibrate"; // GeofenceTransitionsJobIntentService to RingtonePlayingService
 
+    // Default values
+    public static final int DEFAULT_ALARM_ID = -1;
+
     // Channels
     public static final String CHANNEL_ID = "channel_01";
 

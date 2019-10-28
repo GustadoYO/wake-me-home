@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 
+import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.NotificationUtils;
 
@@ -41,6 +42,9 @@ public class NotificationActionsJobIntentService extends JobIntentService {
         assert action != null;
 
         if (action.equals(Constants.ACTION_DISMISS_ALARM)) {
+            int id = intent.getIntExtra(Constants.EXTRA_ALARM_ID, Constants.DEFAULT_ALARM_ID);
+            AppDatabase database = AppDatabase.getInstance(this.getApplication());
+            database.alarmDao().updateAlarmEnabled(id, false);
             Intent stopIntent = new Intent(this, RingtonePlayingService.class);
             this.stopService(stopIntent);
         } else if (action.equals(Constants.ACTION_OPEN_SETTINGS)) {

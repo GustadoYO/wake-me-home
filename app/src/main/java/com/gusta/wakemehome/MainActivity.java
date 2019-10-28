@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                mDb.alarmDao().updateAlarm(alarm);
+                mDb.alarmDao().updateAlarmEnabled(alarm.getId(), alarm.isEnabled());
             }
         });
     }
