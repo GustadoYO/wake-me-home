@@ -30,8 +30,8 @@ import com.gusta.wakemehome.utilities.PermissionUtils;
 
 import java.util.Arrays;
 
-//TODO refactor user permissions from global utils
-public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallback, PermissionUtils.PendingTaskHandler {
+public class GoogleMapsProvider extends MapProvider
+        implements OnMapReadyCallback, PermissionUtils.PendingTaskHandler {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final int CIRCLE_WIDTH = 6;
@@ -50,22 +50,27 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
     public GoogleMapsProvider(MapsActivity mapsActivity) {
         super(mapsActivity);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) mMapsActivity.getSupportFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) mMapsActivity.getSupportFragmentManager().
+                        findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
         // Initialize Places.
-        Places.initialize(mMapsActivity.getApplicationContext(), mMapsActivity.getString(R.string.google_maps_key));
+        Places.initialize(mMapsActivity.getApplicationContext(),
+                mMapsActivity.getString(R.string.google_maps_key));
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(mMapsActivity);
 
         // Construct a FusedLocationProviderClient.
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mMapsActivity);
+        mFusedLocationProviderClient =
+                LocationServices.getFusedLocationProviderClient(mMapsActivity);
 
 
         // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-                mMapsActivity.getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        AutocompleteSupportFragment autocompleteFragment =
+                (AutocompleteSupportFragment) mMapsActivity.getSupportFragmentManager().
+                        findFragmentById(R.id.autocomplete_fragment);
         assert autocompleteFragment != null;
 
         // Specify the types of place data to return.
