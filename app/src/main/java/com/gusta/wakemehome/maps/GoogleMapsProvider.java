@@ -76,9 +76,12 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
             @Override
             public void onPlaceSelected(@NonNull Place place) {
 
-                LatLng cord = MapDestination.getCoordinatesAddress(mGeocoder, place.getName());
-                setMarker(cord);
                 Log.d(TAG, "Place: " + place.getName() + ", " + place.getId());
+                LatLng coordinates = MapDestination.getCoordinatesAddress(mGeocoder, place.getName());
+                if(coordinates != null)
+                    setMarker(coordinates);
+                if(mMapDestination != null)
+                    updateRadius(mMapDestination.getRadius());
             }
 
             @Override
