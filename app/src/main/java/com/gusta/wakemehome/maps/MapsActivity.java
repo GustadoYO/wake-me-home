@@ -12,23 +12,19 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.gusta.wakemehome.DetailActivity;
 import com.gusta.wakemehome.R;
+import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.FileUtils;
 import com.gusta.wakemehome.utilities.UnitsUtils;
-
-import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_ADDRESS;
 
 
 public class MapsActivity extends AppCompatActivity {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
-    public static final String INSTANCE_MAPS_ADDRESS_DATA = "instanceMapsAddressData";
+    private static final String INSTANCE_MAPS_ADDRESS_DATA = "instanceMapsAddressData";
 
-    private Button mUpdateLocationButton;
     private MapProvider mMapProvider;
     private TextView mRadiusText;
-    private SeekBar mRadiusSlider;
     private Toast toast;
 
     @Override
@@ -40,31 +36,32 @@ public class MapsActivity extends AppCompatActivity {
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mRadiusSlider = findViewById(R.id.radius_slider);
+        SeekBar radiusSlider = findViewById(R.id.radius_slider);
         mRadiusText = findViewById(R.id.seekBarInfoTextView);
         mMapProvider = new GoogleMapsProvider(this);
 
         // Check for saved state (like after phone orientation change) - and load it
-        if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_MAPS_ADDRESS_DATA)) {
+        if (savedInstanceState != null &&
+                savedInstanceState.containsKey(INSTANCE_MAPS_ADDRESS_DATA)) {
             MapDestination address = savedInstanceState.getParcelable(INSTANCE_MAPS_ADDRESS_DATA);
             assert address != null;
             mMapProvider.setMapDestination(address);
             float radius = address.getRadius();
-            mRadiusSlider.setProgress((int) radius);
+            radiusSlider.setProgress((int) radius);
             mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         }
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(EXTRA_ALARM_ADDRESS)) {
-            MapDestination address = intent.getParcelableExtra(EXTRA_ALARM_ADDRESS);
+        if (intent != null && intent.hasExtra(Constants.EXTRA_ALARM_DESTINATION)) {
+            MapDestination address = intent.getParcelableExtra(Constants.EXTRA_ALARM_DESTINATION);
             mMapProvider.setMapDestination(address);
 
             float radius = address.getRadius();
-            mRadiusSlider.setProgress((int) radius);
+            radiusSlider.setProgress((int) radius);
             mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         }
 
 
-        mRadiusSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        radiusSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 changeRadius(seekBar);
             }
@@ -76,19 +73,21 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
-        mUpdateLocationButton = findViewById(R.id.updateLocation);
-        mUpdateLocationButton.setOnClickListener(new View.OnClickListener() {
+        Button updateLocationButton = findViewById(R.id.updateLocation);
+        updateLocationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 MapDestination address = mMapProvider.getMapDestination();
                 if (address != null && address.getRadius() > 0) {
-                    Intent intent = new Intent(MapsActivity.this, DetailActivity.class);
-                    intent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, address);
+                    Intent intent = new Intent();
+                    intent.putExtra(Constants.EXTRA_ALARM_DESTINATION, address);
                     setResult(1, intent);
                     finish();
                 } else {
                     if(toast != null)
                         toast.cancel();
-                    toast = Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(getApplicationContext(),
+                            R.string.error_mandatory,
+                            Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }
@@ -116,7 +115,9 @@ public class MapsActivity extends AppCompatActivity {
             if(toast != null)
                 toast.cancel();
             //create toast for radius without selection on map
-            toast = Toast.makeText(getApplicationContext(), R.string.selection_order, Toast.LENGTH_SHORT);
+            toast = Toast.makeText(getApplicationContext(),
+                    R.string.selection_order,
+                    Toast.LENGTH_SHORT);
             toast.show();
             seekBar.setProgress(0);
             return;

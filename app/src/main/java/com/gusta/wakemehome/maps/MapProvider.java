@@ -7,16 +7,18 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.Locale;
 
 abstract class MapProvider {
+
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
-    static final LatLng DEFAULT_LOCATION = new LatLng(-33.8523341, 151.2106085);
-    //first usage of maps
-    static boolean isFirstUsage = false;
-    static final int DEFAULT_ZOOM = 15;
+    protected static final LatLng DEFAULT_LOCATION = new LatLng(-33.8523341, 151.2106085);
+    protected static final int DEFAULT_ZOOM = 15;
 
-    MapsActivity mMapsActivity;
-    MapDestination mMapDestination;
-    Geocoder mGeocoder;
+    //first usage of maps
+    protected static boolean isFirstUsage = false;
+
+    protected MapsActivity mMapsActivity;
+    protected MapDestination mMapDestination;
+    protected Geocoder mGeocoder;
 
     MapProvider(MapsActivity mapsActivity) {
         mMapsActivity = mapsActivity;

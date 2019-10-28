@@ -8,11 +8,12 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.os.Vibrator;
 
+import com.gusta.wakemehome.utilities.Constants;
+
 public class RingtonePlayingService extends Service {
 
     // Extras for ringtone uri as string and should vibrate
-    public static final String EXTRA_RINGTONE_URI = "extraRingtoneUri";
-    public static final String EXTRA_SHOULD_VIBRATE = "extraShouldVibrate";
+
 
     // Vibration length in milliseconds
     private static final long VIBRATION_TIME_MILLISECONDS = 500;
@@ -28,16 +29,16 @@ public class RingtonePlayingService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            if (intent.hasExtra(EXTRA_RINGTONE_URI)) {
-                Uri ringtoneUri = Uri.parse(intent.getStringExtra(EXTRA_RINGTONE_URI));
+            if (intent.hasExtra(Constants.EXTRA_RINGTONE_URI)) {
+                Uri ringtoneUri = Uri.parse(intent.getStringExtra(Constants.EXTRA_RINGTONE_URI));
 
                 this.ringtone = RingtoneManager.getRingtone(this, ringtoneUri);
                 ringtone.play();
             }
 
-            if (intent.hasExtra(EXTRA_SHOULD_VIBRATE)) {
+            if (intent.hasExtra(Constants.EXTRA_SHOULD_VIBRATE)) {
                 boolean shouldVibrate =
-                        intent.getBooleanExtra(EXTRA_SHOULD_VIBRATE, false);
+                        intent.getBooleanExtra(Constants.EXTRA_SHOULD_VIBRATE, false);
 
                 if (shouldVibrate) {
                     vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);

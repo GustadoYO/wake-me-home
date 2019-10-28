@@ -180,6 +180,8 @@ public final class NotificationUtils {
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
 
+        // TODO: Get destination activity class as parameter
+        //  (don't use MainActivity class explicitly)
         // Add the main Activity to the task stack as the parent.
         stackBuilder.addParentStack(MainActivity.class);
 

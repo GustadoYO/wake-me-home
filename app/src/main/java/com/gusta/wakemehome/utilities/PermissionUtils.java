@@ -15,12 +15,11 @@ import androidx.core.app.ActivityCompat;
 
 import com.gusta.wakemehome.BuildConfig;
 import com.gusta.wakemehome.R;
-import com.gusta.wakemehome.geofencing.GeofenceManager;
 
 public final class PermissionUtils {
 
     // Constant for logging
-    private static final String TAG = GeofenceManager.class.getSimpleName();
+    private static final String TAG = PermissionUtils.class.getSimpleName();
 
     /**
      * The interface to handle a task waiting for permission

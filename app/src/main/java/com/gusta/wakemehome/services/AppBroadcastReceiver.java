@@ -1,4 +1,4 @@
-package com.gusta.wakemehome.geofencing;
+package com.gusta.wakemehome.services;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,9 +6,6 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.util.Log;
 
-import com.gusta.wakemehome.services.GeofenceTransitionsJobIntentService;
-import com.gusta.wakemehome.services.NotificationActionsJobIntentService;
-import com.gusta.wakemehome.services.ReRegisterGeofencesJobIntentService;
 import com.gusta.wakemehome.utilities.Constants;
 
 /**
@@ -18,7 +15,7 @@ import com.gusta.wakemehome.utilities.Constants;
  * the transition type and geofence id(s) that triggered the transition. Creates a JobIntentService
  * that will handle the intent in the background.
  */
-public class GeofenceBroadcastReceiver extends BroadcastReceiver {
+public class AppBroadcastReceiver extends BroadcastReceiver {
 
     // Constant for logging
     private static final String TAG = BroadcastReceiver.class.getSimpleName();

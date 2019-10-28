@@ -10,10 +10,8 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
-import com.gusta.wakemehome.DetailActivity;
 import com.gusta.wakemehome.R;
 import com.gusta.wakemehome.database.AlarmEntry;
-import com.gusta.wakemehome.geofencing.GeofenceBroadcastReceiver;
 import com.gusta.wakemehome.geofencing.GeofenceErrorMessages;
 import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.NotificationUtils;
@@ -122,7 +120,7 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
             // TODO: Use JobScheduler to re-register geofences once location access is turned on
 
             // Create the settings button intent
-            Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+            Intent intent = new Intent(this, AppBroadcastReceiver.class);
             intent.setAction(Constants.ACTION_OPEN_SETTINGS);
 
             // Geofence service is not available now. Typically this is because the user turned off
@@ -161,8 +159,8 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
 
         // Play the selected ringtone. We use a Service in order to allow dismissing the alarm
         Intent startIntent = new Intent(this, RingtonePlayingService.class);
-        startIntent.putExtra(RingtonePlayingService.EXTRA_RINGTONE_URI, alarm.getAlert());
-        startIntent.putExtra(RingtonePlayingService.EXTRA_SHOULD_VIBRATE, alarm.isVibrate());
+        startIntent.putExtra(Constants.EXTRA_RINGTONE_URI, alarm.getAlert());
+        startIntent.putExtra(Constants.EXTRA_SHOULD_VIBRATE, alarm.isVibrate());
         this.startService(startIntent);
 
         // Get the transition details as a string and add alarm's location to form title
@@ -170,9 +168,8 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
         String NotificationTitle = geofenceTransitionString + " " + alarm.getLocation();
 
         // Create the dismiss button intent
-        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
-        //TODO change DetailActivity.EXTRA_ALARM_ID to constants
-        intent.putExtra(DetailActivity.EXTRA_ALARM_ID, alarm.getId());
+        Intent intent = new Intent(this, AppBroadcastReceiver.class);
+        intent.putExtra(Constants.EXTRA_ALARM_ID, alarm.getId());
         intent.setAction(Constants.ACTION_DISMISS_ALARM);
 
         // Send notification and log the transition details.
