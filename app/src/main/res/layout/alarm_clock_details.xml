@@ -45,6 +45,7 @@
 
         </LinearLayout>
 
+        <!-- TODO handle unlimited length-->
         <!-- Message edit -->
         <EditText
             android:id="@+id/message"
@@ -53,7 +54,8 @@
             app:layout_constraintTop_toBottomOf="@+id/alert"
             app:layout_constraintLeft_toLeftOf="parent"
             android:importantForAutofill="no"
-            android:inputType="text" />
+            android:inputType="text"
+            android:maxLength="45"/>
 
 
         <!-- Vibrate label -->

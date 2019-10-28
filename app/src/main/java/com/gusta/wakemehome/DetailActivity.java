@@ -27,16 +27,16 @@ import androidx.lifecycle.ViewModelProviders;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
-import com.gusta.wakemehome.maps.MapAddress;
+import com.gusta.wakemehome.maps.MapDestination;
 import com.gusta.wakemehome.maps.MapsActivity;
-import com.gusta.wakemehome.utilities.fileUtils;
+import com.gusta.wakemehome.utilities.FileUtils;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.DetailViewModel;
 import com.gusta.wakemehome.viewmodel.DetailViewModelFactory;
 
 import java.util.Objects;
 
-import static com.gusta.wakemehome.utilities.fileUtils.isPathExists;
+import static com.gusta.wakemehome.utilities.FileUtils.isPathExists;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -71,7 +71,7 @@ public class DetailActivity extends AppCompatActivity {
     // MEMBERS //
     //=========//
 
-    private MapAddress mMapAddress;                 // The current alarm address
+    private MapDestination mMapDestination;                 // The current alarm address
     private int mAlarmId;                           // The current alarm id
     private Uri mAlarmRingtone;                     // The current alarm ringtone
     private DetailViewModel mViewModel;             // The current alarm view model
@@ -116,7 +116,7 @@ public class DetailActivity extends AppCompatActivity {
             if (savedInstanceState.containsKey(INSTANCE_ALARM_ID))
                 mAlarmId = savedInstanceState.getInt(INSTANCE_ALARM_ID, DEFAULT_ALARM_ID);
             if (savedInstanceState.containsKey(INSTANCE_ALARM_ADDRESS_DATA)) {
-                mMapAddress = savedInstanceState.getParcelable(INSTANCE_ALARM_ADDRESS_DATA);
+                mMapDestination = savedInstanceState.getParcelable(INSTANCE_ALARM_ADDRESS_DATA);
             }
             if (savedInstanceState.containsKey(INSTANCE_ALARM_RINGTONE)) {
                 mAlarmRingtone = Uri.parse(savedInstanceState.getString(INSTANCE_ALARM_RINGTONE));
@@ -135,7 +135,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // Save alarm ID to state (to keep it in case of phone orientation change for example)
-        outState.putParcelable(INSTANCE_ALARM_ADDRESS_DATA, mMapAddress);
+        outState.putParcelable(INSTANCE_ALARM_ADDRESS_DATA, mMapDestination);
         outState.putInt(INSTANCE_ALARM_ID, mAlarmId);
         if(mAlarmRingtone != null)
             outState.putString(INSTANCE_ALARM_RINGTONE, mAlarmRingtone.toString());
@@ -162,8 +162,11 @@ public class DetailActivity extends AppCompatActivity {
                         return;
                     }
                     mAlarmId = alarmEntry.getId();
-                    mMapAddress = new MapAddress(alarmEntry.getLatitude(), alarmEntry.getLongitude(), alarmEntry.getLocation(), alarmEntry.getRadius());
+                    mMapDestination =
+                      new MapDestination(alarmEntry.getLatitude(), alarmEntry.getLongitude(),
+                                         alarmEntry.getLocation(), alarmEntry.getRadius());
                     mAlarmRingtone = alarmEntry.getAlert() != null ? Uri.parse(alarmEntry.getAlert()) : null;
+
                     // populate the UI
                     populateUI(alarmEntry);
                 }
@@ -176,13 +179,14 @@ public class DetailActivity extends AppCompatActivity {
         ImageView mapsImage = mDetailBinding.locationDetails.mapImage;
         //delete older map to be able to update map for existing map
         if(deleteTemp){
-            fileUtils.deleteTempImage();
+            FileUtils.deleteTempImage();
         }
-        String tempImagePath = fileUtils.getTempPath() ;
+        String tempImagePath = FileUtils.getTempPath();
         //if there is temp it'll be selected
         //temp image will delete on enter to existing alarm or on back without
         //saving on map activity otherwise we will take the temp file to show up
-        String imgPath = !isPathExists(tempImagePath) ? fileUtils.getMapImagePath(mAlarmId) : tempImagePath;
+        String imgPath =
+                !isPathExists(tempImagePath) ? FileUtils.getMapImagePath(mAlarmId) : tempImagePath;
 
         if(!isPathExists(imgPath)){
             mapsImage.setVisibility(View.GONE);
@@ -217,18 +221,19 @@ public class DetailActivity extends AppCompatActivity {
     public void onSaveButtonClicked() {
 
         //check for getting address data from map at all
-        if(mMapAddress == null){
+        if(mMapDestination == null){
             Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT)
                     .show();
             return;
         }
 
         // Parse numeric fields to their appropriate types
-        String location = mMapAddress.getLocation();
-        float radius = mMapAddress.getRadius();
-        double latitude = mMapAddress.getLatitude();
-        double longitude = mMapAddress.getLongitude();
-        String ringtone = mAlarmRingtone == null ? getDefaultRingtone().toString() : mAlarmRingtone.toString();
+        String location = mMapDestination.getLocation();
+        float radius = mMapDestination.getRadius();
+        double latitude = mMapDestination.getLatitude();
+        double longitude = mMapDestination.getLongitude();
+        String ringtone =
+          mAlarmRingtone == null ? getDefaultRingtone().toString() : mAlarmRingtone.toString();
 
         boolean vibrate = mDetailBinding.clockDetails.vibrate.isChecked();
         String message = mDetailBinding.clockDetails.message.getText().toString();
@@ -238,8 +243,9 @@ public class DetailActivity extends AppCompatActivity {
          */
 
         // Show error and abort save if one of the mandatory fields is empty
-        if (radius == 0 || location == null) {
-            Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT)
+        if (radius <= 0 || location == null) {
+            Toast.makeText(getApplicationContext(),
+                           R.string.error_mandatory, Toast.LENGTH_SHORT)
                     .show();
             return;
         }
@@ -279,7 +285,7 @@ public class DetailActivity extends AppCompatActivity {
                 } else {
                     mDb.alarmDao().updateAlarm(alarm);
                 }
-                fileUtils.saveMapImage(mAlarmId);
+                FileUtils.saveMapImage(mAlarmId);
                 finish();
             }
         });
@@ -300,17 +306,20 @@ public class DetailActivity extends AppCompatActivity {
         // Create a new intent to start an map activity
         Intent mapIntent =
                 new Intent(DetailActivity.this, MapsActivity.class);
-        if (mMapAddress != null && mMapAddress.getLocation() != null && mMapAddress.getRadius() > 0) {
-            MapAddress mapAddress = new MapAddress(mMapAddress.getLatitude(), mMapAddress.getLongitude(), mMapAddress.getLocation(), mMapAddress.getRadius());
-            mapIntent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, mapAddress);
+        if (mMapDestination != null && mMapDestination.getLocation() != null &&
+            mMapDestination.getRadius() >= 0) {
+            MapDestination mapDestination =
+              new MapDestination(mMapDestination.getLatitude(), mMapDestination.getLongitude(),
+                                 mMapDestination.getLocation(), mMapDestination.getRadius());
+            mapIntent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, mapDestination);
         }
         startActivityForResult(mapIntent, MAP_REQUEST_CODE);
 
     }
 
     /**
-     * pick ringtone from default android ringtone selector
-     * Note: this intent doesn't exist on the emulator
+     * pick ringtone from default android ringtone selector.
+     * Note: this intent doesn't exist on the emulator.
      */
     public void pickRingtone() {
         final Uri currentTone = getCurrentRingtone();
@@ -324,23 +333,24 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     /**
-     * default ringtone value of android
-     * @return
+     * Get default ringtone value of android device.
+     * @return Default ringtone value of android device.
      */
     private Uri getDefaultRingtone(){
-        return RingtoneManager.getActualDefaultRingtoneUri(DetailActivity.this, RingtoneManager.TYPE_ALARM);
+        return RingtoneManager.getActualDefaultRingtoneUri(DetailActivity.this,
+                RingtoneManager.TYPE_ALARM);
     }
 
     /**
-     * current could be the saved value when exist or android default
-     * @return
+     * Get current ringtone. If hasn't been chosen yet - returns device default.
+     * @return Current ringtone
      */
     private Uri getCurrentRingtone(){
         return mAlarmRingtone != null ? mAlarmRingtone : getDefaultRingtone();
     }
 
     /**
-     * set the ringtone name from relevant uri -> saved value or default ringtone value
+     * set the ringtone name from relevant uri -> saved value or default ringtone value.
      */
     private void setRingtoneName(){
         //select default ringtone when there isn't ringtone which chose
@@ -350,10 +360,10 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     /**
-     * return results from activities
-     * @param requestCode
-     * @param resultCode
-     * @param data
+     * Handle results from other activities.
+     * @param requestCode   The request asked to be performed by another activity.
+     * @param resultCode    The result code returned from the activity.
+     * @param data          The data returned from the activity.
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -365,7 +375,7 @@ public class DetailActivity extends AppCompatActivity {
         if (requestCode == MAP_REQUEST_CODE) {
             if (data != null && data.hasExtra(EXTRA_ALARM_ADDRESS)) {
                 // get coordinates (from intent)
-                mMapAddress = data.getParcelableExtra(EXTRA_ALARM_ADDRESS);
+                mMapDestination = data.getParcelableExtra(EXTRA_ALARM_ADDRESS);
             }
         }
         updateMapImage(false);

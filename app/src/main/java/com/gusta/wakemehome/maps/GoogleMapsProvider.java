@@ -25,8 +25,8 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.gusta.wakemehome.R;
+import com.gusta.wakemehome.utilities.FileUtils;
 import com.gusta.wakemehome.utilities.PermissionUtils;
-import com.gusta.wakemehome.utilities.fileUtils;
 
 import java.util.Arrays;
 
@@ -51,6 +51,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         super(mapsActivity);
 
         SupportMapFragment mapFragment = (SupportMapFragment) mMapsActivity.getSupportFragmentManager().findFragmentById(R.id.map);
+        assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
         // Initialize Places.
@@ -65,6 +66,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 mMapsActivity.getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        assert autocompleteFragment != null;
 
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
@@ -72,15 +74,15 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onPlaceSelected(Place place) {
+            public void onPlaceSelected(@NonNull Place place) {
 
-                LatLng cord = MapAddress.getCoordinatesAddress(mGeocoder, place.getName());
+                LatLng cord = MapDestination.getCoordinatesAddress(mGeocoder, place.getName());
                 setMarker(cord);
                 Log.d(TAG, "Place: " + place.getName() + ", " + place.getId());
             }
 
             @Override
-            public void onError(Status status) {
+            public void onError(@NonNull Status status) {
                 // TODO: Handle the error.
                 Log.i(TAG, "An error occurred: " + status);
             }
@@ -110,13 +112,13 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
             public void onMapClick(LatLng coordinates) {
 
                 setMarker(coordinates);
-                updateRadius(mMapAddress.getRadius());
+                updateRadius(mMapDestination.getRadius());
 
             }
         });
 
         // Check for first time and it's not came from detail activity
-        if (isFirstUsage && mMapAddress == null) {
+        if (isFirstUsage && mMapDestination == null) {
 
             // Set is not first time for next usage
             isFirstUsage = false;
@@ -132,8 +134,8 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
 
         } else {
 
-            setMarker(mMapAddress.getCoordinates());
-            updateRadius(mMapAddress.getRadius());
+            setMarker(mMapDestination.getCoordinates());
+            updateRadius(mMapDestination.getRadius());
 
         }
 
@@ -146,14 +148,14 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         // Setting the position for the marker
         markerOptions.position(coordinate);
 
-        if (mMapAddress == null) {
-            mMapAddress = new MapAddress(coordinate, 0, mGeocoder);
+        if (mMapDestination == null) {
+            mMapDestination = new MapDestination(coordinate, 0, mGeocoder);
         } else {
-            mMapAddress.setCoordinates(coordinate, mGeocoder);
+            mMapDestination.setCoordinates(coordinate, mGeocoder);
         }
         // Setting the title for the marker.
         // This will be displayed on taping the marker
-        markerOptions.title(mMapAddress.getLocation());
+        markerOptions.title(mMapDestination.getLocation());
 
         // Clears the previously touched position
         mMap.clear();
@@ -253,16 +255,17 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
 
     void updateRadius(float radius) {
 
+        if (radius <= 0) {
+            return;
+        }
+
         //remove the old circle
         if (mMapRadiusCircle != null) {
             mMapRadiusCircle.remove();
         }
+        mMapDestination.setRadius(radius);
 
-        if (radius > 0) {
-            mMapAddress.setRadius(radius);
-        }
-
-        LatLng coordinate = mMapAddress.getCoordinates();
+        LatLng coordinate = mMapDestination.getCoordinates();
 
         // Instantiating CircleOptions to draw a circle around the marker
         CircleOptions circleOptions = new CircleOptions();
@@ -289,11 +292,11 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
     }
 
     /**
-     * update zoon level calculate the different from default zoom level and radius selection for
+     * Update zoom level - calculate the different from default zoom level and radius selection for
      * zoom out in selection of radius
      *
-     * @param radius
-     * @return
+     * @param radius    The current radius to show on map.
+     * @return The delta between wanted zoom (according to radius) and default zoom.
      */
     private int getZoomLevel(float radius) {
         int zoomLevel = DEFAULT_ZOOM;
@@ -311,10 +314,9 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
             public void onSnapshotReady(Bitmap snapshot) {
                 //save to internal storage as temp.png and in case of alarm saving
                 //it'll change to alarm id.png so it'll be max 1 temp map snapshot file
-                fileUtils.createTempMapImage(snapshot);
+                FileUtils.createTempMapImage(snapshot);
             }
         };
-
         mMap.snapshot(callback);
     }
 

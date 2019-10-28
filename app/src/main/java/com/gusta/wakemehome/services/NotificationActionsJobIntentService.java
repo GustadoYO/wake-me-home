@@ -9,6 +9,7 @@ import androidx.core.app.JobIntentService;
 
 import com.gusta.wakemehome.DetailActivity;
 import com.gusta.wakemehome.database.AppDatabase;
+import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.NotificationUtils;
 
 /**
@@ -37,13 +38,23 @@ public class NotificationActionsJobIntentService extends JobIntentService {
      */
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
-        //TODO change DetailActivity.EXTRA_ALARM_ID & DetailActivity.DEFAULT_ALARM_ID to constants
-        int id = intent.getIntExtra(DetailActivity.EXTRA_ALARM_ID, DetailActivity.DEFAULT_ALARM_ID);
-        AppDatabase database = AppDatabase.getInstance(this.getApplication());
-        database.alarmDao().updateAlarmEnabled(id, false);
-        Intent stopIntent = new Intent(this, RingtonePlayingService.class);
-        this.stopService(stopIntent);
+        String action = intent.getAction();
+        Log.d(TAG, "action is: " + action);
+        assert action != null;
+
+        if (action.equals(Constants.ACTION_DISMISS_ALARM)) {
+            //TODO change DetailActivity.EXTRA_ALARM_ID & DetailActivity.DEFAULT_ALARM_ID to constants
+            int id = intent.getIntExtra(DetailActivity.EXTRA_ALARM_ID, DetailActivity.DEFAULT_ALARM_ID);
+            AppDatabase database = AppDatabase.getInstance(this.getApplication());
+            database.alarmDao().updateAlarmEnabled(id, false);
+            Intent stopIntent = new Intent(this, RingtonePlayingService.class);
+            this.stopService(stopIntent);
+        } else if (action.equals(Constants.ACTION_OPEN_SETTINGS)) {
+            Intent settingsIntent =
+                    new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(settingsIntent);
+        }
+
         NotificationUtils.cancelNotification(this);
     }
-
 }

@@ -121,14 +121,16 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
         if (errorCode == GeofenceStatusCodes.GEOFENCE_NOT_AVAILABLE) {
             // TODO: Use JobScheduler to re-register geofences once location access is turned on
 
+            // Create the settings button intent
+            Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+            intent.setAction(Constants.ACTION_OPEN_SETTINGS);
+
             // Geofence service is not available now. Typically this is because the user turned off
             // location access in settings > location access. Send error notification.
             NotificationUtils.notifyUser(this,
                     getString(R.string.geofence_not_available_title),
                     getString(R.string.geofence_not_available_text),
-                    getString(R.string.settings),
-                    new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-            );
+                    getString(R.string.settings), intent, false);
         }
     }
 
@@ -175,7 +177,7 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
 
         // Send notification and log the transition details.
         NotificationUtils.notifyUser(this, NotificationTitle, alarm.getMessage(),
-                getString(R.string.dismiss), intent);
+                getString(R.string.dismiss), intent, true);
     }
 
 }

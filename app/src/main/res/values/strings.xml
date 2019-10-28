@@ -11,7 +11,7 @@
 
     <!--By convention, "action" denotes that this String will be used as the label for an Action,-->
     <!--typically from the action bar.  The ActionBar is limited real estate, so shorter is better.-->
-    <string name="action_settings">Settings</string>
+    <string name="action_preferences">Preferences</string>
 
     <string name="error_message">
         An error has occurred. Please try again by clicking REFRESH
@@ -121,7 +121,7 @@
         Location services are unavailable - ALARMS WILL NOT TRIGGER!
     </string>
     <string name="geofence_not_available_text">
-        Was location access turned off? Click notification to go to settings
+        Click settings to check if location access was turned of
     </string>
 
     <string name="insufficient_permissions">Insufficient permissions.</string>
@@ -129,7 +129,7 @@
         Location permission is needed for core functionality
     </string>
     <string name="permission_denied_explanation">
-        Location permission wad denied - ALARMS WILL NOT TRIGGER!
+        Location permission was denied - ALARMS WILL NOT TRIGGER!
     </string>
 
     <string name="settings">Settings</string>
