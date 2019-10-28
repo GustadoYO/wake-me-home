@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
+import com.gusta.wakemehome.DetailActivity;
 import com.gusta.wakemehome.R;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.geofencing.GeofenceBroadcastReceiver;
@@ -168,6 +169,8 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
 
         // Create the dismiss button intent
         Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+        //TODO change DetailActivity.EXTRA_ALARM_ID to constants
+        intent.putExtra(DetailActivity.EXTRA_ALARM_ID, alarm.getId());
         intent.setAction(Constants.ACTION_DISMISS_ALARM);
 
         // Send notification and log the transition details.
