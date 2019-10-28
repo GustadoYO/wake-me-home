@@ -9,26 +9,26 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
-public class MapAddress implements Parcelable {
+public class MapDestination implements Parcelable {
     private LatLng coordinates;
     private float radius;
     private String location;
 
-    public MapAddress(LatLng coordinates, float radius, Geocoder geocoder) {
+    public MapDestination(LatLng coordinates, float radius, Geocoder geocoder) {
         this.coordinates = coordinates;
         if (coordinates != null)
             this.location = getAddress(geocoder, coordinates.latitude, coordinates.longitude);
         this.radius = radius;
     }
 
-    public MapAddress(String location, float radius, Geocoder geocoder) {
+    public MapDestination(String location, float radius, Geocoder geocoder) {
         this.location = location;
         this.radius = radius;
         if (location != null)
             this.coordinates = getCoordinatesAddress(geocoder, location);
     }
 
-    public MapAddress(double latitude, double longitude, String location, float radius) {
+    public MapDestination(double latitude, double longitude, String location, float radius) {
         this.coordinates = new LatLng(latitude, longitude);
         this.location = location;
         this.radius = radius;
@@ -73,8 +73,8 @@ public class MapAddress implements Parcelable {
         return location + " " + coordinates.toString();
     }
 
-    boolean isValidEntry() {
-        return !(getCoordinates() == null || getLocation() == null || getLocation().isEmpty() || getRadius() < 0);
+    boolean isValidAddress() {
+        return !(getCoordinates() == null || getLocation() == null || getLocation().isEmpty());
     }
 
     static String getAddress(Geocoder geocoder, double lat, double lng) {
@@ -108,7 +108,7 @@ public class MapAddress implements Parcelable {
     // Parcelable METHODS ///////
     /////////////////////////////
 
-    private MapAddress(Parcel in) {
+    private MapDestination(Parcel in) {
         double latitude = in.readDouble();
         double longitude = in.readDouble();
         coordinates = new LatLng(latitude, longitude);
@@ -127,13 +127,13 @@ public class MapAddress implements Parcelable {
         out.writeString(location);
     }
 
-    public static final Parcelable.Creator<MapAddress> CREATOR = new Parcelable.Creator<MapAddress>() {
-        public MapAddress createFromParcel(Parcel in) {
-            return new MapAddress(in);
+    public static final Parcelable.Creator<MapDestination> CREATOR = new Parcelable.Creator<MapDestination>() {
+        public MapDestination createFromParcel(Parcel in) {
+            return new MapDestination(in);
         }
 
-        public MapAddress[] newArray(int size) {
-            return new MapAddress[size];
+        public MapDestination[] newArray(int size) {
+            return new MapDestination[size];
         }
     };
 

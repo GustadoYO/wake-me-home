@@ -46,17 +46,17 @@ public class MapsActivity extends AppCompatActivity {
 
         // Check for saved state (like after phone orientation change) - and load it
         if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_MAPS_ADDRESS_DATA)) {
-            MapAddress address = savedInstanceState.getParcelable(INSTANCE_MAPS_ADDRESS_DATA);
+            MapDestination address = savedInstanceState.getParcelable(INSTANCE_MAPS_ADDRESS_DATA);
             assert address != null;
-            mMapProvider.setMapAddress(address);
+            mMapProvider.setMapDestination(address);
             float radius = address.getRadius();
             mRadiusSlider.setProgress((int) radius);
             mRadiusText.setText(UnitsUtils.formatLength(this, radius));
         }
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ALARM_ADDRESS)) {
-            MapAddress address = intent.getParcelableExtra(EXTRA_ALARM_ADDRESS);
-            mMapProvider.setMapAddress(address);
+            MapDestination address = intent.getParcelableExtra(EXTRA_ALARM_ADDRESS);
+            mMapProvider.setMapDestination(address);
 
             float radius = address.getRadius();
             mRadiusSlider.setProgress((int) radius);
@@ -79,8 +79,8 @@ public class MapsActivity extends AppCompatActivity {
         mUpdateLocationButton = findViewById(R.id.updateLocation);
         mUpdateLocationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                MapAddress address = mMapProvider.getMapAddress();
-                if (address != null && address.isValidEntry()) {
+                MapDestination address = mMapProvider.getMapDestination();
+                if (address != null && address.getRadius() > 0) {
                     Intent intent = new Intent(MapsActivity.this, DetailActivity.class);
                     intent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, address);
                     setResult(1, intent);
@@ -97,7 +97,7 @@ public class MapsActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(INSTANCE_MAPS_ADDRESS_DATA, mMapProvider.getMapAddress());
+        outState.putParcelable(INSTANCE_MAPS_ADDRESS_DATA, mMapProvider.getMapDestination());
         super.onSaveInstanceState(outState);
     }
 
@@ -111,7 +111,7 @@ public class MapsActivity extends AppCompatActivity {
 
     private void changeRadius(SeekBar seekBar) {
         //if address doesn't exist
-        if (mMapProvider.getMapAddress() == null) {
+        if (mMapProvider.getMapDestination() == null) {
             //keep toast to avoid multiple toasts on the screen
             if(toast != null)
                 toast.cancel();
