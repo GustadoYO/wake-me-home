@@ -15,7 +15,7 @@ abstract class MapProvider {
     static final int DEFAULT_ZOOM = 15;
 
     MapsActivity mMapsActivity;
-    MapAddress mMapAddress;
+    MapDestination mMapDestination;
     Geocoder mGeocoder;
 
     MapProvider(MapsActivity mapsActivity) {
@@ -26,15 +26,15 @@ abstract class MapProvider {
 
     abstract void updateRadius(float radius);
 
-    MapAddress getMapAddress() {
-        if (mMapAddress == null || !mMapAddress.isValidEntry()) {
+    MapDestination getMapDestination() {
+        if (mMapDestination == null || !mMapDestination.isValidAddress()) {
             return null;
         }
-        return mMapAddress;
+        return mMapDestination;
     }
 
-    void setMapAddress(MapAddress mMapAddress) {
-        this.mMapAddress = mMapAddress;
+    void setMapDestination(MapDestination mMapDestination) {
+        this.mMapDestination = mMapDestination;
     }
 
 }
