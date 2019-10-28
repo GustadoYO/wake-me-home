@@ -78,9 +78,8 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
 
                 Log.d(TAG, "Place: " + place.getName() + ", " + place.getId());
                 LatLng coordinates = MapDestination.getCoordinatesAddress(mGeocoder, place.getName());
-                if(coordinates != null) {
+                if(coordinates != null)
                     setMarker(coordinates);
-                }
                 if(mMapDestination != null)
                     updateRadius(mMapDestination.getRadius());
             }
