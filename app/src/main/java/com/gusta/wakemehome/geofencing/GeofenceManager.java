@@ -17,7 +17,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.gusta.wakemehome.R;
-import com.gusta.wakemehome.services.AppBroadcastReceiver;
 import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.NotificationUtils;
 import com.gusta.wakemehome.utilities.PermissionUtils;
@@ -74,6 +73,10 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      */
     private ContextWrapper mContextWrapper;
     /**
+     * The broadcast receiver that will listen to the transition events.
+     */
+    private Class<?> mBroadcastReceiverClass;
+    /**
      * The list of entries tracked - each entry will need a geofence.
      */
     private LiveData<? extends List<? extends GeofenceEntry>> mLiveData;
@@ -94,9 +97,10 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
     // PUBLIC METHODS //
     //================//
 
-    public GeofenceManager(ContextWrapper contextWrapper,
+    public GeofenceManager(ContextWrapper contextWrapper, Class<?> broadcastReceiverClass,
                            LiveData<? extends List<? extends GeofenceEntry>> liveData) {
         mContextWrapper = contextWrapper;
+        mBroadcastReceiverClass = broadcastReceiverClass;
         mLiveData = liveData;
         mGeofencingClient = LocationServices.getGeofencingClient(contextWrapper);
     }
@@ -203,7 +207,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
         if (mGeofencePendingIntent != null) {
             return mGeofencePendingIntent;
         }
-        Intent intent = new Intent(mContextWrapper, AppBroadcastReceiver.class);
+        Intent intent = new Intent(mContextWrapper, mBroadcastReceiverClass);
         intent.setAction(Constants.ACTION_GEOFENCE_TRANSITION_OCCURRED);
         // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
         // calling addGeofences() and removeGeofences().

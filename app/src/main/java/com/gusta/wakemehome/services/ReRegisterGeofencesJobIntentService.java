@@ -54,7 +54,8 @@ public class ReRegisterGeofencesJobIntentService extends GeofencingJobIntentServ
 
         // Init the geofence manager if needed
         if (mGeofenceManager == null) {
-            mGeofenceManager = new GeofenceManager(this, mAlarms);
+            mGeofenceManager =
+                    new GeofenceManager(this, AppBroadcastReceiver.class, mAlarms);
         }
 
         // Load all alarms. When loading will finish, the relevant geofences will be added

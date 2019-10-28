@@ -24,6 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.geofencing.GeofenceManager;
+import com.gusta.wakemehome.services.AppBroadcastReceiver;
 import com.gusta.wakemehome.utilities.FileUtils;
 import com.gusta.wakemehome.utilities.PermissionUtils;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
@@ -155,7 +156,9 @@ public class MainActivity extends AppCompatActivity implements
     private void setupViewModel() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         if (mGeofenceManager == null)
-            mGeofenceManager = new GeofenceManager(this, viewModel.getAlarms());
+            mGeofenceManager =
+                    new GeofenceManager(this, AppBroadcastReceiver.class,
+                            viewModel.getAlarms());
 
         viewModel.getAlarms().observe(this, new Observer<List<AlarmEntry>>() {
             @Override
