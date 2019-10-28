@@ -83,8 +83,7 @@ public class MapsActivity extends AppCompatActivity {
                 MapDestination address = mMapProvider.getMapDestination();
                 if (address != null && address.getRadius() > 0) {
                     // TODO: Class should not use DetailActivity class explicitly
-                    Intent intent =
-                            new Intent(MapsActivity.this, DetailActivity.class);
+                    Intent intent = new Intent();
                     intent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, address);
                     setResult(1, intent);
                     finish();
