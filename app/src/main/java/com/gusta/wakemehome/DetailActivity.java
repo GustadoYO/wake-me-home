@@ -46,6 +46,8 @@ public class DetailActivity extends AppCompatActivity {
 
     // Constant for logging
     private static final String TAG = DetailActivity.class.getSimpleName();
+    // TODO: Refactor use of constants for DEFAULT_ALARM_ID & EXTRA_ALARM_ID used in
+    //  NotificationAction and GeofenceTransitionsJobIntentService
     //default value for alarm id
     public static final int DEFAULT_ALARM_ID = -1;
     // Extra for the alarm ID to be received in the intent
@@ -160,11 +162,11 @@ public class DetailActivity extends AppCompatActivity {
                         return;
                     }
                     mAlarmId = alarmEntry.getId();
-                    mMapDestination = 
-                      new MapDestination(alarmEntry.getLatitude(), alarmEntry.getLongitude(), 
+                    mMapDestination =
+                      new MapDestination(alarmEntry.getLatitude(), alarmEntry.getLongitude(),
                                          alarmEntry.getLocation(), alarmEntry.getRadius());
                     mAlarmRingtone = alarmEntry.getAlert() != null ? Uri.parse(alarmEntry.getAlert()) : null;
-                  
+
                     // populate the UI
                     populateUI(alarmEntry);
                 }
@@ -230,7 +232,7 @@ public class DetailActivity extends AppCompatActivity {
         float radius = mMapDestination.getRadius();
         double latitude = mMapDestination.getLatitude();
         double longitude = mMapDestination.getLongitude();
-        String ringtone = 
+        String ringtone =
           mAlarmRingtone == null ? getDefaultRingtone().toString() : mAlarmRingtone.toString();
 
         boolean vibrate = mDetailBinding.clockDetails.vibrate.isChecked();
@@ -242,7 +244,7 @@ public class DetailActivity extends AppCompatActivity {
 
         // Show error and abort save if one of the mandatory fields is empty
         if (radius <= 0 || location == null) {
-            Toast.makeText(getApplicationContext(), 
+            Toast.makeText(getApplicationContext(),
                            R.string.error_mandatory, Toast.LENGTH_SHORT)
                     .show();
             return;
@@ -304,10 +306,10 @@ public class DetailActivity extends AppCompatActivity {
         // Create a new intent to start an map activity
         Intent mapIntent =
                 new Intent(DetailActivity.this, MapsActivity.class);
-        if (mMapDestination != null && mMapDestination.getLocation() != null && 
+        if (mMapDestination != null && mMapDestination.getLocation() != null &&
             mMapDestination.getRadius() >= 0) {
-            MapDestination mapDestination = 
-              new MapDestination(mMapDestination.getLatitude(), mMapDestination.getLongitude(), 
+            MapDestination mapDestination =
+              new MapDestination(mMapDestination.getLatitude(), mMapDestination.getLongitude(),
                                  mMapDestination.getLocation(), mMapDestination.getRadius());
             mapIntent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, mapDestination);
         }

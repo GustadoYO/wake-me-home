@@ -22,6 +22,9 @@ public interface AlarmDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateAlarm(AlarmEntry alarmEntry);
 
+    @Query("UPDATE alarm SET is_enabled = :enable WHERE id = :id")
+    void updateAlarmEnabled(int id, boolean enable);
+
     @Delete
     void deleteAlarm(AlarmEntry alarmEntry);
 
