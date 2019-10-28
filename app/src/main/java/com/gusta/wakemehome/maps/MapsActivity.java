@@ -45,7 +45,8 @@ public class MapsActivity extends AppCompatActivity {
         mMapProvider = new GoogleMapsProvider(this);
 
         // Check for saved state (like after phone orientation change) - and load it
-        if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_MAPS_ADDRESS_DATA)) {
+        if (savedInstanceState != null &&
+                savedInstanceState.containsKey(INSTANCE_MAPS_ADDRESS_DATA)) {
             MapDestination address = savedInstanceState.getParcelable(INSTANCE_MAPS_ADDRESS_DATA);
             assert address != null;
             mMapProvider.setMapDestination(address);
@@ -82,14 +83,17 @@ public class MapsActivity extends AppCompatActivity {
                 MapDestination address = mMapProvider.getMapDestination();
                 if (address != null && address.getRadius() > 0) {
                     // TODO: Class should not use DetailActivity class explicitly
-                    Intent intent = new Intent(MapsActivity.this, DetailActivity.class);
+                    Intent intent =
+                            new Intent(MapsActivity.this, DetailActivity.class);
                     intent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, address);
                     setResult(1, intent);
                     finish();
                 } else {
                     if(toast != null)
                         toast.cancel();
-                    toast = Toast.makeText(getApplicationContext(), R.string.error_mandatory, Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(getApplicationContext(),
+                            R.string.error_mandatory,
+                            Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }
@@ -117,7 +121,9 @@ public class MapsActivity extends AppCompatActivity {
             if(toast != null)
                 toast.cancel();
             //create toast for radius without selection on map
-            toast = Toast.makeText(getApplicationContext(), R.string.selection_order, Toast.LENGTH_SHORT);
+            toast = Toast.makeText(getApplicationContext(),
+                    R.string.selection_order,
+                    Toast.LENGTH_SHORT);
             toast.show();
             seekBar.setProgress(0);
             return;
