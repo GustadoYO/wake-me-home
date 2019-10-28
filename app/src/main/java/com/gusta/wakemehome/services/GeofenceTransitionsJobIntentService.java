@@ -12,7 +12,6 @@ import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 import com.gusta.wakemehome.R;
 import com.gusta.wakemehome.database.AlarmEntry;
-import com.gusta.wakemehome.geofencing.GeofenceBroadcastReceiver;
 import com.gusta.wakemehome.geofencing.GeofenceErrorMessages;
 import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.NotificationUtils;
@@ -121,7 +120,7 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
             // TODO: Use JobScheduler to re-register geofences once location access is turned on
 
             // Create the settings button intent
-            Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+            Intent intent = new Intent(this, AppBroadcastReceiver.class);
             intent.setAction(Constants.ACTION_OPEN_SETTINGS);
 
             // Geofence service is not available now. Typically this is because the user turned off
@@ -169,7 +168,7 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
         String NotificationTitle = geofenceTransitionString + " " + alarm.getLocation();
 
         // Create the dismiss button intent
-        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+        Intent intent = new Intent(this, AppBroadcastReceiver.class);
         intent.setAction(Constants.ACTION_DISMISS_ALARM);
 
         // Send notification and log the transition details.

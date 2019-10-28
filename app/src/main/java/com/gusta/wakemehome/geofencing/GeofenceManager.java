@@ -17,6 +17,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.gusta.wakemehome.R;
+import com.gusta.wakemehome.services.AppBroadcastReceiver;
 import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.NotificationUtils;
 import com.gusta.wakemehome.utilities.PermissionUtils;
@@ -44,6 +45,26 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
         ADD, REMOVE, NONE, UPDATE
     }
 
+    //============//
+    // INTERFACES //
+    //============//
+
+    /**
+     * An interface that an entry needs to implement in order to allow the GeofenceManager to
+     * register geofences based on this entry.
+     */
+    public interface GeofenceEntry {
+        int getId();
+
+        double getLatitude();
+
+        double getLongitude();
+
+        float getRadius();
+
+        boolean isEnabled();
+    }
+
     //=========//
     // MEMBERS //
     //=========//
@@ -64,7 +85,9 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
      * Used when requesting to add or remove geofences.
      */
     private PendingIntent mGeofencePendingIntent;
-
+    /**
+     * The task waiting to be done (waiting for permissions)
+     */
     private GeofenceTask mPendingGeofenceTask = GeofenceTask.NONE;
 
     //================//
@@ -180,7 +203,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
         if (mGeofencePendingIntent != null) {
             return mGeofencePendingIntent;
         }
-        Intent intent = new Intent(mContextWrapper, GeofenceBroadcastReceiver.class);
+        Intent intent = new Intent(mContextWrapper, AppBroadcastReceiver.class);
         intent.setAction(Constants.ACTION_GEOFENCE_TRANSITION_OCCURRED);
         // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
         // calling addGeofences() and removeGeofences().
@@ -286,6 +309,10 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
                 R.string.geofence_not_available_text, R.string.settings, intent,
                 false);
     }
+
+    //============================//
+    // PendingTaskHandler METHODS //
+    //============================//
 
     /**
      * Performs the geofencing task that was pending until location permission was granted or

@@ -57,7 +57,7 @@
 
         <!--The manifest entry for our geofencing broadcast receiver-->
         <receiver
-            android:name=".geofencing.GeofenceBroadcastReceiver"
+            android:name=".services.AppBroadcastReceiver"
             android:exported="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
