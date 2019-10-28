@@ -76,17 +76,17 @@ public class MainActivity extends AppCompatActivity implements
         // positions items within a RecyclerView into a linear list
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        /*
-         * Use this setting to improve performance if you know that changes in content do not
-         * change the child layout size in the RecyclerView
-         */
+        //
+        // Use this setting to improve performance if you know that changes in content do not
+        // change the child layout size in the RecyclerView
+        //
         mRecyclerView.setHasFixedSize(true);
 
 
-        /*
-         * floating action button hide the last item so adding padding
-         * enable last element to be able to display .
-         */
+        //
+        // floating action button hide the last item so adding padding
+        // enable last element to be able to display .
+        //
         mRecyclerView.setClipToPadding(false);
         mRecyclerView.setPadding(0,0,0,
                 getResources().getDimensionPixelOffset(R.dimen.main_activity_recycle_last_element_padding));
@@ -133,11 +133,11 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.d(TAG, "onCreate: registering preference changed listener");
 
-        /*
-         * Register MainActivity as an OnPreferenceChangedListener to receive a callback when a
-         * SharedPreference has changed. Please note that we must unregister MainActivity as an
-         * OnSharedPreferenceChanged listener in onDestroy to avoid any memory leaks.
-         */
+        //
+        // Register MainActivity as an OnPreferenceChangedListener to receive a callback when a
+        // SharedPreference has changed. Please note that we must unregister MainActivity as an
+        // OnSharedPreferenceChanged listener in onDestroy to avoid any memory leaks.
+        //
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
 
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
 
-        /* Unregister MainActivity as an OnPreferenceChangedListener to avoid any memory leaks. */
+        // Unregister MainActivity as an OnPreferenceChangedListener to avoid any memory leaks.
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
