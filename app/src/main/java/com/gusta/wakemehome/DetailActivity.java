@@ -46,7 +46,8 @@ public class DetailActivity extends AppCompatActivity {
 
     // Constant for logging
     private static final String TAG = DetailActivity.class.getSimpleName();
-    // TODO: Refactor use of constants for DEFAULT_ALARM_ID & EXTRA_ALARM_ID used in NotificationAction
+    // TODO: Refactor use of constants for DEFAULT_ALARM_ID & EXTRA_ALARM_ID used in
+    //  NotificationAction and GeofenceTransitionsJobIntentService
     //default value for alarm id
     public static final int DEFAULT_ALARM_ID = -1;
     // Extra for the alarm ID to be received in the intent
