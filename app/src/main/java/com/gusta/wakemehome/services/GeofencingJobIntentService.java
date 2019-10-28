@@ -67,6 +67,6 @@ abstract class GeofencingJobIntentService extends JobIntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mAlarms.removeObserver(mObserver);
+        if (mAlarms != null && mObserver != null) mAlarms.removeObserver(mObserver);
     }
 }

@@ -9,12 +9,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.gusta.wakemehome.DetailActivity;
 import com.gusta.wakemehome.R;
+import com.gusta.wakemehome.utilities.FileUtils;
 import com.gusta.wakemehome.utilities.UnitsUtils;
-import com.gusta.wakemehome.utilities.fileUtils;
 
 import static com.gusta.wakemehome.DetailActivity.EXTRA_ALARM_ADDRESS;
 
@@ -35,7 +36,9 @@ public class MapsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         mRadiusSlider = findViewById(R.id.radius_slider);
         mRadiusText = findViewById(R.id.seekBarInfoTextView);
@@ -44,6 +47,7 @@ public class MapsActivity extends AppCompatActivity {
         // Check for saved state (like after phone orientation change) - and load it
         if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_MAPS_ADDRESS_DATA)) {
             MapDestination address = savedInstanceState.getParcelable(INSTANCE_MAPS_ADDRESS_DATA);
+            assert address != null;
             mMapProvider.setMapDestination(address);
             float radius = address.getRadius();
             mRadiusSlider.setProgress((int) radius);
@@ -100,7 +104,7 @@ public class MapsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean isOptionSelected = super.onOptionsItemSelected(item);
-        fileUtils.deleteTempImage();
+        FileUtils.deleteTempImage();
         finish();
         return isOptionSelected;
     }

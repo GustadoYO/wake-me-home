@@ -34,18 +34,21 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         Log.d(TAG, "action is: " + action);
+        assert action != null;
 
         // Enqueues a JobIntentService passing the context and intent as parameters
-        assert action != null;
-        if (action.equals(Constants.ACTION_GEOFENCE_TRANSITION_OCCURRED)) {
-            GeofenceTransitionsJobIntentService.enqueueWork(context, intent);
-        }
-        if (action.equals(Intent.ACTION_BOOT_COMPLETED) ||
-                action.equals(LocationManager.PROVIDERS_CHANGED_ACTION)) {
-            ReRegisterGeofencesJobIntentService.enqueueWork(context, intent);
-        }
-        if (action.equals(Constants.ACTION_DISMISS_ALARM)) {
-            NotificationActionsJobIntentService.enqueueWork(context, intent);
+        switch (action) {
+            case Constants.ACTION_GEOFENCE_TRANSITION_OCCURRED:
+                GeofenceTransitionsJobIntentService.enqueueWork(context, intent);
+                break;
+            case Intent.ACTION_BOOT_COMPLETED:
+            case LocationManager.PROVIDERS_CHANGED_ACTION:
+                ReRegisterGeofencesJobIntentService.enqueueWork(context, intent);
+                break;
+            case Constants.ACTION_DISMISS_ALARM:
+            case Constants.ACTION_OPEN_SETTINGS:
+                NotificationActionsJobIntentService.enqueueWork(context, intent);
+                break;
         }
     }
 }

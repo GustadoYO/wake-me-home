@@ -24,8 +24,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.geofencing.GeofenceManager;
+import com.gusta.wakemehome.utilities.FileUtils;
 import com.gusta.wakemehome.utilities.PermissionUtils;
-import com.gusta.wakemehome.utilities.fileUtils;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.MainViewModel;
 
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
 
         //save the map dir in app data path
-        fileUtils.setMapsDir(this);
+        FileUtils.setMapsDir(this);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements
                         List<AlarmEntry> alarms = mAdapter.getAlarms();
                         AlarmEntry alarm = alarms.get(position);
                         mDb.alarmDao().deleteAlarm(alarm);
-                        fileUtils.deleteMapImage(alarm.getId());
+                        FileUtils.deleteMapImage(alarm.getId());
                     }
                 });
             }

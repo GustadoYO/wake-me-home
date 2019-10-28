@@ -283,7 +283,8 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
 
         // Notify the user about the error
         NotificationUtils.notifyUser(mContextWrapper, R.string.geofence_not_available_title,
-                R.string.geofence_not_available_text, R.string.settings, intent);
+                R.string.geofence_not_available_text, R.string.settings, intent,
+                false);
     }
 
     /**

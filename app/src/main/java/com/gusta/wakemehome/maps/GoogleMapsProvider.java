@@ -25,8 +25,8 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.gusta.wakemehome.R;
+import com.gusta.wakemehome.utilities.FileUtils;
 import com.gusta.wakemehome.utilities.PermissionUtils;
-import com.gusta.wakemehome.utilities.fileUtils;
 
 import java.util.Arrays;
 
@@ -51,6 +51,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         super(mapsActivity);
 
         SupportMapFragment mapFragment = (SupportMapFragment) mMapsActivity.getSupportFragmentManager().findFragmentById(R.id.map);
+        assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
         // Initialize Places.
@@ -65,6 +66,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 mMapsActivity.getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        assert autocompleteFragment != null;
 
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
@@ -72,7 +74,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onPlaceSelected(Place place) {
+            public void onPlaceSelected(@NonNull Place place) {
 
                 LatLng cord = MapDestination.getCoordinatesAddress(mGeocoder, place.getName());
                 setMarker(cord);
@@ -80,7 +82,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
             }
 
             @Override
-            public void onError(Status status) {
+            public void onError(@NonNull Status status) {
                 // TODO: Handle the error.
                 Log.i(TAG, "An error occurred: " + status);
             }
@@ -290,11 +292,11 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
     }
 
     /**
-     * update zoon level calculate the different from default zoom level and radius selection for
+     * Update zoom level - calculate the different from default zoom level and radius selection for
      * zoom out in selection of radius
      *
-     * @param radius
-     * @return
+     * @param radius    The current radius to show on map.
+     * @return The delta between wanted zoom (according to radius) and default zoom.
      */
     private int getZoomLevel(float radius) {
         int zoomLevel = DEFAULT_ZOOM;
@@ -312,7 +314,7 @@ public class GoogleMapsProvider extends MapProvider implements OnMapReadyCallbac
             public void onSnapshotReady(Bitmap snapshot) {
                 //save to internal storage as temp.png and in case of alarm saving
                 //it'll change to alarm id.png so it'll be max 1 temp map snapshot file
-                fileUtils.createTempMapImage(snapshot);
+                FileUtils.createTempMapImage(snapshot);
             }
         };
         mMap.snapshot(callback);
