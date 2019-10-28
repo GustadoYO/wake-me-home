@@ -2,6 +2,7 @@ package com.gusta.wakemehome.geofencing;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.provider.Settings;
@@ -75,7 +76,7 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
     /**
      * The broadcast receiver that will listen to the transition events.
      */
-    private Class<?> mBroadcastReceiverClass;
+    private Class<? extends BroadcastReceiver> mBroadcastReceiverClass;
     /**
      * The list of entries tracked - each entry will need a geofence.
      */
@@ -97,7 +98,8 @@ public class GeofenceManager implements PermissionUtils.PendingTaskHandler {
     // PUBLIC METHODS //
     //================//
 
-    public GeofenceManager(ContextWrapper contextWrapper, Class<?> broadcastReceiverClass,
+    public GeofenceManager(ContextWrapper contextWrapper,
+                           Class<? extends BroadcastReceiver> broadcastReceiverClass,
                            LiveData<? extends List<? extends GeofenceEntry>> liveData) {
         mContextWrapper = contextWrapper;
         mBroadcastReceiverClass = broadcastReceiverClass;
