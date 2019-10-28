@@ -159,8 +159,8 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
 
         // Play the selected ringtone. We use a Service in order to allow dismissing the alarm
         Intent startIntent = new Intent(this, RingtonePlayingService.class);
-        startIntent.putExtra(RingtonePlayingService.EXTRA_RINGTONE_URI, alarm.getAlert());
-        startIntent.putExtra(RingtonePlayingService.EXTRA_SHOULD_VIBRATE, alarm.isVibrate());
+        startIntent.putExtra(Constants.EXTRA_RINGTONE_URI, alarm.getAlert());
+        startIntent.putExtra(Constants.EXTRA_SHOULD_VIBRATE, alarm.isVibrate());
         this.startService(startIntent);
 
         // Get the transition details as a string and add alarm's location to form title

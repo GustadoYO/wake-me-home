@@ -25,6 +25,7 @@ import com.gusta.wakemehome.database.AlarmEntry;
 import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.geofencing.GeofenceManager;
 import com.gusta.wakemehome.services.AppBroadcastReceiver;
+import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.FileUtils;
 import com.gusta.wakemehome.utilities.PermissionUtils;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
@@ -240,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onItemClickListener(int itemId) {
         // Launch AddTaskActivity adding the itemId as an extra in the intent
         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-        intent.putExtra(DetailActivity.EXTRA_ALARM_ID, itemId);
+        intent.putExtra(Constants.EXTRA_ALARM_ID, itemId);
         startActivity(intent);
     }
 

@@ -29,6 +29,7 @@ import com.gusta.wakemehome.database.AppDatabase;
 import com.gusta.wakemehome.databinding.ActivityDetailBinding;
 import com.gusta.wakemehome.maps.MapDestination;
 import com.gusta.wakemehome.maps.MapsActivity;
+import com.gusta.wakemehome.utilities.Constants;
 import com.gusta.wakemehome.utilities.FileUtils;
 import com.gusta.wakemehome.viewmodel.AppExecutors;
 import com.gusta.wakemehome.viewmodel.DetailViewModel;
@@ -47,17 +48,13 @@ public class DetailActivity extends AppCompatActivity {
     // Constant for logging
     private static final String TAG = DetailActivity.class.getSimpleName();
     //default value for alarm id
-    public static final int DEFAULT_ALARM_ID = -1;
-    // Extra for the alarm ID to be received in the intent
-    public static final String EXTRA_ALARM_ID = "extraAlarmId";
-    // Extra for alarm address object from map provider
-    public static final String EXTRA_ALARM_ADDRESS = "alarmCoordinates";
+    private static final int DEFAULT_ALARM_ID = -1;
     // save alarm ID to be received after rotation
-    public static final String INSTANCE_ALARM_ID = "instanceAlarmId";
+    private static final String INSTANCE_ALARM_ID = "instanceAlarmId";
     // save alarm alert to be received after rotation
-    public static final String INSTANCE_ALARM_RINGTONE = "instanceAlarmAlert";
+    private static final String INSTANCE_ALARM_RINGTONE = "instanceAlarmAlert";
     // save alarm address to be received after rotation
-    public static final String INSTANCE_ALARM_ADDRESS_DATA = "instanceAlarmAddressData";
+    private static final String INSTANCE_ALARM_ADDRESS_DATA = "instanceAlarmAddressData";
 
     // map intent request code
     private static final int MAP_REQUEST_CODE = 1;
@@ -123,7 +120,7 @@ public class DetailActivity extends AppCompatActivity {
 
         // If ALARM_ID was sent, it is update mode (list item clicked)
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(EXTRA_ALARM_ID)) {
+        if (intent != null && intent.hasExtra(Constants.EXTRA_ALARM_ID)) {
             setAlarmData(intent);
         }
         updateMapImage(true);
@@ -144,7 +141,7 @@ public class DetailActivity extends AppCompatActivity {
         // If member alarm is new and there is ID from intent it should load from db
         if (mAlarmId == DEFAULT_ALARM_ID) {
 
-            mAlarmId = intent.getIntExtra(EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
+            mAlarmId = intent.getIntExtra(Constants.EXTRA_ALARM_ID, DEFAULT_ALARM_ID);
             // factory view model is used for sending parameters to the view model in our case
             // with alarm entry id to make sure we have one entity on our viewModel
             DetailViewModelFactory factory = new DetailViewModelFactory(mDb, mAlarmId);
@@ -309,7 +306,7 @@ public class DetailActivity extends AppCompatActivity {
             MapDestination mapDestination = 
               new MapDestination(mMapDestination.getLatitude(), mMapDestination.getLongitude(), 
                                  mMapDestination.getLocation(), mMapDestination.getRadius());
-            mapIntent.putExtra(DetailActivity.EXTRA_ALARM_ADDRESS, mapDestination);
+            mapIntent.putExtra(Constants.EXTRA_ALARM_DESTINATION, mapDestination);
         }
         startActivityForResult(mapIntent, MAP_REQUEST_CODE);
 
@@ -371,9 +368,9 @@ public class DetailActivity extends AppCompatActivity {
                 setRingtoneName();
         }
         if (requestCode == MAP_REQUEST_CODE) {
-            if (data != null && data.hasExtra(EXTRA_ALARM_ADDRESS)) {
+            if (data != null && data.hasExtra(Constants.EXTRA_ALARM_DESTINATION)) {
                 // get coordinates (from intent)
-                mMapDestination = data.getParcelableExtra(EXTRA_ALARM_ADDRESS);
+                mMapDestination = data.getParcelableExtra(Constants.EXTRA_ALARM_DESTINATION);
             }
         }
         updateMapImage(false);
