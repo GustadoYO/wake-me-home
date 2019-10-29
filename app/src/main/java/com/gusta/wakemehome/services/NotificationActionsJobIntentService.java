@@ -42,11 +42,21 @@ public class NotificationActionsJobIntentService extends JobIntentService {
         assert action != null;
 
         if (action.equals(Constants.ACTION_DISMISS_ALARM)) {
+
+            //re register geofences
+            Intent reEegisterIntent = new Intent(getBaseContext(),ReRegisterGeofencesJobIntentService.class);
+            ReRegisterGeofencesJobIntentService.enqueueWork(this, reEegisterIntent);
+
+            //disable dismiss alarm
             int id = intent.getIntExtra(Constants.EXTRA_ALARM_ID, Constants.DEFAULT_ALARM_ID);
-            AppDatabase database = AppDatabase.getInstance(this.getApplication());
-            database.alarmDao().updateAlarmEnabled(id, false);
-            Intent stopIntent = new Intent(this, RingtonePlayingService.class);
+            if(id != Constants.DEFAULT_ALARM_ID) {
+                AppDatabase database = AppDatabase.getInstance(this.getApplication());
+                database.alarmDao().updateAlarmEnabled(id, false);
+            }
+
+            Intent stopIntent = new Intent(getBaseContext(), RingtonePlayingService.class);
             this.stopService(stopIntent);
+
         } else if (action.equals(Constants.ACTION_OPEN_SETTINGS)) {
             Intent settingsIntent =
                     new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);

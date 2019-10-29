@@ -57,9 +57,7 @@ abstract class GeofencingJobIntentService extends JobIntentService {
     /**
      * Override method to implement the logic to run after alarms load.
      */
-    protected void onAlarmsLoaded() {
-        mAlarms.removeObserver(mObserver);
-    }
+    abstract void onAlarmsLoaded();
 
     /**
      * Clear observer.
