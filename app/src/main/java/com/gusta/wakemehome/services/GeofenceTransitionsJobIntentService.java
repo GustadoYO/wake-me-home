@@ -82,8 +82,6 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
      * Get the closest alarm that triggered - and trigger it.
      */
     protected void onAlarmsLoaded() {
-        super.onAlarmsLoaded();
-
         List<AlarmEntry> alarmEntries = mAlarms.getValue();
         assert alarmEntries != null;
 
@@ -97,7 +95,7 @@ public class GeofenceTransitionsJobIntentService extends GeofencingJobIntentServ
                             Integer.parseInt(geofence.getRequestId()))));
 
             // Choose alarm based on radius
-            if (relevantAlarm == null || relevantAlarm.getRadius() > currAlarm.getRadius()) {
+            if (relevantAlarm == null || (currAlarm != null && relevantAlarm.getRadius() > currAlarm.getRadius())) {
                 relevantAlarm = currAlarm;
             }
         }

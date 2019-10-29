@@ -263,7 +263,6 @@ public class DetailActivity extends AppCompatActivity {
                 Objects.requireNonNull(mViewModel.getAlarm().getValue()).isEnabled();
 
         // Save the added/updated alarm entity
-        //TODO add alert
         final AlarmEntry alarm;
         if (mAlarmId == Constants.DEFAULT_ALARM_ID) {
             alarm = new AlarmEntry(location, latitude, longitude, radius,
